@@ -52,10 +52,53 @@ const DIRECTION_COLORS: Record<string, string> = {
 
 const MIN_MONTH = 2022 * 12 + 1;
 const MAX_MONTH = 2027 * 12 + 1;
-const RANGE = MAX_MONTH - MIN_MONTH;
 
 // When user and frontier are within this many months, stagger labels vertically
 const CLOSE_THRESHOLD_MONTHS = 8;
+
+// Custom label renderer for marker labels with full positioning control
+function MarkerLabel({
+  viewBox,
+  label1,
+  label2,
+  color,
+  above,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  viewBox?: any;
+  label1: string;
+  label2: string;
+  color: string;
+  above: boolean; // true = above the bar, false = below
+}) {
+  if (!viewBox) return null;
+  const { x } = viewBox;
+  const yBase = above ? viewBox.y - 8 : viewBox.y + viewBox.height + 16;
+  const textAnchor = 'middle';
+  return (
+    <g>
+      <text
+        x={x}
+        y={yBase}
+        textAnchor={textAnchor}
+        fill={color}
+        fontSize={11}
+        fontWeight={700}
+      >
+        {label1}
+      </text>
+      <text
+        x={x}
+        y={yBase + (above ? -14 : 14)}
+        textAnchor={textAnchor}
+        fill="#6b7280"
+        fontSize={10}
+      >
+        {label2}
+      </text>
+    </g>
+  );
+}
 
 export function TimelinePosition({ timeline, adaptation, locale }: TimelinePositionProps) {
   const t = useTranslations('results');
@@ -74,17 +117,6 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
     projectedColor = DIRECTION_COLORS[adaptation.direction] ?? '#eab308';
   }
 
-  // Determine label anchor for edge avoidance
-  const userPct = ((userMonth - MIN_MONTH) / RANGE) * 100;
-  const frontierPct = ((frontierMonth - MIN_MONTH) / RANGE) * 100;
-  const userAnchor = userPct > 85 ? 'insideTopLeft' as const : 'top' as const;
-  // When close, frontier label goes below; otherwise handle edge
-  const frontierAnchor = markersAreClose
-    ? 'bottom' as const
-    : frontierPct > 85
-      ? 'insideTopLeft' as const
-      : 'top' as const;
-
   // Two invisible data points spanning the full domain to anchor the chart area
   const data = [
     { x: MIN_MONTH, y: 0.5 },
@@ -93,8 +125,10 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
 
   const yearTicks = [2022, 2023, 2024, 2025, 2026].map((y) => y * 12 + 1);
 
-  // Increase chart height when markers are close to make room for bottom labels
-  const chartHeight = markersAreClose ? 230 : 200;
+  // Frontier sub-label: when staggered, include gap info
+  const frontierSub = markersAreClose && timeline.frontierAheadMonths > 0
+    ? `${timeline.frontier} · ${timeline.frontierAheadMonths} ${t('monthsBehind')}`
+    : timeline.frontier;
 
   return (
     <motion.div
@@ -107,8 +141,8 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
           <CardTitle>{t('timelineTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={chartHeight}>
-            <ComposedChart data={data} margin={{ top: 40, right: 40, bottom: 40, left: 20 }}>
+          <ResponsiveContainer width="100%" height={220}>
+            <ComposedChart data={data} margin={{ top: 50, right: 30, bottom: 50, left: 30 }}>
               <XAxis
                 dataKey="x"
                 type="number"
@@ -169,7 +203,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                 radius={4}
               />
 
-              {/* Gap label between user and frontier */}
+              {/* Gap label between user and frontier — only when not staggered */}
               {timeline.frontierAheadMonths > 0 && !markersAreClose && (
                 <ReferenceArea
                   x1={userMonth}
@@ -229,38 +263,32 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                 strokeWidth={2}
               >
                 <Label
-                  value={`◆ ${t('you').toUpperCase()}`}
-                  position={userAnchor}
-                  offset={15}
-                  style={{ fontSize: 11, fill: '#121212', fontWeight: 700 }}
-                />
-                <Label
-                  value={timeline.timelinePositionLabel}
-                  position={userAnchor}
-                  offset={28}
-                  style={{ fontSize: 10, fill: '#6b7280' }}
+                  content={
+                    <MarkerLabel
+                      label1={`◆ ${t('you').toUpperCase()}`}
+                      label2={timeline.timelinePositionLabel}
+                      color="#121212"
+                      above={true}
+                    />
+                  }
                 />
               </ReferenceLine>
 
-              {/* Frontier marker line — below bar when close to user, above otherwise */}
+              {/* Frontier marker line — below bar when close, above otherwise */}
               <ReferenceLine
                 x={frontierMonth}
                 stroke="#FFAB54"
                 strokeWidth={2}
               >
                 <Label
-                  value={`★ ${t('frontier').toUpperCase()}`}
-                  position={frontierAnchor}
-                  offset={markersAreClose ? 8 : 15}
-                  style={{ fontSize: 11, fill: '#FFAB54', fontWeight: 700 }}
-                />
-                <Label
-                  value={markersAreClose
-                    ? `${timeline.frontier} · ${timeline.frontierAheadMonths} ${t('monthsBehind')}`
-                    : timeline.frontier}
-                  position={frontierAnchor}
-                  offset={markersAreClose ? 22 : 28}
-                  style={{ fontSize: 10, fill: '#6b7280' }}
+                  content={
+                    <MarkerLabel
+                      label1={`★ ${t('frontier').toUpperCase()}`}
+                      label2={frontierSub}
+                      color="#FFAB54"
+                      above={!markersAreClose}
+                    />
+                  }
                 />
               </ReferenceLine>
             </ComposedChart>
