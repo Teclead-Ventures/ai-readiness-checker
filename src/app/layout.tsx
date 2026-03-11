@@ -42,8 +42,18 @@ export default async function RootLayout({
             <main className="flex-1">
               {children}
             </main>
-            <footer className="text-center text-sm text-[#444D69] py-4 border-t border-gray-100 bg-white">
-              Powered by Teclead Ventures · AI Readiness Assessment
+            <footer className="text-center text-xs text-[#444D69] py-4 border-t border-gray-100 bg-white space-y-1">
+              <div>Powered by Teclead Ventures · AI Readiness Assessment</div>
+              <div className="text-[10px] text-gray-400">
+                {locale === 'de'
+                  ? 'Cookiefreie, anonyme Analyse · Keine personenbezogenen Daten'
+                  : 'Cookie-free, anonymous analytics · No personal data'}
+              </div>
+              <div className="text-[10px] text-gray-400">
+                <a href="https://teclead-ventures.de/impressum" target="_blank" rel="noopener noreferrer" className="hover:underline">Impressum</a>
+                {' · '}
+                <a href="https://teclead-ventures.de/datenschutz" target="_blank" rel="noopener noreferrer" className="hover:underline">Datenschutz</a>
+              </div>
             </footer>
           </TooltipProvider>
         </NextIntlClientProvider>
