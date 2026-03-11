@@ -1,0 +1,182 @@
+{
+  "common": {
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "export": "Export CSV",
+    "language": "Language",
+    "english": "English",
+    "german": "German",
+    "required": "Required",
+    "optional": "Optional",
+    "of": "of",
+    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment"
+  },
+  "landing": {
+    "headline": "How AI-Ready Is Your Team?",
+    "subhead": "Find out in 5 minutes. Get a personalized readiness score — then benchmark your entire team.",
+    "cta": "Start Assessment",
+    "teamLink": "Already have a team link?",
+    "teamLinkPlaceholder": "Paste your team link here"
+  },
+  "survey": {
+    "title": "AI Readiness Assessment",
+    "step": "Step {current} of {total}",
+    "trackSelection": {
+      "title": "I am a...",
+      "dev": "Developer",
+      "devDesc": "Software engineers, DevOps, data engineers",
+      "business": "Business / Management",
+      "businessDesc": "Managers, product owners, designers, operations"
+    },
+    "profile": {
+      "title": "About You",
+      "name": "Your name",
+      "namePlaceholder": "Enter your name",
+      "nameHint": "Optional if your team uses anonymous mode",
+      "role": "Role",
+      "rolePlaceholder": "Select your role",
+      "experience": "Years of experience",
+      "languages": "Primary programming languages",
+      "industry": "Industry",
+      "industryPlaceholder": "Select your industry",
+      "companySize": "Company size",
+      "companySizePlaceholder": "Select company size"
+    },
+    "selfAssessment": {
+      "titleBefore": "Self-Assessment (Before)",
+      "titleAfter": "Self-Assessment (After)",
+      "scoreLabel": "How would you rate your AI tool usage compared to what's possible?",
+      "scoreMin": "Not using AI",
+      "scoreMax": "Using everything available",
+      "utilizationLabel": "What percentage of your daily work is AI-assisted?",
+      "utilizationAfterLabel": "What percentage of your daily work is AI-assisted?",
+      "potentialLabel": "What percentage of your work COULD be AI-assisted?",
+      "confidenceLabel": "How confident are you that you know most AI tools relevant to your work?",
+      "confidenceMin": "Not confident",
+      "confidenceMax": "Very confident"
+    },
+    "currentUsage": {
+      "title": "Current AI Usage",
+      "tools": "Which AI tools do you use?",
+      "modes": "How do you interact with AI?",
+      "contexts": "In which contexts do you use AI?",
+      "frequency": "How often do you use AI tools?",
+      "frequencyPlaceholder": "Select frequency",
+      "config": "Which advanced configurations do you use?"
+    },
+    "mindset": {
+      "title": "Mindset & Barriers",
+      "openness": "How open are you to AI tools in your workflow?",
+      "opennessLevels": ["Resistant", "Skeptical", "Neutral", "Open", "Enthusiastic"],
+      "barriers": "What blocks you from using AI more?",
+      "priorityAreas": "Top 3 areas where you'd most want AI help"
+    },
+    "features": {
+      "title": "Feature Awareness",
+      "subtitle": "For each feature, select your familiarity level",
+      "dontKnow": "Don't know",
+      "knowIt": "Know it",
+      "useIt": "Use it",
+      "progress": "{count} of {total} answered",
+      "categoryScore": "Category score: {score}%"
+    },
+    "postAssessment": {
+      "title": "Final Thoughts",
+      "topCategories": "Which 3 categories would have the biggest impact on your work?",
+      "freeText": "Anything else you'd like to share?",
+      "freeTextPlaceholder": "Optional: your thoughts on AI in your workflow..."
+    },
+    "submitting": "Calculating your score..."
+  },
+  "results": {
+    "title": "Your AI Readiness Score",
+    "overall": "Overall Score",
+    "categories": "Category Breakdown",
+    "radar": "Readiness Radar",
+    "selfAwareness": "Self-Awareness Gap",
+    "selfAwarenessBefore": "Before seeing features",
+    "selfAwarenessAfter": "After seeing features",
+    "utilization": "Utilization Gap",
+    "utilizationCurrent": "Currently AI-assisted",
+    "utilizationPotential": "Could be AI-assisted",
+    "featureBreakdown": "Feature Awareness by Category",
+    "dontKnow": "Don't know",
+    "knowIt": "Know it",
+    "useIt": "Use it",
+    "opportunities": "Top Opportunities",
+    "opportunitiesDesc": "Based on your answers, your biggest opportunities are in:",
+    "teamCta": {
+      "title": "Want to see how your team compares?",
+      "description": "Create a team, share a link with your colleagues, and see aggregated results with a team dashboard.",
+      "button": "Check Your Team"
+    },
+    "scoreLabels": {
+      "gettingStarted": "Getting Started",
+      "buildingFoundations": "Building Foundations",
+      "proficient": "Proficient",
+      "advanced": "Advanced",
+      "pioneer": "Pioneer"
+    }
+  },
+  "team": {
+    "create": {
+      "title": "Create Your Team",
+      "name": "Team / Company Name",
+      "namePlaceholder": "e.g. Engineering Team",
+      "managerName": "Your Name",
+      "managerNamePlaceholder": "e.g. John Doe",
+      "managerEmail": "Your Email (optional)",
+      "managerEmailPlaceholder": "e.g. john@company.com",
+      "trackPreset": "Survey Track",
+      "trackBoth": "Both (members choose)",
+      "trackDev": "Developer only",
+      "trackBusiness": "Business only",
+      "anonymous": "Anonymous Mode",
+      "anonymousDesc": "Member names won't be visible in the dashboard",
+      "submit": "Create Team"
+    },
+    "created": {
+      "title": "Team Created!",
+      "shareLink": "Share this link with your team:",
+      "resultsLink": "Your team dashboard (bookmark this):",
+      "shareLinkDesc": "Team members use this link to take the survey",
+      "resultsLinkDesc": "View aggregated results here"
+    },
+    "dashboard": {
+      "title": "Team Dashboard",
+      "avgScore": "Team Average",
+      "responses": "Responses",
+      "shareLink": "Share Link",
+      "members": "Team Members",
+      "member": "Member",
+      "score": "Score",
+      "track": "Track",
+      "date": "Date",
+      "heatmap": "Category Heatmap",
+      "noResponses": "No responses yet. Share the survey link with your team to get started.",
+      "anonymous": "Anonymous"
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "stats": "Overview",
+    "totalResponses": "Total Responses",
+    "totalTeams": "Total Teams",
+    "avgScore": "Average Score",
+    "responses": "All Responses",
+    "teams": "All Teams",
+    "name": "Name",
+    "score": "Score",
+    "track": "Track",
+    "team": "Team",
+    "date": "Date",
+    "members": "Members",
+    "viewTeam": "View",
+    "viewResults": "View"
+  }
+}

@@ -1,0 +1,182 @@
+{
+  "common": {
+    "next": "Weiter",
+    "back": "Zurück",
+    "submit": "Absenden",
+    "loading": "Laden...",
+    "error": "Etwas ist schiefgelaufen",
+    "copy": "Kopieren",
+    "copied": "Kopiert!",
+    "export": "CSV exportieren",
+    "language": "Sprache",
+    "english": "English",
+    "german": "Deutsch",
+    "required": "Pflichtfeld",
+    "optional": "Optional",
+    "of": "von",
+    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment"
+  },
+  "landing": {
+    "headline": "Wie AI-ready ist dein Team?",
+    "subhead": "Finde es in 5 Minuten heraus. Erhalte deinen persönlichen Readiness-Score — und benchmarke dann dein ganzes Team.",
+    "cta": "Assessment starten",
+    "teamLink": "Bereits einen Team-Link?",
+    "teamLinkPlaceholder": "Team-Link hier einfügen"
+  },
+  "survey": {
+    "title": "AI Readiness Assessment",
+    "step": "Schritt {current} von {total}",
+    "trackSelection": {
+      "title": "Ich bin...",
+      "dev": "Entwickler/in",
+      "devDesc": "Software-Entwickler, DevOps, Data Engineers",
+      "business": "Business / Management",
+      "businessDesc": "Manager, Product Owner, Designer, Operations"
+    },
+    "profile": {
+      "title": "Über dich",
+      "name": "Dein Name",
+      "namePlaceholder": "Name eingeben",
+      "nameHint": "Optional bei anonymem Team-Modus",
+      "role": "Rolle",
+      "rolePlaceholder": "Rolle auswählen",
+      "experience": "Jahre Berufserfahrung",
+      "languages": "Primäre Programmiersprachen",
+      "industry": "Branche",
+      "industryPlaceholder": "Branche auswählen",
+      "companySize": "Unternehmensgröße",
+      "companySizePlaceholder": "Unternehmensgröße auswählen"
+    },
+    "selfAssessment": {
+      "titleBefore": "Selbsteinschätzung (Vorher)",
+      "titleAfter": "Selbsteinschätzung (Nachher)",
+      "scoreLabel": "Wie würdest du deine KI-Tool-Nutzung im Vergleich zum Möglichen bewerten?",
+      "scoreMin": "Nutze keine KI",
+      "scoreMax": "Nutze alles Verfügbare",
+      "utilizationLabel": "Wie viel Prozent deiner täglichen Arbeit ist KI-unterstützt?",
+      "utilizationAfterLabel": "Wie viel Prozent deiner täglichen Arbeit ist KI-unterstützt?",
+      "potentialLabel": "Wie viel Prozent deiner Arbeit KÖNNTE KI-unterstützt sein?",
+      "confidenceLabel": "Wie sicher bist du, dass du die meisten relevanten KI-Tools kennst?",
+      "confidenceMin": "Unsicher",
+      "confidenceMax": "Sehr sicher"
+    },
+    "currentUsage": {
+      "title": "Aktuelle KI-Nutzung",
+      "tools": "Welche KI-Tools nutzt du?",
+      "modes": "Wie interagierst du mit KI?",
+      "contexts": "In welchen Kontexten nutzt du KI?",
+      "frequency": "Wie oft nutzt du KI-Tools?",
+      "frequencyPlaceholder": "Häufigkeit auswählen",
+      "config": "Welche erweiterten Konfigurationen nutzt du?"
+    },
+    "mindset": {
+      "title": "Einstellung & Barrieren",
+      "openness": "Wie offen bist du für KI-Tools in deinem Arbeitsalltag?",
+      "opennessLevels": ["Ablehnend", "Skeptisch", "Neutral", "Offen", "Begeistert"],
+      "barriers": "Was hindert dich daran, KI mehr zu nutzen?",
+      "priorityAreas": "Top 3 Bereiche, in denen du dir am meisten KI-Hilfe wünschst"
+    },
+    "features": {
+      "title": "Feature-Bewusstsein",
+      "subtitle": "Für jedes Feature: Wähle deinen Bekanntheitsgrad",
+      "dontKnow": "Kenne ich nicht",
+      "knowIt": "Kenne ich",
+      "useIt": "Nutze ich",
+      "progress": "{count} von {total} beantwortet",
+      "categoryScore": "Kategorie-Score: {score}%"
+    },
+    "postAssessment": {
+      "title": "Abschließende Gedanken",
+      "topCategories": "Welche 3 Kategorien hätten den größten Impact auf deine Arbeit?",
+      "freeText": "Möchtest du noch etwas teilen?",
+      "freeTextPlaceholder": "Optional: Deine Gedanken zu KI in deinem Arbeitsalltag..."
+    },
+    "submitting": "Dein Score wird berechnet..."
+  },
+  "results": {
+    "title": "Dein AI Readiness Score",
+    "overall": "Gesamtscore",
+    "categories": "Kategorien-Aufschlüsselung",
+    "radar": "Readiness-Radar",
+    "selfAwareness": "Selbstwahrnehmungs-Lücke",
+    "selfAwarenessBefore": "Vor den Features",
+    "selfAwarenessAfter": "Nach den Features",
+    "utilization": "Nutzungs-Lücke",
+    "utilizationCurrent": "Aktuell KI-unterstützt",
+    "utilizationPotential": "Könnte KI-unterstützt sein",
+    "featureBreakdown": "Feature-Bewusstsein nach Kategorie",
+    "dontKnow": "Kenne ich nicht",
+    "knowIt": "Kenne ich",
+    "useIt": "Nutze ich",
+    "opportunities": "Top-Chancen",
+    "opportunitiesDesc": "Basierend auf deinen Antworten liegen deine größten Chancen in:",
+    "teamCta": {
+      "title": "Möchtest du sehen, wie dein Team abschneidet?",
+      "description": "Erstelle ein Team, teile den Link mit Kollegen und sieh aggregierte Ergebnisse im Team-Dashboard.",
+      "button": "Team erstellen"
+    },
+    "scoreLabels": {
+      "gettingStarted": "Erste Schritte",
+      "buildingFoundations": "Grundlagen aufbauen",
+      "proficient": "Kompetent",
+      "advanced": "Fortgeschritten",
+      "pioneer": "Pionier"
+    }
+  },
+  "team": {
+    "create": {
+      "title": "Team erstellen",
+      "name": "Team- / Firmenname",
+      "namePlaceholder": "z.B. Engineering Team",
+      "managerName": "Dein Name",
+      "managerNamePlaceholder": "z.B. Max Mustermann",
+      "managerEmail": "Deine E-Mail (optional)",
+      "managerEmailPlaceholder": "z.B. max@firma.de",
+      "trackPreset": "Survey-Track",
+      "trackBoth": "Beide (Teilnehmer wählen)",
+      "trackDev": "Nur Entwickler",
+      "trackBusiness": "Nur Business",
+      "anonymous": "Anonymer Modus",
+      "anonymousDesc": "Namen der Teilnehmer werden im Dashboard nicht angezeigt",
+      "submit": "Team erstellen"
+    },
+    "created": {
+      "title": "Team erstellt!",
+      "shareLink": "Teile diesen Link mit deinem Team:",
+      "resultsLink": "Dein Team-Dashboard (Lesezeichen setzen!):",
+      "shareLinkDesc": "Teammitglieder nutzen diesen Link für die Umfrage",
+      "resultsLinkDesc": "Aggregierte Ergebnisse hier ansehen"
+    },
+    "dashboard": {
+      "title": "Team-Dashboard",
+      "avgScore": "Team-Durchschnitt",
+      "responses": "Antworten",
+      "shareLink": "Teilen-Link",
+      "members": "Teammitglieder",
+      "member": "Mitglied",
+      "score": "Score",
+      "track": "Track",
+      "date": "Datum",
+      "heatmap": "Kategorien-Heatmap",
+      "noResponses": "Noch keine Antworten. Teile den Survey-Link mit deinem Team.",
+      "anonymous": "Anonym"
+    }
+  },
+  "admin": {
+    "title": "Admin-Dashboard",
+    "stats": "Übersicht",
+    "totalResponses": "Antworten gesamt",
+    "totalTeams": "Teams gesamt",
+    "avgScore": "Durchschnittsscore",
+    "responses": "Alle Antworten",
+    "teams": "Alle Teams",
+    "name": "Name",
+    "score": "Score",
+    "track": "Track",
+    "team": "Team",
+    "date": "Datum",
+    "members": "Mitglieder",
+    "viewTeam": "Ansehen",
+    "viewResults": "Ansehen"
+  }
+}
