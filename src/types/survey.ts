@@ -62,6 +62,10 @@ export interface SurveyFormData {
   confidence_after: number;
   top_impact_categories: string[];
   free_text?: string;
+
+  // Campaign attribution
+  campaign_src?: string | null;
+  campaign_cid?: string | null;
 }
 
 export type Scores = ScoreResult;

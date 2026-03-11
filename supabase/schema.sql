@@ -66,12 +66,43 @@ CREATE TABLE IF NOT EXISTS responses (
   free_text TEXT,
 
   -- Computed scores
-  scores JSONB NOT NULL DEFAULT '{}',
+  scores JSONB NOT NULL DEFAULT '{}'
+
+  -- Campaign attribution
+  campaign_src TEXT,
+  campaign_cid TEXT,
 
   created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Campaign visits tracking
+CREATE TABLE IF NOT EXISTS campaign_visits (
+  id          TEXT PRIMARY KEY DEFAULT nanoid(),
+  src         TEXT NOT NULL,
+  cid         TEXT,
+  path        TEXT NOT NULL,
+  visited_at  TIMESTAMPTZ DEFAULT now()
+);
+
+-- Form funnel tracking
+CREATE TABLE IF NOT EXISTS funnel_events (
+  id          TEXT PRIMARY KEY DEFAULT nanoid(),
+  session_id  TEXT NOT NULL,
+  src         TEXT,
+  track       TEXT,
+  step        TEXT NOT NULL,
+  action      TEXT NOT NULL CHECK (action IN ('enter', 'complete')),
+  created_at  TIMESTAMPTZ DEFAULT now()
 );
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_responses_team ON responses(team_id);
 CREATE INDEX IF NOT EXISTS idx_responses_track ON responses(track);
 CREATE INDEX IF NOT EXISTS idx_responses_created ON responses(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_responses_campaign_src ON responses(campaign_src);
+CREATE INDEX IF NOT EXISTS idx_campaign_visits_src ON campaign_visits(src);
+CREATE INDEX IF NOT EXISTS idx_campaign_visits_src_at ON campaign_visits(src, visited_at DESC);
+CREATE INDEX IF NOT EXISTS idx_funnel_session ON funnel_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_funnel_step ON funnel_events(step, action);
+CREATE INDEX IF NOT EXISTS idx_funnel_src_step ON funnel_events(src, step);
+CREATE INDEX IF NOT EXISTS idx_funnel_created ON funnel_events(created_at DESC);

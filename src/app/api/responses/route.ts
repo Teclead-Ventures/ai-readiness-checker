@@ -45,6 +45,8 @@ const surveySchema = z.object({
   confidence_after: z.number().min(1).max(5),
   top_impact_categories: z.array(z.string()),
   free_text: z.string().optional().default(''),
+  campaign_src: z.string().optional(),
+  campaign_cid: z.string().optional(),
 });
 
 export async function POST(request: NextRequest) {
