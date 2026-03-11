@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import {
   ComposedChart,
+  Line,
   XAxis,
   YAxis,
   ReferenceArea,
@@ -123,8 +124,11 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
   }
   const labelPositions = computeLabelPositions(markers, MIN_MONTH, MAX_MONTH);
 
-  // Dummy data point to render the chart area
-  const data = [{ x: MIN_MONTH, y: 0 }];
+  // Two invisible data points spanning the full domain to anchor the chart area
+  const data = [
+    { x: MIN_MONTH, y: 0.5 },
+    { x: MAX_MONTH, y: 0.5 },
+  ];
 
   const yearTicks = [2022, 2023, 2024, 2025, 2026].map((y) => y * 12 + 1);
 
@@ -152,6 +156,9 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                 tick={{ fontSize: 11, fill: '#6b7280' }}
               />
               <YAxis hide domain={[0, 1]} />
+
+              {/* Invisible line to anchor the chart coordinate system */}
+              <Line dataKey="y" stroke="transparent" dot={false} isAnimationActive={false} />
 
               {/* Era background bands */}
               {ERA_BANDS.map((band) => (

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import {
   ComposedChart,
+  Line,
   XAxis,
   YAxis,
   ReferenceArea,
@@ -118,7 +119,13 @@ export function TeamTimelineOverlay({
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={200}>
-            <ComposedChart margin={{ top: 30, right: 20, bottom: 40, left: 20 }}>
+            <ComposedChart
+              data={[
+                { x: MIN_MONTH, y: 0.5 },
+                { x: MAX_MONTH, y: 0.5 },
+              ]}
+              margin={{ top: 30, right: 20, bottom: 40, left: 20 }}
+            >
               <XAxis
                 dataKey="x"
                 type="number"
@@ -130,6 +137,9 @@ export function TeamTimelineOverlay({
                 tick={{ fontSize: 11, fill: '#6b7280' }}
               />
               <YAxis hide domain={[0, 1]} />
+
+              {/* Invisible line to anchor the chart coordinate system */}
+              <Line dataKey="y" stroke="transparent" dot={false} isAnimationActive={false} />
 
               {/* Era background bands */}
               {ERA_BANDS.map((band) => (
