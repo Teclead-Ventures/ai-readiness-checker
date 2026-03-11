@@ -52,51 +52,10 @@ const DIRECTION_COLORS: Record<string, string> = {
 
 const MIN_MONTH = 2022 * 12 + 1;
 const MAX_MONTH = 2027 * 12 + 1;
+const RANGE = MAX_MONTH - MIN_MONTH;
 
-// Compute label positions to avoid overlaps
-function computeLabelPositions(
-  markers: { key: string; month: number }[],
-  minMonth: number,
-  maxMonth: number,
-): Record<string, 'top' | 'insideTopLeft' | 'insideTopRight' | 'insideTop'> {
-  const range = maxMonth - minMonth;
-  const positions: Record<string, 'top' | 'insideTopLeft' | 'insideTopRight' | 'insideTop'> = {};
-
-  // Sort markers by month
-  const sorted = [...markers].sort((a, b) => a.month - b.month);
-
-  for (let i = 0; i < sorted.length; i++) {
-    const m = sorted[i];
-    const pct = ((m.month - minMonth) / range) * 100;
-
-    // Default to top
-    let pos: 'top' | 'insideTopLeft' | 'insideTopRight' | 'insideTop' = 'top';
-
-    // Near right edge — shift left
-    if (pct > 85) pos = 'insideTopLeft';
-    // Near left edge — shift right
-    else if (pct < 15) pos = 'insideTopRight';
-
-    // Check proximity to other markers
-    for (let j = 0; j < sorted.length; j++) {
-      if (i === j) continue;
-      const otherPct = ((sorted[j].month - minMonth) / range) * 100;
-      const dist = Math.abs(pct - otherPct);
-      if (dist < 8) {
-        // Too close — stagger: earlier marker goes left, later goes right
-        if (m.month <= sorted[j].month) {
-          pos = 'insideTopRight';
-        } else {
-          pos = 'insideTopLeft';
-        }
-      }
-    }
-
-    positions[m.key] = pos;
-  }
-
-  return positions;
-}
+// When user and frontier are within this many months, stagger labels vertically
+const CLOSE_THRESHOLD_MONTHS = 8;
 
 export function TimelinePosition({ timeline, adaptation, locale }: TimelinePositionProps) {
   const t = useTranslations('results');
@@ -104,6 +63,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
 
   const userMonth = dateToMonth(timeline.timelinePosition);
   const frontierMonth = dateToMonth(timeline.frontier);
+  const markersAreClose = Math.abs(frontierMonth - userMonth) < CLOSE_THRESHOLD_MONTHS;
 
   // Projected position
   let projectedMonth: number | null = null;
@@ -114,15 +74,16 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
     projectedColor = DIRECTION_COLORS[adaptation.direction] ?? '#eab308';
   }
 
-  // Build markers for label collision detection
-  const markers: { key: string; month: number }[] = [
-    { key: 'user', month: userMonth },
-    { key: 'frontier', month: frontierMonth },
-  ];
-  if (projectedMonth !== null) {
-    markers.push({ key: 'projected', month: projectedMonth });
-  }
-  const labelPositions = computeLabelPositions(markers, MIN_MONTH, MAX_MONTH);
+  // Determine label anchor for edge avoidance
+  const userPct = ((userMonth - MIN_MONTH) / RANGE) * 100;
+  const frontierPct = ((frontierMonth - MIN_MONTH) / RANGE) * 100;
+  const userAnchor = userPct > 85 ? 'insideTopLeft' as const : 'top' as const;
+  // When close, frontier label goes below; otherwise handle edge
+  const frontierAnchor = markersAreClose
+    ? 'insideBottomLeft' as const
+    : frontierPct > 85
+      ? 'insideTopLeft' as const
+      : 'top' as const;
 
   // Two invisible data points spanning the full domain to anchor the chart area
   const data = [
@@ -131,6 +92,9 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
   ];
 
   const yearTicks = [2022, 2023, 2024, 2025, 2026].map((y) => y * 12 + 1);
+
+  // Increase chart height when markers are close to make room for bottom labels
+  const chartHeight = markersAreClose ? 230 : 200;
 
   return (
     <motion.div
@@ -143,7 +107,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
           <CardTitle>{t('timelineTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={chartHeight}>
             <ComposedChart data={data} margin={{ top: 40, right: 20, bottom: 40, left: 20 }}>
               <XAxis
                 dataKey="x"
@@ -206,7 +170,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
               />
 
               {/* Gap label between user and frontier */}
-              {timeline.frontierAheadMonths > 0 && (
+              {timeline.frontierAheadMonths > 0 && !markersAreClose && (
                 <ReferenceArea
                   x1={userMonth}
                   x2={frontierMonth}
@@ -237,7 +201,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                 >
                   <Label
                     value={lang === 'de' ? 'Prognose' : 'Projected'}
-                    position={labelPositions['projected'] ?? 'top'}
+                    position="top"
                     offset={15}
                     style={{ fontSize: 10, fill: projectedColor, fontWeight: 600 }}
                   />
@@ -258,7 +222,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                 />
               )}
 
-              {/* User marker line */}
+              {/* User marker line — always labeled above */}
               <ReferenceLine
                 x={userMonth}
                 stroke="#121212"
@@ -266,19 +230,19 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
               >
                 <Label
                   value={`◆ ${t('you').toUpperCase()}`}
-                  position={labelPositions['user'] ?? 'top'}
+                  position={userAnchor}
                   offset={15}
                   style={{ fontSize: 11, fill: '#121212', fontWeight: 700 }}
                 />
                 <Label
                   value={timeline.timelinePositionLabel}
-                  position={labelPositions['user'] ?? 'top'}
+                  position={userAnchor}
                   offset={28}
                   style={{ fontSize: 10, fill: '#6b7280' }}
                 />
               </ReferenceLine>
 
-              {/* Frontier marker line */}
+              {/* Frontier marker line — below bar when close to user, above otherwise */}
               <ReferenceLine
                 x={frontierMonth}
                 stroke="#FFAB54"
@@ -286,14 +250,16 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
               >
                 <Label
                   value={`★ ${t('frontier').toUpperCase()}`}
-                  position={labelPositions['frontier'] ?? 'top'}
-                  offset={15}
+                  position={frontierAnchor}
+                  offset={markersAreClose ? 8 : 15}
                   style={{ fontSize: 11, fill: '#FFAB54', fontWeight: 700 }}
                 />
                 <Label
-                  value={timeline.frontier}
-                  position={labelPositions['frontier'] ?? 'top'}
-                  offset={28}
+                  value={markersAreClose
+                    ? `${timeline.frontier} · ${timeline.frontierAheadMonths} ${t('monthsBehind')}`
+                    : timeline.frontier}
+                  position={frontierAnchor}
+                  offset={markersAreClose ? 22 : 28}
                   style={{ fontSize: 10, fill: '#6b7280' }}
                 />
               </ReferenceLine>
