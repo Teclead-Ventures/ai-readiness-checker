@@ -21,7 +21,13 @@
     "subhead": "Finde es in 5 Minuten heraus. Erhalte deinen persönlichen Readiness-Score — und benchmarke dann dein ganzes Team.",
     "cta": "Assessment starten",
     "teamLink": "Bereits einen Team-Link?",
-    "teamLinkPlaceholder": "Team-Link hier einfügen"
+    "teamLinkPlaceholder": "Team-Link hier einfügen",
+    "feature1Title": "5-Minuten-Assessment",
+    "feature1Desc": "Bewerte die AI-Fähigkeiten deines Teams über 50+ Tools und Praktiken.",
+    "feature2Title": "Timeline-Positionierung",
+    "feature2Desc": "Sieh, wo dein Team auf der AI-Adoption-Timeline steht — und wie schnell sich die Lücke schließt.",
+    "feature3Title": "Team-Benchmarks",
+    "feature3Desc": "Vergleiche individuelle Scores, erkenne Stärken und identifiziere Wachstumsbereiche im Team."
   },
   "survey": {
     "title": "AI Readiness Assessment",

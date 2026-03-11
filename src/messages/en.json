@@ -21,7 +21,13 @@
     "subhead": "Find out in 5 minutes. Get a personalized readiness score — then benchmark your entire team.",
     "cta": "Start Assessment",
     "teamLink": "Already have a team link?",
-    "teamLinkPlaceholder": "Paste your team link here"
+    "teamLinkPlaceholder": "Paste your team link here",
+    "feature1Title": "5-Minute Assessment",
+    "feature1Desc": "Rate your team's AI capabilities across 50+ tools and practices.",
+    "feature2Title": "Timeline Positioning",
+    "feature2Desc": "See where you stand on the AI adoption timeline — and how fast the gap is closing.",
+    "feature3Title": "Team Benchmarks",
+    "feature3Desc": "Compare individual scores, spot strengths, and identify growth areas as a team."
   },
   "survey": {
     "title": "AI Readiness Assessment",

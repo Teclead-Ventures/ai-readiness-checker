@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Suspense, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -40,7 +41,35 @@ function HomeContent() {
           </Link>
         </div>
 
-        <Card className="mt-12 max-w-md mx-auto border border-gray-200 shadow-none">
+        {/* Feature highlights */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
+          {([
+            { icon: '⏱', titleKey: 'feature1Title' as const, descKey: 'feature1Desc' as const },
+            { icon: '📍', titleKey: 'feature2Title' as const, descKey: 'feature2Desc' as const },
+            { icon: '📊', titleKey: 'feature3Title' as const, descKey: 'feature3Desc' as const },
+          ]).map((feature, i) => (
+            <motion.div
+              key={feature.titleKey}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 + i * 0.15 }}
+            >
+              <Card className="border border-gray-100 shadow-sm h-full">
+                <CardContent className="pt-5 text-center space-y-2">
+                  <div className="text-2xl">{feature.icon}</div>
+                  <h3 className="font-semibold text-[#121212] text-sm">
+                    {t(`landing.${feature.titleKey}`)}
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {t(`landing.${feature.descKey}`)}
+                  </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        <Card className="mt-8 max-w-md mx-auto border border-gray-200 shadow-none">
           <CardContent className="pt-6">
             <p className="text-sm text-gray-500 mb-3">{t('landing.teamLink')}</p>
             <div className="flex gap-2">
