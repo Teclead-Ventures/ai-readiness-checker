@@ -66,6 +66,7 @@ export default function AdminPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [scoreFilter, setScoreFilter] = useState<string>('all');
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -141,6 +142,56 @@ export default function AdminPage() {
           </Card>
         </Link>
       </div>
+
+      {/* Reset database button */}
+      <Card className="border-red-200 bg-red-50">
+        <CardContent className="flex items-center justify-between py-4">
+          <div>
+            <p className="text-sm font-medium text-red-800">
+              {locale === 'de' ? 'Testdaten zurucksetzen' : 'Reset Test Data'}
+            </p>
+            <p className="text-xs text-red-600">
+              {locale === 'de'
+                ? 'Alle Antworten, Teams, Kampagnen-Besuche und Funnel-Events loschen.'
+                : 'Delete all responses, teams, campaign visits, and funnel events.'}
+            </p>
+          </div>
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={resetting}
+            onClick={async () => {
+              const confirmed = window.confirm(
+                locale === 'de'
+                  ? 'Wirklich ALLE Daten loschen? Diese Aktion kann nicht ruckgangig gemacht werden.'
+                  : 'Really delete ALL data? This action cannot be undone.'
+              );
+              if (!confirmed) return;
+              setResetting(true);
+              try {
+                const res = await fetch('/api/admin/reset', { method: 'DELETE' });
+                if (res.ok) {
+                  setResponses([]);
+                  setTeams([]);
+                  setStats(null);
+                  window.location.reload();
+                } else {
+                  alert('Reset failed. Check console.');
+                }
+              } catch (err) {
+                console.error('Reset error:', err);
+                alert('Reset failed.');
+              } finally {
+                setResetting(false);
+              }
+            }}
+          >
+            {resetting
+              ? (locale === 'de' ? 'Wird geloscht...' : 'Clearing...')
+              : (locale === 'de' ? 'Alle Daten loschen' : 'Clear All Data')}
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Stats cards */}
       {stats && (
