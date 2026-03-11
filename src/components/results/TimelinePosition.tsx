@@ -80,7 +80,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
   const userAnchor = userPct > 85 ? 'insideTopLeft' as const : 'top' as const;
   // When close, frontier label goes below; otherwise handle edge
   const frontierAnchor = markersAreClose
-    ? 'insideBottomLeft' as const
+    ? 'bottom' as const
     : frontierPct > 85
       ? 'insideTopLeft' as const
       : 'top' as const;
@@ -108,7 +108,7 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={chartHeight}>
-            <ComposedChart data={data} margin={{ top: 40, right: 20, bottom: 40, left: 20 }}>
+            <ComposedChart data={data} margin={{ top: 40, right: 40, bottom: 40, left: 20 }}>
               <XAxis
                 dataKey="x"
                 type="number"
