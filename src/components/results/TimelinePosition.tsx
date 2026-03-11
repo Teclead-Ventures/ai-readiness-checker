@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TimelinePositionProps {
   timeline: ScoreResult['timeline'];
+  adaptation?: ScoreResult['adaptation'];
   locale: string;
 }
 
@@ -26,18 +27,46 @@ function monthToFraction(dateStr: string, minMonth: number, range: number): numb
   return ((month - minMonth) / range) * 100;
 }
 
-export function TimelinePosition({ timeline, locale }: TimelinePositionProps) {
+function monthsBetween(a: string, b: string): number {
+  const [ay, am] = a.split('-').map(Number);
+  const [by, bm] = b.split('-').map(Number);
+  return (by - ay) * 12 + (bm - am);
+}
+
+function subtractMonths(dateStr: string, months: number): string {
+  const [y, m] = dateStr.split('-').map(Number);
+  const totalMonths = y * 12 + m - months;
+  const newYear = Math.floor(totalMonths / 12);
+  const newMonth = totalMonths % 12 || 12;
+  return `${newYear}-${String(newMonth).padStart(2, '0')}`;
+}
+
+const DIRECTION_COLORS: Record<string, string> = {
+  closing: '#22c55e',
+  stable: '#eab308',
+  widening: '#ef4444',
+};
+
+export function TimelinePosition({ timeline, adaptation, locale }: TimelinePositionProps) {
   const t = useTranslations('results');
   const lang = locale as 'en' | 'de';
 
-  const minDate = '2022-01';
-  const maxDate = '2027-01';
   const minMonth = 2022 * 12 + 1;
   const maxMonth = 2027 * 12 + 1;
   const range = maxMonth - minMonth;
 
   const userPos = monthToFraction(timeline.timelinePosition, minMonth, range);
   const frontierPos = monthToFraction(timeline.frontier, minMonth, range);
+
+  // Calculate projected position
+  let projectedPos: number | null = null;
+  let projectedColor = '#eab308';
+  if (adaptation) {
+    const projectedDate = subtractMonths(timeline.frontier, adaptation.projectedGap12Months);
+    projectedPos = monthToFraction(projectedDate, minMonth, range);
+    projectedPos = Math.max(0, Math.min(projectedPos, 100));
+    projectedColor = DIRECTION_COLORS[adaptation.direction] ?? '#eab308';
+  }
 
   const yearMarkers = [2022, 2023, 2024, 2025, 2026];
 
@@ -112,6 +141,55 @@ export function TimelinePosition({ timeline, locale }: TimelinePositionProps) {
                 {timeline.frontier}
               </span>
             </motion.div>
+
+            {/* Projected position line */}
+            {adaptation && projectedPos !== null && (
+              <>
+                {/* Dashed connecting line from current to projected */}
+                <div
+                  className="absolute"
+                  style={{
+                    left: `${Math.min(userPos, projectedPos)}%`,
+                    width: `${Math.abs(projectedPos - userPos)}%`,
+                    top: '3.25rem',
+                    height: '0px',
+                    borderTop: `2px dashed ${projectedColor}`,
+                    opacity: 0.5,
+                  }}
+                />
+
+                {/* Projected dashed vertical line */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="absolute"
+                  style={{
+                    left: `${Math.min(projectedPos, 98)}%`,
+                    top: '0.5rem',
+                    bottom: '4rem',
+                    width: '0px',
+                    borderLeft: `2px dashed ${projectedColor}`,
+                  }}
+                />
+
+                {/* Projected label */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.65 }}
+                  className="absolute flex flex-col items-center"
+                  style={{ left: `${Math.min(projectedPos, 96)}%`, top: '0' }}
+                >
+                  <span
+                    className="text-[9px] font-semibold whitespace-nowrap"
+                    style={{ color: projectedColor }}
+                  >
+                    {lang === 'de' ? 'Prognose' : 'Projected'}
+                  </span>
+                </motion.div>
+              </>
+            )}
 
             {/* Gap label */}
             {timeline.frontierAheadMonths > 0 && (

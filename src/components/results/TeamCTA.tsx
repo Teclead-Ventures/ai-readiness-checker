@@ -1,13 +1,20 @@
 'use client';
 
+import { useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 
 export function TeamCTA() {
   const t = useTranslations('results.teamCta');
+  const { trackStep } = useFunnelTracking();
+
+  const handleCtaClick = useCallback(() => {
+    trackStep('team_cta', 'enter');
+  }, [trackStep]);
 
   return (
     <motion.div
@@ -23,6 +30,7 @@ export function TeamCTA() {
           <Button
             size="lg"
             className="bg-[#121212] text-white hover:bg-gray-800 rounded-lg font-bold"
+            onClick={handleCtaClick}
             render={<a href="/team/new" />}
           >
             {t('button')}

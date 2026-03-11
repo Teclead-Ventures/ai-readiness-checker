@@ -1,7 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { SurveyResponse } from '@/types/survey';
+import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ReadinessGauge } from '@/components/results/ReadinessGauge';
 import { TimelinePosition } from '@/components/results/TimelinePosition';
@@ -20,6 +22,11 @@ interface ResultsContentProps {
 
 export function ResultsContent({ response, locale }: ResultsContentProps) {
   const t = useTranslations('results');
+  const { trackStep } = useFunnelTracking(response.track);
+
+  useEffect(() => {
+    trackStep('results_view', 'enter');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
@@ -37,6 +44,7 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       {/* 2. Timeline Position (hero) */}
       <TimelinePosition
         timeline={response.scores.timeline}
+        adaptation={response.scores.adaptation}
         locale={locale}
       />
 

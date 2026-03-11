@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { StepProgress } from './StepProgress';
@@ -14,9 +15,12 @@ import { CurrentUsageStep } from './CurrentUsageStep';
 import { MindsetStep } from './MindsetStep';
 import { FeatureMatrixStep } from './FeatureMatrixStep';
 import { FreeTextStep } from './FreeTextStep';
+import { getCampaignFromSession } from '@/lib/campaign';
 import type { Track, SurveyFormData } from '@/types/survey';
 
 const TOTAL_STEPS = 8;
+
+const STEP_IDS = ['track_select', 'profile', 'pre_assessment', 'current_usage', 'mindset', 'feature_matrix', 'post_assessment', 'free_text'] as const;
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -85,6 +89,23 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   });
 
   const track = methods.watch('track');
+  const { trackStep } = useFunnelTracking(track);
+  const prevStepRef = useRef(step);
+
+  // Fire survey_start on mount
+  useEffect(() => {
+    trackStep('survey_start', 'enter');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track step transitions
+  useEffect(() => {
+    const previousStep = prevStepRef.current;
+    if (previousStep !== step) {
+      trackStep(STEP_IDS[previousStep], 'complete');
+      trackStep(STEP_IDS[step], 'enter');
+      prevStepRef.current = step;
+    }
+  }, [step, trackStep]);
 
   const updateStepInUrl = useCallback(
     (newStep: number) => {
@@ -152,20 +173,26 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
     async (data: SurveyFormData) => {
       setSubmitting(true);
       try {
+        const campaign = getCampaignFromSession();
         const res = await fetch('/api/responses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify({
+            ...data,
+            campaign_src: campaign.src || undefined,
+            campaign_cid: campaign.cid || undefined,
+          }),
         });
         if (!res.ok) throw new Error('Submit failed');
         const { id } = await res.json();
+        trackStep('submit', 'complete');
         router.push(`/survey/${id}/results`);
       } catch {
         setSubmitting(false);
         alert(tCommon('error'));
       }
     },
-    [router, tCommon],
+    [router, tCommon, trackStep],
   );
 
   const isLastStep = step === TOTAL_STEPS - 1;

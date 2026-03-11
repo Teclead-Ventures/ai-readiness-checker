@@ -2,14 +2,25 @@
 
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
+import { Suspense, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import { useCampaignTracking } from '@/hooks/useCampaignTracking';
+import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 
-export default function Home() {
+function HomeContent() {
   const t = useTranslations();
   const [teamLink, setTeamLink] = useState('');
+  const { src, cid } = useCampaignTracking();
+  const { trackStep } = useFunnelTracking();
+
+  useEffect(() => {
+    trackStep('landing', 'enter');
+  }, [trackStep]);
+
+  const surveyHref = `/survey${src ? '?src=' + src + (cid ? '&cid=' + cid : '') : ''}`;
 
   return (
     <div className="flex flex-col items-center justify-center px-4 py-16 md:py-24">
@@ -22,7 +33,7 @@ export default function Home() {
         </p>
 
         <div className="pt-4">
-          <Link href="/survey">
+          <Link href={surveyHref} onClick={() => trackStep('landing', 'complete')}>
             <Button size="lg" className="bg-[#FFAB54] hover:bg-[#FFAB54]/90 text-[#121212] font-bold text-lg px-8 py-6 rounded-xl">
               {t('landing.cta')}
             </Button>
@@ -60,5 +71,13 @@ export default function Home() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense>
+      <HomeContent />
+    </Suspense>
   );
 }
