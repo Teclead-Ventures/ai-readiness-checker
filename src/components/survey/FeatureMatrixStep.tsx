@@ -85,7 +85,7 @@ function TierSection({
         />
         <div className="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span className="text-sm font-semibold text-foreground">
-            Tier {tier} — {tierName} ({era})
+            Tier {tier} — {tierName}
           </span>
           <span className="text-xs text-muted-foreground">
             {answered}/{total} done

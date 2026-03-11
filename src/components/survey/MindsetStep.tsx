@@ -27,7 +27,7 @@ export function MindsetStep({ track }: MindsetStepProps) {
 
   const tierOptions = ([1, 2, 3, 4, 5] as const).map((tier) => ({
     key: `tier_${tier}`,
-    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]} (${TIER_CONFIG[tier].era})`,
+    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]}`,
   }));
 
   return (
