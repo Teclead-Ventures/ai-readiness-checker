@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
     // Query campaign_visits grouped by src and date
     let visitsQuery = supabase
       .from('campaign_visits')
-      .select('src, cid, created_at');
+      .select('src, cid, visited_at');
 
     if (srcFilter) {
       visitsQuery = visitsQuery.eq('src', srcFilter);
@@ -97,7 +97,7 @@ export async function GET(request: NextRequest) {
       // Daily visits
       const dailyVisitsMap = new Map<string, number>();
       for (const v of srcVisits) {
-        const date = v.created_at?.slice(0, 10) || 'unknown';
+        const date = v.visited_at?.slice(0, 10) || 'unknown';
         dailyVisitsMap.set(date, (dailyVisitsMap.get(date) || 0) + 1);
       }
       const dailyVisits: DailyCount[] = Array.from(dailyVisitsMap.entries())
