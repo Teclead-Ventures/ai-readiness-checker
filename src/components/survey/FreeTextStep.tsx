@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import type { Track, SurveyFormData } from '@/types/survey';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 
 interface FreeTextStepProps {
   track: Track;
@@ -18,21 +18,22 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
   const { register, setValue, watch } = useFormContext<SurveyFormData>();
 
   const topCategories = watch('top_impact_categories') || [];
-  const featureData = getFeaturesForTrack(track);
-  const categoryNames = Object.entries(featureData).map(([key, cat]) => ({
-    key,
-    name: locale === 'de' ? cat.name.de : cat.name.en,
+  const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
+
+  const tierOptions = ([1, 2, 3, 4, 5] as const).map((tier) => ({
+    key: `tier_${tier}`,
+    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]} (${TIER_CONFIG[tier].era})`,
   }));
 
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold">{t('title')}</h2>
 
-      {/* Top Impact Categories (select 3) */}
+      {/* Top Impact Tiers (select 3) */}
       <div className="space-y-3">
         <Label className="text-base font-medium">{t('topCategories')}</Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {categoryNames.map(({ key, name }) => {
+          {tierOptions.map(({ key, name }) => {
             const checked = topCategories.includes(key);
             const atLimit = topCategories.length >= 3 && !checked;
             return (

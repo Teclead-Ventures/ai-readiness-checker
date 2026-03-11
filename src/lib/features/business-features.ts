@@ -1,82 +1,93 @@
-import { FeatureData } from '@/types/survey';
+import { Capability } from './types';
 
-export const BUSINESS_FEATURES: FeatureData = {
-  A: {
-    name: { en: "AI Chat & Research", de: "KI-Chat & Recherche" },
-    items: [
-      { id: "A1", en: "ChatGPT (web or desktop app)", de: "ChatGPT (Web oder Desktop-App)" },
-      { id: "A2", en: "Claude.ai (web or desktop app)", de: "Claude.ai (Web oder Desktop-App)" },
-      { id: "A3", en: "Google Gemini", de: "Google Gemini" },
-      { id: "A4", en: "Perplexity AI (AI-powered search)", de: "Perplexity AI (KI-gestützte Suche)" },
-      { id: "A5", en: "Microsoft Copilot (Bing Chat / Windows integration)", de: "Microsoft Copilot (Bing Chat / Windows-Integration)" },
-    ]
-  },
-  B: {
-    name: { en: "Office & Productivity", de: "Office & Produktivität" },
-    items: [
-      { id: "B1", en: "Microsoft Copilot in Word (drafting, rewriting, summarizing)", de: "Microsoft Copilot in Word (Entwurf, Umschreiben, Zusammenfassen)" },
-      { id: "B2", en: "Microsoft Copilot in Excel (formulas, analysis, charts)", de: "Microsoft Copilot in Excel (Formeln, Analyse, Diagramme)" },
-      { id: "B3", en: "Microsoft Copilot in PowerPoint (slide generation)", de: "Microsoft Copilot in PowerPoint (Folienerstellung)" },
-      { id: "B4", en: "Microsoft Copilot in Outlook (email drafting, summarizing threads)", de: "Microsoft Copilot in Outlook (E-Mail-Entwurf, Thread-Zusammenfassung)" },
-      { id: "B5", en: "Microsoft Copilot in Teams (meeting summaries, action items)", de: "Microsoft Copilot in Teams (Meeting-Zusammenfassungen, Aufgaben)" },
-      { id: "B6", en: "Google Workspace AI (Gemini in Docs, Sheets, Slides)", de: "Google Workspace AI (Gemini in Docs, Sheets, Slides)" },
-      { id: "B7", en: "Notion AI (writing, summarizing, database queries)", de: "Notion AI (Schreiben, Zusammenfassen, Datenbank-Abfragen)" },
-    ]
-  },
-  C: {
-    name: { en: "Writing & Communication", de: "Schreiben & Kommunikation" },
-    items: [
-      { id: "C1", en: "AI email drafting and reply suggestions", de: "KI-E-Mail-Entwurf und Antwortvorschläge" },
-      { id: "C2", en: "AI-powered translation (DeepL, Google Translate AI)", de: "KI-gestützte Übersetzung (DeepL, Google Translate)" },
-      { id: "C3", en: "AI writing assistants (Grammarly, LanguageTool)", de: "KI-Schreibassistenten (Grammarly, LanguageTool)" },
-      { id: "C4", en: "AI meeting transcription and summaries (Otter, Fireflies, tl;dv)", de: "KI-Meeting-Transkription und Zusammenfassungen (Otter, Fireflies, tl;dv)" },
-      { id: "C5", en: "Slack AI (channel summaries, thread catch-up)", de: "Slack AI (Kanal-Zusammenfassungen, Thread-Zusammenfassung)" },
-    ]
-  },
-  D: {
-    name: { en: "Data & Analysis", de: "Daten & Analyse" },
-    items: [
-      { id: "D1", en: "AI data analysis from uploaded files (CSV, Excel → insights)", de: "KI-Datenanalyse aus hochgeladenen Dateien (CSV, Excel → Erkenntnisse)" },
-      { id: "D2", en: "AI-generated charts and visualizations", de: "KI-generierte Diagramme und Visualisierungen" },
-      { id: "D3", en: "Natural language database queries", de: "Datenbank-Abfragen in natürlicher Sprache" },
-      { id: "D4", en: "AI-powered dashboards and reporting", de: "KI-gestützte Dashboards und Berichte" },
-    ]
-  },
-  E: {
-    name: { en: "Project & Product Management", de: "Projekt- & Produktmanagement" },
-    items: [
-      { id: "E1", en: "AI ticket/story writing (Jira, Linear, Notion)", de: "KI-Ticket/Story-Erstellung (Jira, Linear, Notion)" },
-      { id: "E2", en: "AI sprint planning and estimation", de: "KI-Sprint-Planung und Schätzung" },
-      { id: "E3", en: "AI-generated PRDs and specifications", de: "KI-generierte PRDs und Spezifikationen" },
-      { id: "E4", en: "AI roadmap prioritization", de: "KI-Roadmap-Priorisierung" },
-    ]
-  },
-  F: {
-    name: { en: "Design & Creative", de: "Design & Kreativ" },
-    items: [
-      { id: "F1", en: "AI image generation (DALL-E, Midjourney, Stable Diffusion)", de: "KI-Bildgenerierung (DALL-E, Midjourney, Stable Diffusion)" },
-      { id: "F2", en: "AI presentation design", de: "KI-Präsentationsdesign" },
-      { id: "F3", en: "AI video creation or editing", de: "KI-Videoproduktion oder -Bearbeitung" },
-      { id: "F4", en: "AI UI/UX design assistance (Figma AI, Galileo)", de: "KI UI/UX-Design-Unterstützung (Figma AI, Galileo)" },
-    ]
-  },
-  G: {
-    name: { en: "Workflow Automation", de: "Workflow-Automatisierung" },
-    items: [
-      { id: "G1", en: "AI-powered workflow automation (Zapier AI, Make AI)", de: "KI-gestützte Workflow-Automatisierung (Zapier AI, Make AI)" },
-      { id: "G2", en: "AI chatbots / customer support automation", de: "KI-Chatbots / Kundensupport-Automatisierung" },
-      { id: "G3", en: "AI document processing and extraction", de: "KI-Dokumentenverarbeitung und -Extraktion" },
-      { id: "G4", en: "Custom AI agents for business processes", de: "Benutzerdefinierte KI-Agenten für Geschäftsprozesse" },
-    ]
-  },
-  H: {
-    name: { en: "Advanced AI Capabilities", de: "Erweiterte KI-Fähigkeiten" },
-    items: [
-      { id: "H1", en: "AI with file/document upload for analysis", de: "KI mit Datei-Upload für Analyse" },
-      { id: "H2", en: "AI web browsing and research", de: "KI-Webrecherche" },
-      { id: "H3", en: "AI artifacts (interactive apps built in conversation)", de: "KI-Artefakte (interaktive Apps aus Konversation)" },
-      { id: "H4", en: "AI projects with persistent context", de: "KI-Projekte mit persistentem Kontext" },
-      { id: "H5", en: "Computer Use (AI controlling your screen)", de: "Computer Use (KI steuert Ihren Bildschirm)" },
-    ]
-  }
-};
+export const BUSINESS_CAPABILITIES: Capability[] = [
+  // ── TIER 1: TABLE STAKES (2022–2023) ─────────────────────────────
+  { id: "T1_01", tier: 1, firstAvailable: "2022-11",
+    en: "AI chat assistants for questions and research",
+    de: "KI-Chat-Assistenten für Fragen und Recherche",
+    examples: { en: "e.g. ChatGPT, Claude.ai, Google Gemini, Microsoft Copilot", de: "z.B. ChatGPT, Claude.ai, Google Gemini, Microsoft Copilot" } },
+  { id: "T1_02", tier: 1, firstAvailable: "2022-12",
+    en: "AI-powered web search and research",
+    de: "KI-gestützte Websuche und Recherche",
+    examples: { en: "e.g. Perplexity AI, Bing Copilot, Google AI Overview", de: "z.B. Perplexity AI, Bing Copilot, Google AI Overview" } },
+  { id: "T1_03", tier: 1, firstAvailable: "2023-02",
+    en: "AI writing and grammar assistance",
+    de: "KI-Schreib- und Grammatikhilfe",
+    examples: { en: "e.g. Grammarly, LanguageTool, DeepL", de: "z.B. Grammarly, LanguageTool, DeepL" } },
+
+  // ── TIER 2: PRODUCTIVE USAGE (2023–2024) ─────────────────────────
+  { id: "T2_01", tier: 2, firstAvailable: "2023-02",
+    en: "AI-integrated note-taking and knowledge management",
+    de: "KI-integrierte Notizen und Wissensmanagement",
+    examples: { en: "e.g. Notion AI, Obsidian AI plugins", de: "z.B. Notion AI, Obsidian AI-Plugins" } },
+  { id: "T2_02", tier: 2, firstAvailable: "2023-02",
+    en: "AI meeting transcription and summaries",
+    de: "KI-Meeting-Transkription und Zusammenfassungen",
+    examples: { en: "e.g. Otter.ai, Fireflies, tl;dv, Copilot in Teams", de: "z.B. Otter.ai, Fireflies, tl;dv, Copilot in Teams" } },
+  { id: "T2_03", tier: 2, firstAvailable: "2022-09",
+    en: "AI image and visual content generation",
+    de: "KI-Bild- und visuelle Inhaltsgenerierung",
+    examples: { en: "e.g. DALL-E, Midjourney, Stable Diffusion, Canva AI", de: "z.B. DALL-E, Midjourney, Stable Diffusion, Canva AI" } },
+  { id: "T2_04", tier: 2, firstAvailable: "2024-02",
+    en: "AI-powered team communication",
+    de: "KI-gestützte Teamkommunikation",
+    examples: { en: "e.g. Slack AI summaries, Teams AI", de: "z.B. Slack AI Zusammenfassungen, Teams AI" } },
+
+  // ── TIER 3: INTEGRATED WORKFLOWS (2024) ──────────────────────────
+  { id: "T3_01", tier: 3, firstAvailable: "2023-11",
+    en: "AI in office documents — writing and editing",
+    de: "KI in Office-Dokumenten — Schreiben und Bearbeiten",
+    examples: { en: "e.g. Copilot in Word, Gemini in Docs", de: "z.B. Copilot in Word, Gemini in Docs" } },
+  { id: "T3_02", tier: 3, firstAvailable: "2023-11",
+    en: "AI in spreadsheets — formulas, analysis, charts",
+    de: "KI in Tabellen — Formeln, Analyse, Diagramme",
+    examples: { en: "e.g. Copilot in Excel, Gemini in Sheets", de: "z.B. Copilot in Excel, Gemini in Sheets" } },
+  { id: "T3_03", tier: 3, firstAvailable: "2023-11",
+    en: "AI presentation generation",
+    de: "KI-Präsentationserstellung",
+    examples: { en: "e.g. Copilot in PowerPoint, Gemini in Slides, Gamma", de: "z.B. Copilot in PowerPoint, Gemini in Slides, Gamma" } },
+  { id: "T3_04", tier: 3, firstAvailable: "2023-12",
+    en: "AI data analysis from uploaded files",
+    de: "KI-Datenanalyse aus hochgeladenen Dateien",
+    examples: { en: "Upload CSV/Excel → insights, charts, summaries", de: "CSV/Excel hochladen → Erkenntnisse, Diagramme" } },
+  { id: "T3_05", tier: 3, firstAvailable: "2024-05",
+    en: "AI desktop apps with persistent context",
+    de: "KI-Desktop-Apps mit persistentem Kontext",
+    examples: { en: "e.g. ChatGPT Desktop, Claude Desktop", de: "z.B. ChatGPT Desktop, Claude Desktop" } },
+
+  // ── TIER 4: ADVANCED USAGE (2025) ────────────────────────────────
+  { id: "T4_01", tier: 4, firstAvailable: "2024-06",
+    en: "AI projects with file uploads and persistent context",
+    de: "KI-Projekte mit Datei-Uploads und persistentem Kontext",
+    examples: { en: "Upload docs → AI remembers across conversations", de: "Dokumente hochladen → KI merkt sich Kontext" } },
+  { id: "T4_02", tier: 4, firstAvailable: "2024-06",
+    en: "Interactive AI artifacts — apps built in conversation",
+    de: "Interaktive KI-Artefakte — Apps aus Konversation",
+    examples: { en: "Build calculators, dashboards, tools by describing them", de: "Rechner, Dashboards, Tools durch Beschreibung bauen" } },
+  { id: "T4_03", tier: 4, firstAvailable: "2023-06",
+    en: "AI workflow automation",
+    de: "KI-Workflow-Automatisierung",
+    examples: { en: "e.g. Zapier AI, Make AI, automated processes", de: "z.B. Zapier AI, Make AI, automatisierte Prozesse" } },
+  { id: "T4_04", tier: 4, firstAvailable: "2024-01",
+    en: "AI ticket and specification writing",
+    de: "KI-Ticket- und Spezifikationserstellung",
+    examples: { en: "AI-generated user stories, PRDs, acceptance criteria", de: "KI-generierte User Stories, PRDs, Akzeptanzkriterien" } },
+
+  // ── TIER 5: FRONTIER (2026) ──────────────────────────────────────
+  { id: "T5_01", tier: 5, firstAvailable: "2024-10",
+    en: "Computer Use — AI controlling your screen",
+    de: "Computer Use — KI steuert Ihren Bildschirm",
+    examples: { en: "AI navigates apps, fills forms, automates visually", de: "KI navigiert Apps, füllt Formulare, automatisiert visuell" } },
+  { id: "T5_02", tier: 5, firstAvailable: "2025-06",
+    en: "Custom AI agents for business processes",
+    de: "Benutzerdefinierte KI-Agenten für Geschäftsprozesse",
+    examples: { en: "Build AI agents for recurring business tasks", de: "KI-Agenten für wiederkehrende Aufgaben bauen" } },
+  { id: "T5_03", tier: 5, firstAvailable: "2024-11",
+    en: "AI connected to business tools via integrations",
+    de: "KI verbunden mit Business-Tools",
+    examples: { en: "AI reads/writes Slack, Jira, CRM, databases", de: "KI liest/schreibt Slack, Jira, CRM, Datenbanken" } },
+  { id: "T5_04", tier: 5, firstAvailable: "2025-09",
+    en: "AI with persistent memory across sessions",
+    de: "KI mit persistentem Gedächtnis",
+    examples: { en: "AI remembers preferences, projects, past conversations", de: "KI merkt sich Präferenzen, Projekte, Gespräche" } },
+];

@@ -37,6 +37,8 @@ export function MemberTable({ responses, anonymous }: MemberTableProps) {
             <TableRow>
               <TableHead>{t('member')}</TableHead>
               <TableHead>{t('score')}</TableHead>
+              <TableHead>{t('timelinePosition')}</TableHead>
+              <TableHead>{t('gapMonths')}</TableHead>
               <TableHead>{t('track')}</TableHead>
               <TableHead>{t('date')}</TableHead>
             </TableRow>
@@ -47,6 +49,9 @@ export function MemberTable({ responses, anonymous }: MemberTableProps) {
               const displayName = anonymous
                 ? `${t('anonymous')} #${sorted.length - index}`
                 : response.respondent_name || `${t('anonymous')} #${sorted.length - index}`;
+
+              const timelineLabel = response.scores.timeline?.timelinePositionLabel ?? '-';
+              const gapMonths = response.scores.timeline?.gapMonths;
 
               return (
                 <TableRow key={response.id}>
@@ -64,6 +69,14 @@ export function MemberTable({ responses, anonymous }: MemberTableProps) {
                     >
                       {response.scores.overall}
                     </Badge>
+                  </TableCell>
+                  <TableCell>{timelineLabel}</TableCell>
+                  <TableCell>
+                    {gapMonths !== undefined ? (
+                      <span className={gapMonths > 18 ? 'text-red-600 font-medium' : gapMonths > 12 ? 'text-orange-500 font-medium' : ''}>
+                        {gapMonths}
+                      </span>
+                    ) : '-'}
                   </TableCell>
                   <TableCell className="capitalize">{response.track}</TableCell>
                   <TableCell>

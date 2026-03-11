@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { SurveyResponse } from '@/types/survey';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 
 export async function GET(
   _request: NextRequest,
@@ -35,28 +35,21 @@ export async function GET(
 
     const typedResponses = (responses || []) as SurveyResponse[];
 
-    // Collect all category keys across all responses
-    const allCategoryKeys = new Set<string>();
-    typedResponses.forEach((r) => {
-      Object.keys(r.scores.categories).forEach((k) => allCategoryKeys.add(k));
-    });
-    const sortedCategories = Array.from(allCategoryKeys).sort();
-
-    // Build category header labels
-    const categoryHeaders = sortedCategories.map((key) => {
-      // Try to get a nice name from dev features first, then business
-      const devFeatures = getFeaturesForTrack('dev');
-      const bizFeatures = getFeaturesForTrack('business');
-      const name = devFeatures[key]?.name?.en || bizFeatures[key]?.name?.en || key;
-      return `${key}: ${name}`;
-    });
+    // Build tier headers
+    const tiers = [1, 2, 3, 4, 5] as const;
+    const tierHeaders = tiers.map(
+      (tier) => `T${tier}: ${TIER_CONFIG[tier].en}`
+    );
 
     // CSV header
     const headers = [
       'Name',
       'Track',
       'Overall Score',
-      ...categoryHeaders,
+      ...tierHeaders,
+      'Timeline Position',
+      'Gap (Months)',
+      'Direction',
       'Date',
     ];
 
@@ -66,15 +59,22 @@ export async function GET(
         ? `Anonymous #${typedResponses.length - index}`
         : r.respondent_name || `Anonymous #${typedResponses.length - index}`;
 
-      const categoryScores = sortedCategories.map(
-        (key) => r.scores.categories[key]?.toString() ?? ''
+      const tierScores = tiers.map(
+        (tier) => (r.scores.tiers[tier] ?? '').toString()
       );
+
+      const timelinePosition = r.scores.timeline?.timelinePositionLabel ?? '';
+      const gapMonths = r.scores.timeline?.gapMonths?.toString() ?? '';
+      const direction = r.scores.adaptation?.direction ?? '';
 
       return [
         escapeCsv(name),
         r.track,
         r.scores.overall.toString(),
-        ...categoryScores,
+        ...tierScores,
+        escapeCsv(timelinePosition),
+        gapMonths,
+        direction,
         new Date(r.created_at).toISOString().split('T')[0],
       ];
     });

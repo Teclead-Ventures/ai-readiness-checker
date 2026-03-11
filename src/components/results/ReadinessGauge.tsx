@@ -65,7 +65,7 @@ export function ReadinessGauge({ score, locale }: ReadinessGaugeProps) {
             cy={center}
             r={radius}
             fill="none"
-            stroke="#FFAB54"
+            stroke={label.color}
             strokeWidth={strokeWidth}
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -77,7 +77,7 @@ export function ReadinessGauge({ score, locale }: ReadinessGaugeProps) {
           <span className="text-5xl font-bold text-[#121212]">
             {displayScore}
           </span>
-          <span className="text-sm font-medium mt-1 text-[#FFAB54]">
+          <span className="text-sm font-medium mt-1" style={{ color: label.color }}>
             {label.label[locale as 'en' | 'de'] ?? label.label.en}
           </span>
         </div>

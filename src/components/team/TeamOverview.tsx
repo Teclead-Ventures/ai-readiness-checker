@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TeamWithResponses, getScoreLabel } from '@/types/survey';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 import {
   RadarChart,
   PolarGrid,
@@ -32,29 +32,18 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
   const scoreLabel = getScoreLabel(avgScore);
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
-  // Calculate average category scores
-  const allCategoryKeys = new Set<string>();
-  responses.forEach((r) => {
-    Object.keys(r.scores.categories).forEach((k) => allCategoryKeys.add(k));
+  // Calculate average tier scores across all members
+  const tierAverages = ([1, 2, 3, 4, 5] as const).map((tier) => {
+    const values = responses
+      .filter((r) => r.scores.tiers[tier] !== undefined)
+      .map((r) => r.scores.tiers[tier]);
+    const avg = values.length
+      ? Math.round(values.reduce((s, v) => s + v, 0) / values.length)
+      : 0;
+    const config = TIER_CONFIG[tier];
+    const label = config[lang];
+    return { tier: `T${tier}`, fullLabel: `${label} (${config.era})`, score: avg };
   });
-
-  // Determine which tracks are present
-  const tracks = new Set(responses.map((r) => r.track));
-  const primaryTrack = tracks.size === 1 ? responses[0].track : 'dev';
-  const features = getFeaturesForTrack(primaryTrack);
-
-  const categoryAverages = Array.from(allCategoryKeys)
-    .sort()
-    .map((key) => {
-      const values = responses
-        .filter((r) => r.scores.categories[key] !== undefined)
-        .map((r) => r.scores.categories[key]);
-      const avg = values.length
-        ? Math.round(values.reduce((s, v) => s + v, 0) / values.length)
-        : 0;
-      const catName = features[key]?.name?.[lang] || key;
-      return { category: catName, shortKey: key, score: avg };
-    });
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -86,9 +75,9 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={280}>
-            <RadarChart data={categoryAverages} cx="50%" cy="50%" outerRadius="70%">
+            <RadarChart data={tierAverages} cx="50%" cy="50%" outerRadius="70%">
               <PolarGrid />
-              <PolarAngleAxis dataKey="shortKey" tick={{ fontSize: 12 }} />
+              <PolarAngleAxis dataKey="tier" tick={{ fontSize: 12 }} />
               <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
               <Radar
                 dataKey="score"
@@ -98,6 +87,14 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
               />
             </RadarChart>
           </ResponsiveContainer>
+          {/* Tier legend */}
+          <div className="flex gap-3 text-xs text-muted-foreground flex-wrap mt-2">
+            {tierAverages.map((t) => (
+              <span key={t.tier}>
+                <strong>{t.tier}</strong> = {t.fullLabel}
+              </span>
+            ))}
+          </div>
         </CardContent>
       </Card>
     </div>

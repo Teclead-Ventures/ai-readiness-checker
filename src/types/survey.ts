@@ -1,18 +1,7 @@
+import type { ScoreResult } from '@/lib/scoring';
+
 export type Track = 'dev' | 'business';
-export type FeatureValue = 0 | 1 | 2; // 0=don't know, 1=know, 2=use
-
-export interface FeatureItem {
-  id: string;
-  en: string;
-  de: string;
-}
-
-export interface FeatureCategory {
-  name: { en: string; de: string };
-  items: FeatureItem[];
-}
-
-export type FeatureData = Record<string, FeatureCategory>;
+export type FeatureValue = 0 | 1 | 2 | 3; // 0=unaware, 1=aware, 2=tried, 3=integrated
 
 export interface DevProfile {
   role: string;
@@ -75,12 +64,7 @@ export interface SurveyFormData {
   free_text?: string;
 }
 
-export interface Scores {
-  overall: number;
-  categories: Record<string, number>;
-  awareness_gap?: number;
-  utilization_gap?: number;
-}
+export type Scores = ScoreResult;
 
 export interface SurveyResponse extends SurveyFormData {
   id: string;
@@ -104,11 +88,12 @@ export interface TeamWithResponses extends Team {
 }
 
 export const SCORE_LABELS = [
-  { min: 0, max: 30, label: { en: 'Getting Started', de: 'Erste Schritte' }, color: '#ef4444' },
-  { min: 31, max: 55, label: { en: 'Building Foundations', de: 'Grundlagen aufbauen' }, color: '#f59e0b' },
-  { min: 56, max: 75, label: { en: 'Proficient', de: 'Kompetent' }, color: '#eab308' },
-  { min: 76, max: 90, label: { en: 'Advanced', de: 'Fortgeschritten' }, color: '#22c55e' },
-  { min: 91, max: 100, label: { en: 'Pioneer', de: 'Pionier' }, color: '#3b82f6' },
+  { min: 0, max: 20, label: { en: 'Getting Started', de: 'Erste Schritte' }, color: '#ef4444' },
+  { min: 21, max: 40, label: { en: 'Building Foundations', de: 'Grundlagen aufbauen' }, color: '#f97316' },
+  { min: 41, max: 60, label: { en: 'Developing', de: 'Entwickelnd' }, color: '#eab308' },
+  { min: 61, max: 80, label: { en: 'Proficient', de: 'Kompetent' }, color: '#22c55e' },
+  { min: 81, max: 95, label: { en: 'Advanced', de: 'Fortgeschritten' }, color: '#3b82f6' },
+  { min: 96, max: 100, label: { en: 'Pioneer', de: 'Pionier' }, color: '#a855f7' },
 ] as const;
 
 export function getScoreLabel(score: number) {

@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Lightbulb } from 'lucide-react';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { getCapabilitiesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 import { FeatureValue } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
@@ -14,28 +15,34 @@ interface OpportunitiesListProps {
 }
 
 interface Opportunity {
-  categoryName: string;
-  knowButDontUseCount: number;
-  items: string[];
+  tierName: string;
+  tier: number;
+  capabilityName: string;
+  firstAvailable: string;
+  value: number;
 }
 
 export function OpportunitiesList({ features, track, locale }: OpportunitiesListProps) {
   const t = useTranslations('results');
-  const featureData = getFeaturesForTrack(track);
   const lang = locale as 'en' | 'de';
+  const capabilities = getCapabilitiesForTrack(track);
 
-  const opportunities: Opportunity[] = Object.entries(featureData)
-    .map(([key, category]) => {
-      const knowButDontUse = category.items.filter((item) => features[item.id] === 1);
-      return {
-        categoryName: category.name[lang] ?? category.name.en,
-        knowButDontUseCount: knowButDontUse.length,
-        items: knowButDontUse.map((item) => item[lang] ?? item.en),
-      };
+  // Find top opportunities: capabilities where user scored lowest, prioritized by tier weight
+  const opportunities: Opportunity[] = capabilities
+    .map((cap) => ({
+      tierName: TIER_CONFIG[cap.tier][lang],
+      tier: cap.tier,
+      capabilityName: cap[lang],
+      firstAvailable: cap.firstAvailable,
+      value: features[cap.id] ?? 0,
+    }))
+    .filter((o) => o.value < 3) // Not yet integrated
+    .sort((a, b) => {
+      // Sort by value ascending (worst first), then by tier ascending (foundational first)
+      if (a.value !== b.value) return a.value - b.value;
+      return a.tier - b.tier;
     })
-    .filter((o) => o.knowButDontUseCount > 0)
-    .sort((a, b) => b.knowButDontUseCount - a.knowButDontUseCount)
-    .slice(0, 3);
+    .slice(0, 6);
 
   if (opportunities.length === 0) return null;
 
@@ -54,7 +61,7 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
           <CardDescription>{t('opportunitiesDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {opportunities.map((opp, i) => (
               <motion.div
                 key={i}
@@ -63,18 +70,16 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
                 transition={{ duration: 0.3, delay: 0.6 + i * 0.1 }}
                 className="bg-[#FFAB54]/5 border border-[#FFAB54]/20 rounded-xl p-4"
               >
-                <h4 className="font-semibold text-sm mb-1">{opp.categoryName}</h4>
-                <p className="text-xs text-muted-foreground mb-2">
-                  {opp.knowButDontUseCount} {t('knowIt').toLowerCase()} &rarr; {t('useIt').toLowerCase()}
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                    {t('tier')} {opp.tier}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">{opp.tierName}</span>
+                </div>
+                <h4 className="font-semibold text-sm mb-1">{opp.capabilityName}</h4>
+                <p className="text-xs text-muted-foreground">
+                  {t('availableSince')} {opp.firstAvailable}
                 </p>
-                <ul className="space-y-1">
-                  {opp.items.map((item, j) => (
-                    <li key={j} className="text-xs text-gray-700 flex items-start gap-1.5">
-                      <span className="text-[#FFAB54] mt-0.5">&#x2022;</span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
               </motion.div>
             ))}
           </div>

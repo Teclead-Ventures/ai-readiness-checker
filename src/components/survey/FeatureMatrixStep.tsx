@@ -5,66 +5,68 @@ import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DEV_FEATURES } from '@/lib/features/dev-features';
-import { BUSINESS_FEATURES } from '@/lib/features/business-features';
+import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
+import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
+import { TIER_CONFIG, RESPONSE_SCALE, Capability } from '@/lib/features/types';
 import { FeatureItem } from './FeatureItem';
-import type { FeatureValue, FeatureData, SurveyFormData, Track } from '@/types/survey';
+import type { FeatureValue, SurveyFormData, Track } from '@/types/survey';
 
 interface FeatureMatrixStepProps {
   track: Track;
 }
 
-interface CategorySectionProps {
-  categoryKey: string;
-  categoryName: string;
-  items: { id: string; label: string }[];
+interface TierSectionProps {
+  tier: 1 | 2 | 3 | 4 | 5;
+  tierName: string;
+  era: string;
+  capabilities: { id: string; label: string; examples: string }[];
   features: Record<string, FeatureValue>;
   onFeatureChange: (featureId: string, value: FeatureValue) => void;
   defaultExpanded: boolean;
 }
 
-function computeCategoryScore(
-  items: { id: string }[],
+function computeTierScore(
+  capabilities: { id: string }[],
   features: Record<string, FeatureValue>,
 ): { answered: number; total: number; score: number } {
   let answered = 0;
   let sum = 0;
-  const total = items.length;
+  const total = capabilities.length;
 
-  for (const item of items) {
-    const val = features[item.id];
+  for (const cap of capabilities) {
+    const val = features[cap.id];
     if (val !== undefined && val !== null) {
       answered++;
       sum += val;
     }
   }
 
-  // Score: each item max 2, so percentage = sum / (total * 2) * 100
-  const score = total > 0 ? Math.round((sum / (total * 2)) * 100) : 0;
+  // Score: each item max 3, so percentage = sum / (total * 3) * 100
+  const score = total > 0 ? Math.round((sum / (total * 3)) * 100) : 0;
   return { answered, total, score };
 }
 
 function scoreToColor(score: number): string {
   if (score <= 25) return 'bg-red-500';
-  if (score <= 50) return 'bg-amber-500';
+  if (score <= 50) return 'bg-orange-500';
   if (score <= 75) return 'bg-yellow-400';
   return 'bg-green-500';
 }
 
-function CategorySection({
-  categoryKey,
-  categoryName,
-  items,
+function TierSection({
+  tier,
+  tierName,
+  era,
+  capabilities,
   features,
   onFeatureChange,
   defaultExpanded,
-}: CategorySectionProps) {
+}: TierSectionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const t = useTranslations('survey.features');
 
   const { answered, total, score } = useMemo(
-    () => computeCategoryScore(items, features),
-    [items, features],
+    () => computeTierScore(capabilities, features),
+    [capabilities, features],
   );
 
   return (
@@ -83,10 +85,10 @@ function CategorySection({
         />
         <div className="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span className="text-sm font-semibold text-foreground">
-            {categoryKey}. {categoryName}
+            Tier {tier} — {tierName} ({era})
           </span>
           <span className="text-xs text-muted-foreground">
-            {answered}/{total}
+            {answered}/{total} done
           </span>
         </div>
         <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
@@ -104,12 +106,13 @@ function CategorySection({
 
       {expanded && (
         <div className="divide-y divide-border/50 px-4">
-          {items.map((item) => (
+          {capabilities.map((cap) => (
             <FeatureItem
-              key={item.id}
-              featureId={item.id}
-              label={item.label}
-              value={features[item.id]}
+              key={cap.id}
+              featureId={cap.id}
+              label={cap.label}
+              examples={cap.examples}
+              value={features[cap.id]}
               onChange={onFeatureChange}
             />
           ))}
@@ -124,26 +127,18 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
   const locale = useLocale();
   const { setValue } = useFormContext<SurveyFormData>();
 
-  const featureData: FeatureData = track === 'dev' ? DEV_FEATURES : BUSINESS_FEATURES;
+  const capabilities: Capability[] = track === 'dev' ? DEV_CAPABILITIES : BUSINESS_CAPABILITIES;
   const features: Record<string, FeatureValue> =
     useWatch<SurveyFormData, 'features'>({ name: 'features' }) ?? {};
 
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
-  // Build flat list of all feature ids for progress count
-  const allItems = useMemo(() => {
-    const result: string[] = [];
-    for (const cat of Object.values(featureData)) {
-      for (const item of cat.items) {
-        result.push(item.id);
-      }
-    }
-    return result;
-  }, [featureData]);
+  // Build flat list of all capability ids for progress count
+  const allIds = useMemo(() => capabilities.map((c) => c.id), [capabilities]);
 
   const answeredCount = useMemo(
-    () => allItems.filter((id) => features[id] !== undefined && features[id] !== null).length,
-    [allItems, features],
+    () => allIds.filter((id) => features[id] !== undefined && features[id] !== null).length,
+    [allIds, features],
   );
 
   const handleFeatureChange = useCallback(
@@ -153,18 +148,32 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
     [setValue],
   );
 
-  const categoryEntries = useMemo(
-    () =>
-      Object.entries(featureData).map(([key, cat]) => ({
-        key,
-        name: cat.name[lang],
-        items: cat.items.map((item) => ({
-          id: item.id,
-          label: item[lang],
-        })),
-      })),
-    [featureData, lang],
-  );
+  // Group capabilities by tier
+  const tierEntries = useMemo(() => {
+    const tiers = [1, 2, 3, 4, 5] as const;
+    return tiers
+      .map((tier) => {
+        const tierCaps = capabilities.filter((c) => c.tier === tier);
+        if (tierCaps.length === 0) return null;
+        const config = TIER_CONFIG[tier];
+        return {
+          tier,
+          tierName: config[lang],
+          era: config.era,
+          capabilities: tierCaps.map((c) => ({
+            id: c.id,
+            label: c[lang],
+            examples: c.examples[lang],
+          })),
+        };
+      })
+      .filter(Boolean) as {
+      tier: 1 | 2 | 3 | 4 | 5;
+      tierName: string;
+      era: string;
+      capabilities: { id: string; label: string; examples: string }[];
+    }[];
+  }, [capabilities, lang]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -179,38 +188,39 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full bg-primary transition-all duration-300"
-            style={{ width: `${allItems.length > 0 ? (answeredCount / allItems.length) * 100 : 0}%` }}
+            style={{ width: `${allIds.length > 0 ? (answeredCount / allIds.length) * 100 : 0}%` }}
           />
         </div>
         <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-          {t('progress', { count: answeredCount, total: allItems.length })}
+          {t('progress', { count: answeredCount, total: allIds.length })}
         </span>
       </div>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm bg-red-500" />
-          {t('dontKnow')}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm bg-amber-500" />
-          {t('knowIt')}
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="inline-block h-3 w-3 rounded-sm bg-green-500" />
-          {t('useIt')}
-        </span>
+        {([0, 1, 2, 3] as const).map((level) => {
+          const scale = RESPONSE_SCALE[level];
+          return (
+            <span key={level} className="flex items-center gap-1.5">
+              <span
+                className="inline-block h-3 w-3 rounded-sm"
+                style={{ backgroundColor: scale.color }}
+              />
+              {scale[lang]}
+            </span>
+          );
+        })}
       </div>
 
-      {/* Categories */}
+      {/* Tiers */}
       <div className="flex flex-col gap-3">
-        {categoryEntries.map((cat) => (
-          <CategorySection
-            key={cat.key}
-            categoryKey={cat.key}
-            categoryName={cat.name}
-            items={cat.items}
+        {tierEntries.map((entry) => (
+          <TierSection
+            key={entry.tier}
+            tier={entry.tier}
+            tierName={entry.tierName}
+            era={entry.era}
+            capabilities={entry.capabilities}
             features={features}
             onFeatureChange={handleFeatureChange}
             defaultExpanded={true}

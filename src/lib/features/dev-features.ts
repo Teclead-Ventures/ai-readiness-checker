@@ -1,99 +1,117 @@
-import { FeatureData } from '@/types/survey';
+import { Capability } from './types';
 
-export const DEV_FEATURES: FeatureData = {
-  A: {
-    name: { en: "Code Writing & Completion", de: "Code-Erstellung & Vervollständigung" },
-    items: [
-      { id: "A1", en: "Inline code completions (e.g. Copilot Tab, Cursor Tab)", de: "Inline Code-Vervollständigung (z.B. Copilot Tab, Cursor Tab)" },
-      { id: "A2", en: "Multi-line / function-level code generation from comments", de: "Mehrzeilige / funktionsweite Code-Generierung aus Kommentaren" },
-      { id: "A3", en: "Natural language → code in chat", de: "Natürliche Sprache → Code im Chat" },
-      { id: "A4", en: "Multi-file edits from a single prompt (Cursor Composer, Claude Code)", de: "Multi-Datei-Bearbeitung aus einem Prompt (Cursor Composer, Claude Code)" },
-      { id: "A5", en: "Full app generation from descriptions (Bolt, Lovable, Replit, v0)", de: "App-Generierung aus Beschreibungen (Bolt, Lovable, Replit, v0)" },
-    ]
-  },
-  B: {
-    name: { en: "Code Review & Quality", de: "Code-Review & Qualität" },
-    items: [
-      { id: "B1", en: "AI-powered PR review (Copilot Code Review, CodeRabbit)", de: "KI-gestützte PR-Reviews (Copilot Code Review, CodeRabbit)" },
-      { id: "B2", en: "Automated test generation from code changes (Qodo, Copilot)", de: "Automatische Testgenerierung aus Code-Änderungen (Qodo, Copilot)" },
-      { id: "B3", en: "AI security scanning in PRs", de: "KI-Sicherheitsscanning in PRs" },
-      { id: "B4", en: "Codebase-aware review (full repo context, not just diff)", de: "Codebase-bewusstes Review (gesamter Repo-Kontext)" },
-    ]
-  },
-  C: {
-    name: { en: "Testing", de: "Testing" },
-    items: [
-      { id: "C1", en: "Unit test generation with edge cases", de: "Unit-Test-Generierung mit Randfällen" },
-      { id: "C2", en: "E2E / integration test generation", de: "E2E / Integrationstest-Generierung" },
-      { id: "C3", en: "Test coverage analysis by AI", de: "Testabdeckungsanalyse durch KI" },
-      { id: "C4", en: "Test-driven development with AI", de: "Testgetriebene Entwicklung mit KI" },
-    ]
-  },
-  D: {
-    name: { en: "Debugging & Incident Response", de: "Debugging & Incident Response" },
-    items: [
-      { id: "D1", en: "AI-assisted error diagnosis (paste error → get fix)", de: "KI-gestützte Fehlerdiagnose (Fehler einfügen → Fix erhalten)" },
-      { id: "D2", en: "Log analysis and root cause identification", de: "Log-Analyse und Ursachenermittlung" },
-      { id: "D3", en: "AI-powered incident triage", de: "KI-gestützte Incident-Triage" },
-      { id: "D4", en: "Parallel hypothesis debugging with multiple agents", de: "Paralleles Debugging mit mehreren Agenten" },
-    ]
-  },
-  E: {
-    name: { en: "Git & Workflow Automation", de: "Git & Workflow-Automatisierung" },
-    items: [
-      { id: "E1", en: "AI commit message generation", de: "KI-generierte Commit-Nachrichten" },
-      { id: "E2", en: "Natural language git operations", de: "Git-Operationen in natürlicher Sprache" },
-      { id: "E3", en: "AI-assisted merge conflict resolution", de: "KI-gestützte Merge-Konfliktlösung" },
-      { id: "E4", en: "Git worktrees for parallel AI tasks", de: "Git-Worktrees für parallele KI-Aufgaben" },
-      { id: "E5", en: "Checkpoint/undo system for AI changes", de: "Checkpoint/Undo-System für KI-Änderungen" },
-    ]
-  },
-  F: {
-    name: { en: "Documentation & Knowledge", de: "Dokumentation & Wissen" },
-    items: [
-      { id: "F1", en: "Auto-generated code documentation / docstrings", de: "Auto-generierte Code-Dokumentation" },
-      { id: "F2", en: "Architecture documentation generation (ADRs)", de: "Architekturdokumentation-Generierung (ADRs)" },
-      { id: "F3", en: "Codebase Q&A (ask questions about unfamiliar code)", de: "Codebase Q&A (Fragen an unbekannten Code)" },
-      { id: "F4", en: "Onboarding guides from repo analysis", de: "Onboarding-Guides aus Repo-Analyse" },
-    ]
-  },
-  G: {
-    name: { en: "Refactoring & Architecture", de: "Refactoring & Architektur" },
-    items: [
-      { id: "G1", en: "AI-powered code refactoring", de: "KI-gestütztes Code-Refactoring" },
-      { id: "G2", en: "Dependency impact analysis", de: "Abhängigkeits-Auswirkungsanalyse" },
-      { id: "G3", en: "Architecture-level analysis and recommendations", de: "Architektur-Analyse und -Empfehlungen" },
-      { id: "G4", en: "Migration / framework upgrade assistance", de: "Migrations- / Framework-Upgrade-Unterstützung" },
-    ]
-  },
-  H: {
-    name: { en: "Advanced / Agentic Features", de: "Erweiterte / Agentische Features" },
-    items: [
-      { id: "H1", en: "Custom instruction files (CLAUDE.md, .cursorrules)", de: "Benutzerdefinierte Instruktionsdateien (CLAUDE.md, .cursorrules)" },
-      { id: "H2", en: "Custom slash commands / skills", de: "Benutzerdefinierte Slash-Commands / Skills" },
-      { id: "H3", en: "MCP servers (AI connected to Slack, Notion, DBs)", de: "MCP-Server (KI verbunden mit Slack, Notion, DBs)" },
-      { id: "H4", en: "Hooks / automation (pre/post AI events)", de: "Hooks / Automatisierung (vor/nach KI-Events)" },
-      { id: "H5", en: "Agent teams (multiple AI agents coordinating)", de: "Agent-Teams (mehrere KI-Agenten koordinieren)" },
-      { id: "H6", en: "Background/async agents (assign issue → get PR)", de: "Hintergrund-Agenten (Issue zuweisen → PR erhalten)" },
-      { id: "H7", en: "AI memory / persistent context across sessions", de: "KI-Gedächtnis / persistenter Kontext über Sessions" },
-      { id: "H8", en: "Computer Use (AI controlling browser/desktop)", de: "Computer Use (KI steuert Browser/Desktop)" },
-    ]
-  },
-  I: {
-    name: { en: "AI Applications", de: "KI-Anwendungen" },
-    items: [
-      { id: "I1", en: "Interactive AI artifacts (apps from conversation)", de: "Interaktive KI-Artefakte (Apps aus Konversation)" },
-      { id: "I2", en: "AI projects/workspaces with persistent context", de: "KI-Projekte mit persistentem Kontext" },
-      { id: "I3", en: "Local/on-premise models (Ollama) for privacy", de: "Lokale Modelle (Ollama) für Datenschutz" },
-    ]
-  },
-  J: {
-    name: { en: "DevOps & Infrastructure", de: "DevOps & Infrastruktur" },
-    items: [
-      { id: "J1", en: "AI-assisted CI/CD pipeline configuration", de: "KI-gestützte CI/CD-Pipeline-Konfiguration" },
-      { id: "J2", en: "Infrastructure-as-code generation (Terraform)", de: "Infrastructure-as-Code-Generierung (Terraform)" },
-      { id: "J3", en: "AI monitoring and alerting setup", de: "KI-Monitoring und Alerting-Einrichtung" },
-      { id: "J4", en: "Container/deployment config generation", de: "Container/Deployment-Konfiguration" },
-    ]
-  }
-};
+export const DEV_CAPABILITIES: Capability[] = [
+  // ── TIER 1: TABLE STAKES (2022–2023) ─────────────────────────────
+  { id: "T1_01", tier: 1, firstAvailable: "2022-06",
+    en: "Inline code completions",
+    de: "Inline Code-Vervollständigung",
+    examples: { en: "e.g. GitHub Copilot, Cursor Tab, Tabnine, Windsurf", de: "z.B. GitHub Copilot, Cursor Tab, Tabnine, Windsurf" } },
+  { id: "T1_02", tier: 1, firstAvailable: "2022-11",
+    en: "AI chat for code questions and generation",
+    de: "KI-Chat für Code-Fragen und -Generierung",
+    examples: { en: "e.g. Copilot Chat, Cursor Chat, ChatGPT, Claude.ai", de: "z.B. Copilot Chat, Cursor Chat, ChatGPT, Claude.ai" } },
+  { id: "T1_03", tier: 1, firstAvailable: "2022-11",
+    en: "AI-assisted error diagnosis",
+    de: "KI-gestützte Fehlerdiagnose",
+    examples: { en: "Paste an error or stack trace → get explanation and fix", de: "Fehler oder Stack-Trace einfügen → Erklärung und Fix erhalten" } },
+  { id: "T1_04", tier: 1, firstAvailable: "2022-06",
+    en: "AI-generated documentation and docstrings",
+    de: "KI-generierte Dokumentation und Docstrings",
+    examples: { en: "Auto-generated from function signatures via any AI tool", de: "Automatisch generiert aus Funktionssignaturen" } },
+
+  // ── TIER 2: PRODUCTIVE USAGE (2023–2024) ─────────────────────────
+  { id: "T2_01", tier: 2, firstAvailable: "2023-06",
+    en: "Codebase Q&A and exploration",
+    de: "Codebase-Fragen und -Erkundung",
+    examples: { en: "Ask questions about unfamiliar code, navigate large repos", de: "Fragen an unbekannten Code, große Repos navigieren" } },
+  { id: "T2_02", tier: 2, firstAvailable: "2023-11",
+    en: "AI-assisted git workflows",
+    de: "KI-gestützte Git-Workflows",
+    examples: { en: "Commit messages, branch management, PR descriptions", de: "Commit-Nachrichten, Branch-Management, PR-Beschreibungen" } },
+  { id: "T2_03", tier: 2, firstAvailable: "2023-12",
+    en: "AI code refactoring and transformation",
+    de: "KI-gestütztes Code-Refactoring",
+    examples: { en: "Rename, restructure, migrate patterns via AI", de: "Umbenennen, Umstrukturieren, Muster migrieren via KI" } },
+  { id: "T2_04", tier: 2, firstAvailable: "2023-12",
+    en: "AI test generation",
+    de: "KI-Testgenerierung",
+    examples: { en: "Unit tests with edge cases, integration tests", de: "Unit-Tests mit Randfällen, Integrationstests" } },
+  { id: "T2_05", tier: 2, firstAvailable: "2023-01",
+    en: "AI-powered code review",
+    de: "KI-gestütztes Code-Review",
+    examples: { en: "Automated PR review for bugs, style, security", de: "Automatisiertes PR-Review für Bugs, Stil, Sicherheit" } },
+
+  // ── TIER 3: INTEGRATED WORKFLOWS (2024) ──────────────────────────
+  { id: "T3_01", tier: 3, firstAvailable: "2024-07",
+    en: "Multi-file agentic editing",
+    de: "Multi-Datei-agentische Bearbeitung",
+    examples: { en: "Single prompt → changes across multiple files", de: "Ein Prompt → Änderungen über mehrere Dateien" } },
+  { id: "T3_02", tier: 3, firstAvailable: "2024-10",
+    en: "Full application generation from descriptions",
+    de: "App-Generierung aus Beschreibungen",
+    examples: { en: "Describe an app → get working prototype (Bolt, Lovable, v0)", de: "App beschreiben → Prototyp erhalten (Bolt, Lovable, v0)" } },
+  { id: "T3_03", tier: 3, firstAvailable: "2024-06",
+    en: "Interactive AI artifacts and prototypes",
+    de: "Interaktive KI-Artefakte und Prototypen",
+    examples: { en: "Build interactive apps, visualizations in conversation", de: "Interaktive Apps, Visualisierungen im Chat erstellen" } },
+  { id: "T3_04", tier: 3, firstAvailable: "2024-03",
+    en: "AI security scanning and vulnerability detection",
+    de: "KI-Sicherheitsscanning und Schwachstellenerkennung",
+    examples: { en: "Automated security analysis in PRs and code", de: "Automatisierte Sicherheitsanalyse in PRs und Code" } },
+  { id: "T3_05", tier: 3, firstAvailable: "2024-06",
+    en: "Architecture analysis and migration assistance",
+    de: "Architektur-Analyse und Migrationsunterstützung",
+    examples: { en: "Dependency analysis, framework upgrades, ADR generation", de: "Abhängigkeitsanalyse, Framework-Upgrades, ADR-Generierung" } },
+  { id: "T3_06", tier: 3, firstAvailable: "2024-06",
+    en: "AI-powered incident triage and log analysis",
+    de: "KI-gestützte Incident-Triage und Log-Analyse",
+    examples: { en: "Automated root cause analysis from logs and alerts", de: "Automatisierte Ursachenanalyse aus Logs und Alerts" } },
+
+  // ── TIER 4: ADVANCED CONFIGURATION (2025) ────────────────────────
+  { id: "T4_01", tier: 4, firstAvailable: "2023-06",
+    en: "Custom AI instruction files",
+    de: "Benutzerdefinierte KI-Instruktionsdateien",
+    examples: { en: "CLAUDE.md, .cursorrules, copilot-instructions.md", de: "CLAUDE.md, .cursorrules, copilot-instructions.md" } },
+  { id: "T4_02", tier: 4, firstAvailable: "2024-11",
+    en: "MCP server integrations",
+    de: "MCP-Server-Integrationen",
+    examples: { en: "Connect AI to Slack, Notion, databases, APIs", de: "KI mit Slack, Notion, Datenbanken, APIs verbinden" } },
+  { id: "T4_03", tier: 4, firstAvailable: "2025-05",
+    en: "Background and asynchronous AI agents",
+    de: "Hintergrund- und asynchrone KI-Agenten",
+    examples: { en: "Assign issue → AI works autonomously → opens PR", de: "Issue zuweisen → KI arbeitet autonom → erstellt PR" } },
+  { id: "T4_04", tier: 4, firstAvailable: "2024-02",
+    en: "AI memory and persistent context across sessions",
+    de: "KI-Gedächtnis und persistenter Kontext",
+    examples: { en: "AI remembers project patterns and preferences", de: "KI merkt sich Projektmuster und Präferenzen" } },
+  { id: "T4_05", tier: 4, firstAvailable: "2025-10",
+    en: "AI-assisted merge conflict resolution",
+    de: "KI-gestützte Merge-Konfliktlösung",
+    examples: { en: "AI understands both sides and resolves conflicts", de: "KI versteht beide Seiten und löst Konflikte" } },
+  { id: "T4_06", tier: 4, firstAvailable: "2024-06",
+    en: "Checkpoint and undo systems for AI changes",
+    de: "Checkpoint- und Undo-Systeme für KI-Änderungen",
+    examples: { en: "Automatic snapshots, instant rollback of AI edits", de: "Automatische Snapshots, sofortiges Rollback" } },
+
+  // ── TIER 5: FRONTIER (2026) ──────────────────────────────────────
+  { id: "T5_01", tier: 5, firstAvailable: "2025-02",
+    en: "Custom slash commands and reusable AI skills",
+    de: "Benutzerdefinierte Slash-Commands und KI-Skills",
+    examples: { en: "Build reusable prompt workflows, share across team", de: "Wiederverwendbare Prompt-Workflows, im Team teilen" } },
+  { id: "T5_02", tier: 5, firstAvailable: "2025-06",
+    en: "Hooks and event-driven AI automation",
+    de: "Hooks und ereignisgesteuerte KI-Automatisierung",
+    examples: { en: "Trigger scripts on AI events (pre-commit, post-edit)", de: "Skripte bei KI-Events auslösen" } },
+  { id: "T5_03", tier: 5, firstAvailable: "2026-02",
+    en: "Agent teams — multi-agent coordination",
+    de: "Agent-Teams — Multi-Agenten-Koordination",
+    examples: { en: "Multiple AI agents collaborate, communicate, share findings", de: "Mehrere KI-Agenten arbeiten zusammen" } },
+  { id: "T5_04", tier: 5, firstAvailable: "2024-10",
+    en: "Computer Use — AI controlling browser and desktop",
+    de: "Computer Use — KI steuert Browser und Desktop",
+    examples: { en: "AI interprets screen, clicks, fills forms, navigates apps", de: "KI interpretiert Bildschirm, klickt, füllt Formulare" } },
+  { id: "T5_05", tier: 5, firstAvailable: "2025-10",
+    en: "Git worktrees for parallel AI development",
+    de: "Git-Worktrees für parallele KI-Entwicklung",
+    examples: { en: "Multiple AI agents on separate branches simultaneously", de: "Mehrere KI-Agenten auf separaten Branches gleichzeitig" } },
+];

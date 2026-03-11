@@ -21,6 +21,10 @@ interface AdminStats {
   totalTeams: number;
   avgScore: number;
   trackDistribution: { dev: number; business: number };
+  avgTimelineGap: number;
+  avgTimelinePosition: string | null;
+  directionCounts: { widening: number; stable: number; closing: number };
+  pctWidening: number;
 }
 
 export default function AdminPage() {
@@ -84,7 +88,7 @@ export default function AdminPage() {
 
       {/* Stats cards */}
       {stats && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-sm text-muted-foreground">
@@ -120,6 +124,19 @@ export default function AdminPage() {
               </div>
             </CardContent>
           </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm text-muted-foreground">
+                {t('avgTimelineGap')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{stats.avgTimelineGap}<span className="text-lg font-normal text-muted-foreground ml-1">mo</span></div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stats.pctWidening}% {t('wideningGap')}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -146,6 +163,8 @@ export default function AdminPage() {
                 <TableRow>
                   <TableHead>{t('name')}</TableHead>
                   <TableHead>{t('score')}</TableHead>
+                  <TableHead>{t('timelinePosition')}</TableHead>
+                  <TableHead>{t('gapMonths')}</TableHead>
                   <TableHead>{t('track')}</TableHead>
                   <TableHead>{t('team')}</TableHead>
                   <TableHead>{t('date')}</TableHead>
@@ -155,6 +174,9 @@ export default function AdminPage() {
               <TableBody>
                 {responses.map((response) => {
                   const scoreLabel = getScoreLabel(response.scores.overall);
+                  const timelineLabel = response.scores.timeline?.timelinePositionLabel ?? '-';
+                  const gapMonths = response.scores.timeline?.gapMonths;
+
                   return (
                     <TableRow key={response.id}>
                       <TableCell>
@@ -164,6 +186,14 @@ export default function AdminPage() {
                         <Badge style={{ backgroundColor: scoreLabel.color, color: '#fff' }}>
                           {response.scores.overall}
                         </Badge>
+                      </TableCell>
+                      <TableCell>{timelineLabel}</TableCell>
+                      <TableCell>
+                        {gapMonths !== undefined ? (
+                          <span className={gapMonths > 18 ? 'text-red-600 font-medium' : gapMonths > 12 ? 'text-orange-500 font-medium' : ''}>
+                            {gapMonths}
+                          </span>
+                        ) : '-'}
                       </TableCell>
                       <TableCell className="capitalize">{response.track}</TableCell>
                       <TableCell>

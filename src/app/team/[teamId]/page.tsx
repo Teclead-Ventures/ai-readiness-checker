@@ -4,6 +4,7 @@ import { TeamOverview } from '@/components/team/TeamOverview';
 import { MemberTable } from '@/components/team/MemberTable';
 import { CategoryHeatmap } from '@/components/team/CategoryHeatmap';
 import { ShareLinks } from '@/components/team/ShareLinks';
+import { AdaptationSummary } from '@/components/team/AdaptationSummary';
 import { TeamWithResponses } from '@/types/survey';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -55,6 +56,7 @@ export default async function TeamDashboardPage({
       {hasResponses ? (
         <>
           <TeamOverview team={team} locale={locale} />
+          <AdaptationSummary responses={team.responses} />
           <MemberTable responses={team.responses} anonymous={team.anonymous} />
           <CategoryHeatmap
             responses={team.responses}

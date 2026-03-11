@@ -4,6 +4,9 @@ import { useTranslations } from 'next-intl';
 import { SurveyResponse } from '@/types/survey';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { ReadinessGauge } from '@/components/results/ReadinessGauge';
+import { TimelinePosition } from '@/components/results/TimelinePosition';
+import { AdaptationProjection } from '@/components/results/AdaptationProjection';
+import { TierProgress } from '@/components/results/TierProgress';
 import { RadarChart } from '@/components/results/RadarChart';
 import { GapComparison } from '@/components/results/GapComparison';
 import { FeatureBreakdown } from '@/components/results/FeatureBreakdown';
@@ -26,16 +29,36 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         <LanguageSwitcher variant="light" />
       </div>
 
-      {/* Gauge - centered */}
+      {/* 1. Overall Score Gauge */}
       <div className="flex justify-center py-4">
         <ReadinessGauge score={response.scores.overall} locale={locale} />
       </div>
 
-      {/* Charts grid - 2 columns on desktop */}
+      {/* 2. Timeline Position (hero) */}
+      <TimelinePosition
+        timeline={response.scores.timeline}
+        locale={locale}
+      />
+
+      {/* 3. Adaptation Projection (urgency driver) */}
+      <AdaptationProjection
+        adaptation={response.scores.adaptation}
+        timeline={response.scores.timeline}
+        locale={locale}
+      />
+
+      {/* 4. Tier Progress Bars */}
+      <TierProgress
+        tiers={response.scores.tiers}
+        features={response.features}
+        track={response.track}
+        locale={locale}
+      />
+
+      {/* 5. Tier Radar Chart + 8. Tier Breakdown - 2 columns on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <RadarChart
-          categories={response.scores.categories}
-          track={response.track}
+          tiers={response.scores.tiers}
           locale={locale}
         />
         <FeatureBreakdown
@@ -45,7 +68,7 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         />
       </div>
 
-      {/* Gap comparison - full width with internal 2-col */}
+      {/* 6 & 7. Self-Awareness Gap + Utilization Gap */}
       <GapComparison
         selfScoreBefore={response.self_score_before}
         selfScoreAfter={response.self_score_after}
@@ -54,14 +77,14 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         locale={locale}
       />
 
-      {/* Opportunities */}
+      {/* 9. Top Opportunities */}
       <OpportunitiesList
         features={response.features}
         track={response.track}
         locale={locale}
       />
 
-      {/* Team CTA */}
+      {/* 10. Team CTA */}
       {!response.team_id && <TeamCTA />}
     </div>
   );

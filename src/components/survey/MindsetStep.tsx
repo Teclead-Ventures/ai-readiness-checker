@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { BARRIERS, type Track, type SurveyFormData } from '@/types/survey';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 
 interface MindsetStepProps {
   track: Track;
@@ -23,10 +23,11 @@ export function MindsetStep({ track }: MindsetStepProps) {
   const priorityAreas = watch('priority_areas') || [];
 
   const opennessLevels = t.raw('opennessLevels') as string[];
-  const featureData = getFeaturesForTrack(track);
-  const categoryNames = Object.entries(featureData).map(([key, cat]) => ({
-    key,
-    name: locale === 'de' ? cat.name.de : cat.name.en,
+  const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
+
+  const tierOptions = ([1, 2, 3, 4, 5] as const).map((tier) => ({
+    key: `tier_${tier}`,
+    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]} (${TIER_CONFIG[tier].era})`,
   }));
 
   return (
@@ -95,7 +96,7 @@ export function MindsetStep({ track }: MindsetStepProps) {
           {t('priorityAreas')}
         </Label>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {categoryNames.map(({ key, name }) => {
+          {tierOptions.map(({ key, name }) => {
             const checked = priorityAreas.includes(key);
             const atLimit = priorityAreas.length >= 3 && !checked;
             return (

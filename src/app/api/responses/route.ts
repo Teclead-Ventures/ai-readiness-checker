@@ -5,7 +5,7 @@ import { createServerClient } from '@/lib/supabase/server';
 import { calculateFullScores } from '@/lib/scoring';
 import type { FeatureValue } from '@/types/survey';
 
-const featureValueSchema = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+const featureValueSchema = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
 
 const surveySchema = z.object({
   track: z.enum(['dev', 'business']),

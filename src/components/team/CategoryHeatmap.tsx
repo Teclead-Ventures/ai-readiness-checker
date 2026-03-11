@@ -2,12 +2,12 @@
 
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SurveyResponse, Track } from '@/types/survey';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { SurveyResponse } from '@/types/survey';
+import { TIER_CONFIG } from '@/lib/features/types';
 
 interface CategoryHeatmapProps {
   responses: SurveyResponse[];
-  track: Track | 'both';
+  track: 'dev' | 'business' | 'both';
   anonymous: boolean;
   locale: string;
 }
@@ -22,15 +22,13 @@ function getCellColor(score: number): string {
 
 function getTextColor(score: number): string {
   if (score <= 30) return '#444D69';
-  if (score <= 55) return '#121212';
-  if (score <= 75) return '#121212';
-  if (score <= 90) return '#121212';
   return '#121212';
 }
 
+const TIERS = [1, 2, 3, 4, 5] as const;
+
 export function CategoryHeatmap({
   responses,
-  track,
   anonymous,
   locale,
 }: CategoryHeatmapProps) {
@@ -38,31 +36,19 @@ export function CategoryHeatmap({
 
   if (responses.length === 0) return null;
 
-  // Group responses by track
-  const devResponses = responses.filter((r) => r.track === 'dev');
-  const businessResponses = responses.filter((r) => r.track === 'business');
+  const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
-  const renderHeatmap = (
-    trackResponses: SurveyResponse[],
-    trackType: Track,
-    showTrackLabel: boolean
-  ) => {
-    if (trackResponses.length === 0) return null;
+  // Sort by date DESC
+  const sorted = [...responses].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
-    const features = getFeaturesForTrack(trackType);
-    const categoryKeys = Object.keys(features).sort();
-    const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
-
-    // Sort by date DESC
-    const sorted = [...trackResponses].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-    );
-
-    return (
-      <div className="space-y-2">
-        {showTrackLabel && (
-          <h4 className="text-sm font-medium capitalize">{trackType}</h4>
-        )}
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('heatmap')}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         <div className="overflow-x-auto">
           <table className="text-xs w-full">
             <thead>
@@ -70,15 +56,18 @@ export function CategoryHeatmap({
                 <th className="text-left p-1.5 min-w-[120px] font-medium text-muted-foreground">
                   {t('member')}
                 </th>
-                {categoryKeys.map((key) => (
-                  <th
-                    key={key}
-                    className="p-1.5 text-center font-medium text-muted-foreground min-w-[40px]"
-                    title={features[key].name[lang]}
-                  >
-                    {key}
-                  </th>
-                ))}
+                {TIERS.map((tier) => {
+                  const config = TIER_CONFIG[tier];
+                  return (
+                    <th
+                      key={tier}
+                      className="p-1.5 text-center font-medium text-muted-foreground min-w-[60px]"
+                      title={`${config[lang]} (${config.era})`}
+                    >
+                      T{tier}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -92,11 +81,11 @@ export function CategoryHeatmap({
                     <td className="p-1.5 font-medium truncate max-w-[150px]">
                       {displayName}
                     </td>
-                    {categoryKeys.map((key) => {
-                      const score = response.scores.categories[key] ?? 0;
+                    {TIERS.map((tier) => {
+                      const score = response.scores.tiers[tier] ?? 0;
                       return (
                         <td
-                          key={key}
+                          key={tier}
                           className="p-1 text-center"
                         >
                           <div
@@ -117,30 +106,17 @@ export function CategoryHeatmap({
             </tbody>
           </table>
         </div>
-        {/* Legend */}
-        <div className="flex gap-3 text-xs text-muted-foreground flex-wrap mt-2">
-          {categoryKeys.map((key) => (
-            <span key={key}>
-              <strong>{key}</strong> = {features[key].name[lang]}
-            </span>
-          ))}
+        {/* Tier legend */}
+        <div className="flex gap-3 text-xs text-muted-foreground flex-wrap">
+          {TIERS.map((tier) => {
+            const config = TIER_CONFIG[tier];
+            return (
+              <span key={tier}>
+                <strong>T{tier}</strong> = {config[lang]} ({config.era})
+              </span>
+            );
+          })}
         </div>
-      </div>
-    );
-  };
-
-  const showTrackLabels = track === 'both' && devResponses.length > 0 && businessResponses.length > 0;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('heatmap')}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {(track === 'both' || track === 'dev') &&
-          renderHeatmap(devResponses.length > 0 ? devResponses : responses.filter(r => r.track === 'dev'), 'dev', showTrackLabels)}
-        {(track === 'both' || track === 'business') &&
-          renderHeatmap(businessResponses.length > 0 ? businessResponses : responses.filter(r => r.track === 'business'), 'business', showTrackLabels)}
         {/* Color legend */}
         <div className="flex gap-2 items-center text-xs flex-wrap">
           <span className="text-muted-foreground">Score:</span>

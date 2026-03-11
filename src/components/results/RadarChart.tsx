@@ -9,22 +9,21 @@ import {
   Radar,
   ResponsiveContainer,
 } from 'recharts';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG } from '@/lib/features/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface RadarChartProps {
-  categories: Record<string, number>;
-  track: 'dev' | 'business';
+  tiers: Record<number, number>;
   locale: string;
 }
 
-export function RadarChart({ categories, track, locale }: RadarChartProps) {
+export function RadarChart({ tiers, locale }: RadarChartProps) {
   const t = useTranslations('results');
-  const featureData = getFeaturesForTrack(track);
+  const lang = locale as 'en' | 'de';
 
-  const data = Object.entries(categories).map(([key, value]) => ({
-    category: featureData[key]?.name[locale as 'en' | 'de'] ?? featureData[key]?.name.en ?? key,
-    score: value,
+  const data = ([1, 2, 3, 4, 5] as const).map((tier) => ({
+    category: TIER_CONFIG[tier][lang],
+    score: tiers[tier] ?? 0,
     fullMark: 100,
   }));
 

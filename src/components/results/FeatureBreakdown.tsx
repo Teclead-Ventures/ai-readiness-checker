@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { getFeaturesForTrack } from '@/lib/scoring';
+import { TIER_CONFIG, RESPONSE_SCALE } from '@/lib/features/types';
+import { getCapabilitiesForTrack } from '@/lib/scoring';
 import { FeatureValue } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -12,38 +13,46 @@ interface FeatureBreakdownProps {
   locale: string;
 }
 
-interface CategoryCount {
+interface TierCount {
+  tier: number;
   name: string;
-  dontKnow: number;
-  knowIt: number;
-  useIt: number;
+  unaware: number;
+  aware: number;
+  tried: number;
+  integrated: number;
   total: number;
 }
 
 export function FeatureBreakdown({ features, track, locale }: FeatureBreakdownProps) {
   const t = useTranslations('results');
-  const featureData = getFeaturesForTrack(track);
+  const lang = locale as 'en' | 'de';
+  const capabilities = getCapabilitiesForTrack(track);
 
-  const categoryCounts: CategoryCount[] = Object.entries(featureData).map(([key, category]) => {
-    let dontKnow = 0;
-    let knowIt = 0;
-    let useIt = 0;
+  const tierCounts: TierCount[] = ([1, 2, 3, 4, 5] as const).map((tier) => {
+    const tierCaps = capabilities.filter((c) => c.tier === tier);
+    let unaware = 0;
+    let aware = 0;
+    let tried = 0;
+    let integrated = 0;
 
-    for (const item of category.items) {
-      const val = features[item.id] ?? 0;
-      if (val === 0) dontKnow++;
-      else if (val === 1) knowIt++;
-      else useIt++;
+    for (const cap of tierCaps) {
+      const val = features[cap.id] ?? 0;
+      if (val === 0) unaware++;
+      else if (val === 1) aware++;
+      else if (val === 2) tried++;
+      else integrated++;
     }
 
     return {
-      name: category.name[locale as 'en' | 'de'] ?? category.name.en,
-      dontKnow,
-      knowIt,
-      useIt,
-      total: category.items.length,
+      tier,
+      name: TIER_CONFIG[tier][lang],
+      unaware,
+      aware,
+      tried,
+      integrated,
+      total: tierCaps.length,
     };
-  });
+  }).filter((tc) => tc.total > 0);
 
   return (
     <motion.div
@@ -57,52 +66,71 @@ export function FeatureBreakdown({ features, track, locale }: FeatureBreakdownPr
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Legend */}
-          <div className="flex gap-4 text-xs mb-2">
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-red-500" />
-              <span>{t('dontKnow')}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-amber-500" />
-              <span>{t('knowIt')}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-3 h-3 rounded-sm bg-green-500" />
-              <span>{t('useIt')}</span>
-            </div>
+          <div className="flex flex-wrap gap-4 text-xs mb-2">
+            {([0, 1, 2, 3] as const).map((level) => (
+              <div key={level} className="flex items-center gap-1.5">
+                <div
+                  className="w-3 h-3 rounded-sm"
+                  style={{ backgroundColor: RESPONSE_SCALE[level].color }}
+                />
+                <span>{RESPONSE_SCALE[level][lang]}</span>
+              </div>
+            ))}
           </div>
 
-          {categoryCounts.map((cat, i) => (
+          {tierCounts.map((tc, i) => (
             <div key={i} className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="font-medium truncate mr-2">{cat.name}</span>
+                <span className="font-medium truncate mr-2">
+                  {t('tier')} {tc.tier}: {tc.name}
+                </span>
                 <span className="text-muted-foreground whitespace-nowrap">
-                  {cat.useIt}/{cat.total}
+                  {tc.integrated}/{tc.total} {RESPONSE_SCALE[3][lang].toLowerCase()}
                 </span>
               </div>
               <div className="flex h-5 rounded-md overflow-hidden">
-                {cat.dontKnow > 0 && (
+                {tc.unaware > 0 && (
                   <div
-                    className="bg-red-500 flex items-center justify-center text-[10px] text-white font-medium"
-                    style={{ width: `${(cat.dontKnow / cat.total) * 100}%` }}
+                    className="flex items-center justify-center text-[10px] text-white font-medium"
+                    style={{
+                      width: `${(tc.unaware / tc.total) * 100}%`,
+                      backgroundColor: RESPONSE_SCALE[0].color,
+                    }}
                   >
-                    {cat.dontKnow}
+                    {tc.unaware}
                   </div>
                 )}
-                {cat.knowIt > 0 && (
+                {tc.aware > 0 && (
                   <div
-                    className="bg-amber-500 flex items-center justify-center text-[10px] text-white font-medium"
-                    style={{ width: `${(cat.knowIt / cat.total) * 100}%` }}
+                    className="flex items-center justify-center text-[10px] text-white font-medium"
+                    style={{
+                      width: `${(tc.aware / tc.total) * 100}%`,
+                      backgroundColor: RESPONSE_SCALE[1].color,
+                    }}
                   >
-                    {cat.knowIt}
+                    {tc.aware}
                   </div>
                 )}
-                {cat.useIt > 0 && (
+                {tc.tried > 0 && (
                   <div
-                    className="bg-green-500 flex items-center justify-center text-[10px] text-white font-medium"
-                    style={{ width: `${(cat.useIt / cat.total) * 100}%` }}
+                    className="flex items-center justify-center text-[10px] text-white font-medium"
+                    style={{
+                      width: `${(tc.tried / tc.total) * 100}%`,
+                      backgroundColor: RESPONSE_SCALE[2].color,
+                    }}
                   >
-                    {cat.useIt}
+                    {tc.tried}
+                  </div>
+                )}
+                {tc.integrated > 0 && (
+                  <div
+                    className="flex items-center justify-center text-[10px] text-white font-medium"
+                    style={{
+                      width: `${(tc.integrated / tc.total) * 100}%`,
+                      backgroundColor: RESPONSE_SCALE[3].color,
+                    }}
+                  >
+                    {tc.integrated}
                   </div>
                 )}
               </div>
