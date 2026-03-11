@@ -47,7 +47,7 @@ function FeatureItemInner({ featureId, label, value, onChange }: FeatureItemProp
                 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 isActive
                   ? cn(state.activeBg, state.activeText, 'ring-2', state.activeRing, 'shadow-sm')
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                  : 'bg-gray-100 text-[#444D69] hover:text-foreground hover:bg-muted',
               )}
             >
               {t(state.key)}

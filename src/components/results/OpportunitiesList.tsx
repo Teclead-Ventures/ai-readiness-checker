@@ -48,7 +48,7 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Lightbulb className="h-5 w-5 text-amber-500" />
+            <Lightbulb className="h-5 w-5 text-[#FFAB54]" />
             {t('opportunities')}
           </CardTitle>
           <CardDescription>{t('opportunitiesDesc')}</CardDescription>
@@ -61,7 +61,7 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.6 + i * 0.1 }}
-                className="rounded-lg border bg-amber-50 p-4"
+                className="bg-[#FFAB54]/5 border border-[#FFAB54]/20 rounded-xl p-4"
               >
                 <h4 className="font-semibold text-sm mb-1">{opp.categoryName}</h4>
                 <p className="text-xs text-muted-foreground mb-2">
@@ -70,7 +70,7 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
                 <ul className="space-y-1">
                   {opp.items.map((item, j) => (
                     <li key={j} className="text-xs text-gray-700 flex items-start gap-1.5">
-                      <span className="text-amber-500 mt-0.5">&#x2022;</span>
+                      <span className="text-[#FFAB54] mt-0.5">&#x2022;</span>
                       {item}
                     </li>
                   ))}

@@ -238,7 +238,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
               size="lg"
               onClick={goBack}
               disabled={isFirstStep}
-              className="min-w-[100px] h-11"
+              className="min-w-[100px] h-11 bg-white text-[#121212] border border-gray-300 hover:bg-gray-50 rounded-lg px-8 py-3"
             >
               {tCommon('back')}
             </Button>
@@ -248,7 +248,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 type="submit"
                 size="lg"
                 disabled={submitting}
-                className="min-w-[100px] h-11"
+                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
               >
                 {submitting ? t('submitting') : tCommon('submit')}
               </Button>
@@ -257,7 +257,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 type="button"
                 size="lg"
                 onClick={goNext}
-                className="min-w-[100px] h-11"
+                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
               >
                 {tCommon('next')}
               </Button>

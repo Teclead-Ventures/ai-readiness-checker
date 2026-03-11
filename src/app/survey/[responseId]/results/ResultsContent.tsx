@@ -22,8 +22,8 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{t('title')}</h1>
-        <LanguageSwitcher />
+        <h1 className="text-2xl font-bold text-[#121212]">{t('title')}</h1>
+        <LanguageSwitcher variant="light" />
       </div>
 
       {/* Gauge - centered */}

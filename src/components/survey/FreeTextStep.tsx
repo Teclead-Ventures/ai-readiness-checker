@@ -42,7 +42,7 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
                   atLimit
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:bg-muted/50'
-                } ${checked ? 'border-primary bg-primary/5' : ''}`}
+                } ${checked ? 'border-[#FFAB54] bg-[#FFAB54]/5' : ''}`}
               >
                 <Checkbox
                   checked={checked}
@@ -70,7 +70,7 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
         <Label className="text-base font-medium">{t('freeText')}</Label>
         <Textarea
           placeholder={t('freeTextPlaceholder')}
-          className="min-h-[120px]"
+          className="min-h-[120px] rounded-lg border-gray-300 px-4 py-3 focus:ring-[#FFAB54] focus:border-[#FFAB54]"
           {...register('free_text')}
         />
       </div>

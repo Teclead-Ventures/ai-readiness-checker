@@ -36,12 +36,12 @@ export function GapComparison({
     {
       name: t('selfAwarenessBefore'),
       value: selfScoreBefore,
-      color: '#3b82f6',
+      color: '#444D69',
     },
     {
       name: t('selfAwarenessAfter'),
       value: selfScoreAfter,
-      color: '#22c55e',
+      color: '#FFAB54',
     },
   ];
 
@@ -49,12 +49,12 @@ export function GapComparison({
     {
       name: t('utilizationCurrent'),
       value: utilizationAfter,
-      color: '#3b82f6',
+      color: '#444D69',
     },
     {
       name: t('utilizationPotential'),
       value: potentialUtilization,
-      color: '#22c55e',
+      color: '#FFAB54',
     },
   ];
 

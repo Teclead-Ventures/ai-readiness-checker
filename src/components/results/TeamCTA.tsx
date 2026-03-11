@@ -15,13 +15,14 @@ export function TeamCTA() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.6 }}
     >
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50">
+      <Card className="bg-gradient-to-br from-[#FFAB54]/10 to-[#FFAB54]/5 border border-[#FFAB54]/20">
         <CardContent className="flex flex-col items-center text-center py-8 gap-4">
-          <Users className="h-10 w-10 text-blue-500" />
-          <h3 className="text-xl font-semibold">{t('title')}</h3>
+          <Users className="h-10 w-10 text-[#FFAB54]" />
+          <h3 className="text-xl font-semibold text-[#121212]">{t('title')}</h3>
           <p className="text-muted-foreground max-w-md">{t('description')}</p>
           <Button
             size="lg"
+            className="bg-[#121212] text-white hover:bg-gray-800 rounded-lg font-bold"
             render={<a href="/team/new" />}
           >
             {t('button')}

@@ -30,16 +30,16 @@ export function TrackSelector({ onSelect, selected }: TrackSelectorProps) {
             whileTap={{ scale: 0.98 }}
           >
             <Card
-              className={`cursor-pointer transition-colors min-h-[140px] ${
+              className={`cursor-pointer transition-all min-h-[140px] rounded-xl border-2 ${
                 selected === value
-                  ? 'ring-2 ring-primary bg-primary/5'
-                  : 'hover:bg-muted/50'
+                  ? 'border-[#FFAB54] bg-[#FFAB54]/5'
+                  : 'border-gray-200 hover:border-[#FFAB54]'
               }`}
               onClick={() => onSelect(value)}
             >
               <CardHeader className="flex flex-col items-center text-center gap-3 py-6">
-                <Icon className="size-10 text-primary" />
-                <CardTitle className="text-lg">
+                <Icon className="size-10 text-[#121212]" />
+                <CardTitle className="text-lg text-[#121212]">
                   {value === 'dev' ? t('dev') : t('business')}
                 </CardTitle>
                 <CardDescription className="text-sm">

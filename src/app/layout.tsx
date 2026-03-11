@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -30,16 +32,17 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <body className={`${inter.variable} font-sans antialiased bg-gray-50 min-h-screen flex flex-col`}>
+      <body className={`${dmSans.variable} font-sans antialiased bg-gray-50 min-h-screen flex flex-col`}>
         <NextIntlClientProvider messages={messages}>
           <TooltipProvider>
-            <header className="bg-[#1a1f36] text-white px-4 py-3 flex items-center justify-between">
+            <header className="bg-[#121212] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
               <div className="font-bold text-lg tracking-tight">Teclead Ventures</div>
+              <LanguageSwitcher />
             </header>
             <main className="flex-1">
               {children}
             </main>
-            <footer className="text-center text-sm text-gray-500 py-4 border-t border-gray-200 bg-white">
+            <footer className="text-center text-sm text-[#444D69] py-4 border-t border-gray-100 bg-white">
               Powered by Teclead Ventures · AI Readiness Assessment
             </footer>
           </TooltipProvider>

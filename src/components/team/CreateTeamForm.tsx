@@ -86,7 +86,7 @@ export function CreateTeamForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full max-w-lg mx-auto bg-white rounded-xl border border-gray-200 p-8">
       <CardHeader>
         <CardTitle>{t('create.title')}</CardTitle>
       </CardHeader>
@@ -192,7 +192,7 @@ export function CreateTeamForm() {
 
           <Button
             type="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+            className="w-full bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg py-3"
             disabled={submitting}
           >
             {submitting ? tc('loading') : t('create.submit')}

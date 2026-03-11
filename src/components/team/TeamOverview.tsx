@@ -92,8 +92,8 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
               <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
               <Radar
                 dataKey="score"
-                stroke="#3b82f6"
-                fill="#3b82f6"
+                stroke="#FFAB54"
+                fill="#FFAB54"
                 fillOpacity={0.3}
               />
             </RadarChart>

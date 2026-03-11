@@ -18,7 +18,7 @@ function CopyButton({ value }: { value: string }) {
   };
 
   return (
-    <Button variant="outline" size="sm" onClick={handleCopy} className="shrink-0">
+    <Button size="sm" onClick={handleCopy} className="shrink-0 bg-[#121212] text-white hover:bg-gray-800 rounded-lg">
       {copied ? (
         <>
           <CheckIcon className="size-4 mr-1" />

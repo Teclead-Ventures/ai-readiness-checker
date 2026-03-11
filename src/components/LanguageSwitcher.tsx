@@ -1,9 +1,12 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Button } from '@/components/ui/button';
 
-export function LanguageSwitcher() {
+interface LanguageSwitcherProps {
+  variant?: 'dark' | 'light';
+}
+
+export function LanguageSwitcher({ variant = 'dark' }: LanguageSwitcherProps) {
   const t = useTranslations('common');
 
   function setLocale(locale: string) {
@@ -11,14 +14,23 @@ export function LanguageSwitcher() {
     window.location.reload();
   }
 
+  const inactiveClass =
+    variant === 'light'
+      ? 'text-[#444D69] hover:text-[#FFAB54] cursor-pointer transition-colors'
+      : 'text-white/70 hover:text-[#FFAB54] cursor-pointer transition-colors';
+
+  const separatorClass =
+    variant === 'light' ? 'text-gray-300 select-none' : 'text-white/40 select-none';
+
   return (
-    <div className="flex gap-1">
-      <Button variant="ghost" size="sm" onClick={() => setLocale('en')} className="text-xs px-2">
+    <div className="flex items-center gap-1 text-sm">
+      <span className={inactiveClass} onClick={() => setLocale('en')}>
         {t('english')}
-      </Button>
-      <Button variant="ghost" size="sm" onClick={() => setLocale('de')} className="text-xs px-2">
+      </span>
+      <span className={separatorClass}>|</span>
+      <span className={inactiveClass} onClick={() => setLocale('de')}>
         {t('german')}
-      </Button>
+      </span>
     </div>
   );
 }

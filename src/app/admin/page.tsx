@@ -80,7 +80,7 @@ export default function AdminPage() {
 
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-[#1a1f36]">{t('title')}</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-[#121212]">{t('title')}</h1>
 
       {/* Stats cards */}
       {stats && (
@@ -170,7 +170,7 @@ export default function AdminPage() {
                         {response.team_id ? (
                           <Link
                             href={`/team/${response.team_id}`}
-                            className="text-blue-600 hover:underline"
+                            className="text-[#FFAB54] hover:underline font-medium"
                           >
                             {teamNameMap.get(response.team_id) || response.team_id}
                           </Link>

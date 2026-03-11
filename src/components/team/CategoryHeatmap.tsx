@@ -13,19 +13,19 @@ interface CategoryHeatmapProps {
 }
 
 function getCellColor(score: number): string {
-  if (score <= 30) return '#ef4444';
-  if (score <= 55) return '#f59e0b';
-  if (score <= 75) return '#eab308';
-  if (score <= 90) return '#22c55e';
-  return '#3b82f6';
+  if (score <= 30) return '#E5E7EB';
+  if (score <= 55) return '#FDD9AA';
+  if (score <= 75) return '#FCC47A';
+  if (score <= 90) return '#FFAB54';
+  return '#F59520';
 }
 
 function getTextColor(score: number): string {
-  if (score <= 30) return '#fff';
-  if (score <= 55) return '#fff';
-  if (score <= 75) return '#000';
-  if (score <= 90) return '#fff';
-  return '#fff';
+  if (score <= 30) return '#444D69';
+  if (score <= 55) return '#121212';
+  if (score <= 75) return '#121212';
+  if (score <= 90) return '#121212';
+  return '#121212';
 }
 
 export function CategoryHeatmap({
@@ -145,11 +145,11 @@ export function CategoryHeatmap({
         <div className="flex gap-2 items-center text-xs flex-wrap">
           <span className="text-muted-foreground">Score:</span>
           {[
-            { range: '0-30', color: '#ef4444', textColor: '#fff' },
-            { range: '31-55', color: '#f59e0b', textColor: '#fff' },
-            { range: '56-75', color: '#eab308', textColor: '#000' },
-            { range: '76-90', color: '#22c55e', textColor: '#fff' },
-            { range: '91-100', color: '#3b82f6', textColor: '#fff' },
+            { range: '0-30', color: '#E5E7EB', textColor: '#444D69' },
+            { range: '31-55', color: '#FDD9AA', textColor: '#121212' },
+            { range: '56-75', color: '#FCC47A', textColor: '#121212' },
+            { range: '76-90', color: '#FFAB54', textColor: '#121212' },
+            { range: '91-100', color: '#F59520', textColor: '#121212' },
           ].map((l) => (
             <span
               key={l.range}

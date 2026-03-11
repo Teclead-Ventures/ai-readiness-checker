@@ -49,7 +49,7 @@ export function MindsetStep({ track }: MindsetStepProps) {
                 key={value}
                 className={`flex items-center gap-2 px-4 py-3 rounded-lg border cursor-pointer transition-colors min-h-[44px] ${
                   isSelected
-                    ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                    ? 'border-[#FFAB54] bg-[#FFAB54]/5 ring-1 ring-[#FFAB54]'
                     : 'hover:bg-muted/50'
                 }`}
               >
@@ -105,7 +105,7 @@ export function MindsetStep({ track }: MindsetStepProps) {
                   atLimit
                     ? 'opacity-50 cursor-not-allowed'
                     : 'hover:bg-muted/50'
-                } ${checked ? 'border-primary bg-primary/5' : ''}`}
+                } ${checked ? 'border-[#FFAB54] bg-[#FFAB54]/5' : ''}`}
               >
                 <Checkbox
                   checked={checked}
