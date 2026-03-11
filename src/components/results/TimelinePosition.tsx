@@ -73,7 +73,7 @@ function MarkerLabel({
 }) {
   if (!viewBox) return null;
   const { x } = viewBox;
-  const yBase = above ? viewBox.y - 8 : viewBox.y + viewBox.height + 16;
+  const yBase = above ? viewBox.y - 8 : viewBox.y + viewBox.height + 36;
   const textAnchor = 'middle';
   return (
     <g>
@@ -141,8 +141,8 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
           <CardTitle>{t('timelineTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={220}>
-            <ComposedChart data={data} margin={{ top: 50, right: 30, bottom: 50, left: 30 }}>
+          <ResponsiveContainer width="100%" height={markersAreClose ? 260 : 220}>
+            <ComposedChart data={data} margin={{ top: 50, right: 30, bottom: markersAreClose ? 70 : 50, left: 30 }}>
               <XAxis
                 dataKey="x"
                 type="number"
