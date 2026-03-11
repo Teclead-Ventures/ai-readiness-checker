@@ -1,9 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
+import {
+  ComposedChart,
+  XAxis,
+  YAxis,
+  ReferenceArea,
+  ReferenceLine,
+  ResponsiveContainer,
+  Scatter,
+  Tooltip,
+  Label,
+  Cell,
+} from 'recharts';
 import { TIER_CONFIG } from '@/lib/features/types';
-import type { ScoreResult } from '@/lib/scoring';
+import { ERA_BANDS, dateToMonth } from '@/components/results/TimelinePosition';
 import type { SurveyResponse } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -13,76 +24,86 @@ interface TeamTimelineOverlayProps {
   locale: string;
 }
 
-// Reuse ERA_BANDS from TimelinePosition
-const ERA_BANDS = [
-  { tier: 1 as const, start: '2022-01', end: '2023-06', color: '#22c55e20' },
-  { tier: 2 as const, start: '2023-06', end: '2024-06', color: '#3b82f620' },
-  { tier: 3 as const, start: '2024-06', end: '2025-01', color: '#eab30820' },
-  { tier: 4 as const, start: '2025-01', end: '2025-12', color: '#f9731620' },
-  { tier: 5 as const, start: '2025-12', end: '2027-01', color: '#a855f720' },
-];
-
-function monthToFraction(dateStr: string, minMonth: number, range: number): number {
-  const [y, m] = dateStr.split('-').map(Number);
-  const month = y * 12 + m;
-  return ((month - minMonth) / range) * 100;
-}
-
-function monthsBetween(a: string, b: string): number {
-  const [ay, am] = a.split('-').map(Number);
-  const [by, bm] = b.split('-').map(Number);
-  return (by - ay) * 12 + (bm - am);
-}
-
 const DIRECTION_COLORS: Record<string, string> = {
   closing: '#22c55e',
   stable: '#eab308',
   widening: '#ef4444',
 };
 
+const MIN_MONTH = 2022 * 12 + 1;
+const MAX_MONTH = 2027 * 12 + 1;
+
+interface MemberPoint {
+  x: number;
+  y: number;
+  name: string;
+  score: number;
+  gap: number;
+  direction: string;
+  color: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CustomTooltip({ active, payload }: any) {
+  if (!active || !payload?.[0]) return null;
+  const d = payload[0].payload as MemberPoint;
+  return (
+    <div className="bg-white rounded-lg shadow-lg border px-3 py-2 text-xs">
+      <div className="font-semibold text-[#121212]">{d.name}</div>
+      <div className="text-muted-foreground mt-0.5">Score: {d.score}</div>
+      <div className="text-muted-foreground">Gap: {d.gap} months</div>
+    </div>
+  );
+}
+
 export function TeamTimelineOverlay({
   responses,
   anonymous,
   locale,
 }: TeamTimelineOverlayProps) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const lang = locale as 'en' | 'de';
 
-  const minMonth = 2022 * 12 + 1;
-  const maxMonth = 2027 * 12 + 1;
-  const range = maxMonth - minMonth;
+  // Filter responses with valid timeline data
+  const validResponses = responses.filter(
+    (r) => r.scores?.timeline?.timelinePosition
+  );
 
-  const yearMarkers = [2022, 2023, 2024, 2025, 2026];
+  if (validResponses.length === 0) return null;
 
-  // Calculate team average timeline position
-  const positions = responses
-    .map((r) => r.scores?.timeline?.timelinePosition)
-    .filter(Boolean) as string[];
+  // Build scatter data — spread members vertically to avoid dot overlap
+  const memberData: MemberPoint[] = validResponses.map((r, i) => {
+    const direction = r.scores?.adaptation?.direction ?? 'stable';
+    const name = anonymous
+      ? `Member ${i + 1}`
+      : r.respondent_name || `Member ${i + 1}`;
+    return {
+      x: dateToMonth(r.scores!.timeline.timelinePosition),
+      y: 0.3 + (i % 3) * 0.15, // stagger vertically
+      name,
+      score: r.scores?.overall ?? 0,
+      gap: r.scores?.timeline?.frontierAheadMonths ?? 0,
+      direction,
+      color: DIRECTION_COLORS[direction] ?? '#eab308',
+    };
+  });
 
-  if (positions.length === 0) return null;
-
+  // Team average month
   const avgMonthValue =
-    positions.reduce((sum, pos) => {
-      const [y, m] = pos.split('-').map(Number);
-      return sum + y * 12 + m;
-    }, 0) / positions.length;
+    validResponses.reduce((sum, r) => {
+      return sum + dateToMonth(r.scores!.timeline.timelinePosition);
+    }, 0) / validResponses.length;
 
-  const avgYear = Math.floor(avgMonthValue / 12);
-  const avgMonth = Math.round(avgMonthValue % 12);
-  const avgPos = ((avgMonthValue - minMonth) / range) * 100;
-
-  // Frontier: rightmost position across all responses
-  const frontierPositions = responses
+  // Frontier: latest across all responses
+  const frontierDates = validResponses
     .map((r) => r.scores?.timeline?.frontier)
     .filter(Boolean) as string[];
-
   const frontierDate =
-    frontierPositions.length > 0
-      ? frontierPositions.sort((a, b) => b.localeCompare(a))[0]
+    frontierDates.length > 0
+      ? frontierDates.sort((a, b) => b.localeCompare(a))[0]
       : '2026-02';
+  const frontierMonth = dateToMonth(frontierDate);
 
-  const frontierPos = monthToFraction(frontierDate, minMonth, range);
-
+  const yearTicks = [2022, 2023, 2024, 2025, 2026].map((y) => y * 12 + 1);
   const title = lang === 'de' ? 'Team-Timeline' : 'Team Timeline';
 
   return (
@@ -96,152 +117,98 @@ export function TeamTimelineOverlay({
           <CardTitle>{title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="relative w-full pt-10 pb-16">
-            {/* Era background bands */}
-            {ERA_BANDS.map((band) => {
-              const left = monthToFraction(band.start, minMonth, range);
-              const right = monthToFraction(band.end, minMonth, range);
-              return (
-                <div
+          <ResponsiveContainer width="100%" height={200}>
+            <ComposedChart margin={{ top: 30, right: 20, bottom: 40, left: 20 }}>
+              <XAxis
+                dataKey="x"
+                type="number"
+                domain={[MIN_MONTH, MAX_MONTH]}
+                ticks={yearTicks}
+                tickFormatter={(val: number) => String(Math.floor(val / 12))}
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 11, fill: '#6b7280' }}
+              />
+              <YAxis hide domain={[0, 1]} />
+
+              {/* Era background bands */}
+              {ERA_BANDS.map((band) => (
+                <ReferenceArea
                   key={band.tier}
-                  className="absolute top-0 bottom-0 rounded"
-                  style={{
-                    left: `${left}%`,
-                    width: `${right - left}%`,
-                    backgroundColor: band.color,
-                  }}
+                  x1={band.startMonth}
+                  x2={band.endMonth}
+                  y1={0}
+                  y2={1}
+                  fill={band.color}
+                  fillOpacity={1}
+                  stroke="none"
+                >
+                  <Label
+                    value={TIER_CONFIG[band.tier][lang]}
+                    position="insideBottom"
+                    offset={8}
+                    style={{ fontSize: 9, fill: '#6b7280' }}
+                  />
+                </ReferenceArea>
+              ))}
+
+              {/* Timeline bar */}
+              <ReferenceArea
+                x1={MIN_MONTH}
+                x2={MAX_MONTH}
+                y1={0.48}
+                y2={0.52}
+                fill="#d1d5db"
+                fillOpacity={1}
+                stroke="none"
+                radius={4}
+              />
+
+              {/* Team average dashed line */}
+              <ReferenceLine
+                x={Math.round(avgMonthValue)}
+                stroke="#FFAB54"
+                strokeDasharray="6 3"
+                strokeWidth={2}
+              >
+                <Label
+                  value={lang === 'de' ? 'Team-Durchschnitt' : 'Team Average'}
+                  position="top"
+                  offset={10}
+                  style={{ fontSize: 10, fill: '#FFAB54', fontWeight: 600 }}
                 />
-              );
-            })}
+              </ReferenceLine>
 
-            {/* Main timeline bar */}
-            <div className="relative h-1 bg-gray-300 rounded-full mx-4 mt-6" />
+              {/* Frontier marker */}
+              <ReferenceLine
+                x={frontierMonth}
+                stroke="#FFAB54"
+                strokeWidth={2}
+              >
+                <Label
+                  value="★ FRONTIER"
+                  position="insideTopLeft"
+                  offset={10}
+                  style={{ fontSize: 10, fill: '#FFAB54', fontWeight: 700 }}
+                />
+              </ReferenceLine>
 
-            {/* Team average dashed line */}
-            <div
-              className="absolute top-0 bottom-12"
-              style={{
-                left: `${Math.min(avgPos, 98)}%`,
-                width: '2px',
-                borderLeft: '2px dashed #FFAB54',
-              }}
-            />
-            <div
-              className="absolute text-[10px] font-semibold text-[#FFAB54] whitespace-nowrap -translate-x-1/2"
-              style={{
-                left: `${Math.min(avgPos, 98)}%`,
-                top: '0',
-              }}
-            >
-              {lang === 'de' ? 'Team-Durchschnitt' : 'Team Average'}
-            </div>
+              {/* Member scatter dots */}
+              <Scatter data={memberData} dataKey="y">
+                {memberData.map((entry, i) => (
+                  <Cell
+                    key={i}
+                    fill={entry.color}
+                    stroke="#fff"
+                    strokeWidth={2}
+                    r={7}
+                  />
+                ))}
+              </Scatter>
 
-            {/* Member dots */}
-            {responses.map((r, i) => {
-              const timelinePos = r.scores?.timeline?.timelinePosition;
-              if (!timelinePos) return null;
-
-              const xPos = monthToFraction(timelinePos, minMonth, range);
-              const direction = r.scores?.adaptation?.direction ?? 'stable';
-              const dotColor = DIRECTION_COLORS[direction] ?? '#eab308';
-              const name = anonymous
-                ? `Member ${i + 1}`
-                : r.respondent_name || `Member ${i + 1}`;
-
-              return (
-                <div key={r.id ?? i}>
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ duration: 0.3, delay: 0.2 + i * 0.05 }}
-                    className="absolute cursor-pointer"
-                    style={{
-                      left: `${Math.min(xPos, 97)}%`,
-                      top: '3rem',
-                      transform: 'translate(-50%, -50%)',
-                    }}
-                    onMouseEnter={() => setHoveredIndex(i)}
-                    onMouseLeave={() => setHoveredIndex(null)}
-                  >
-                    <div
-                      className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm"
-                      style={{ backgroundColor: dotColor }}
-                    />
-                  </motion.div>
-
-                  {/* Tooltip */}
-                  {hoveredIndex === i && (
-                    <div
-                      className="absolute z-10 bg-white rounded-lg shadow-lg border px-3 py-2 text-xs whitespace-nowrap"
-                      style={{
-                        left: `${Math.min(xPos, 90)}%`,
-                        top: '1rem',
-                        transform: 'translateX(-50%)',
-                      }}
-                    >
-                      <div className="font-semibold text-[#121212]">{name}</div>
-                      <div className="text-muted-foreground mt-0.5">
-                        {lang === 'de' ? 'Score' : 'Score'}: {r.scores?.overall ?? '—'}
-                      </div>
-                      <div className="text-muted-foreground">
-                        {lang === 'de' ? 'Abstand' : 'Gap'}:{' '}
-                        {r.scores?.timeline?.frontierAheadMonths ?? '—'}{' '}
-                        {lang === 'de' ? 'Monate' : 'months'}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-
-            {/* Frontier marker */}
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.5 }}
-              className="absolute flex flex-col items-center"
-              style={{
-                left: `${Math.min(frontierPos, 98)}%`,
-                top: '0.5rem',
-              }}
-            >
-              <span className="text-lg text-[#FFAB54]">&#9733;</span>
-            </motion.div>
-
-            {/* Year markers */}
-            <div className="relative mt-4 mx-4">
-              {yearMarkers.map((year) => {
-                const pos = monthToFraction(`${year}-01`, minMonth, range);
-                return (
-                  <span
-                    key={year}
-                    className="absolute text-[10px] text-muted-foreground -translate-x-1/2"
-                    style={{ left: `${pos}%` }}
-                  >
-                    {year}
-                  </span>
-                );
-              })}
-            </div>
-
-            {/* Era labels */}
-            <div className="relative mt-6 mx-4">
-              {ERA_BANDS.map((band) => {
-                const left = monthToFraction(band.start, minMonth, range);
-                const right = monthToFraction(band.end, minMonth, range);
-                const center = (left + right) / 2;
-                return (
-                  <span
-                    key={band.tier}
-                    className="absolute text-[9px] text-muted-foreground -translate-x-1/2 text-center whitespace-nowrap"
-                    style={{ left: `${center}%` }}
-                  >
-                    {TIER_CONFIG[band.tier][lang]}
-                  </span>
-                );
-              })}
-            </div>
-          </div>
+              <Tooltip content={<CustomTooltip />} />
+            </ComposedChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     </motion.div>
