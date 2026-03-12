@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -117,7 +118,16 @@ export default function AdminPage() {
 
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto space-y-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-[#121212]">{t('title')}</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl md:text-3xl font-bold text-[#121212]">{t('title')}</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => signOut({ callbackUrl: '/admin/login' })}
+        >
+          {locale === 'de' ? 'Abmelden' : 'Sign Out'}
+        </Button>
+      </div>
 
       {/* Nav cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
