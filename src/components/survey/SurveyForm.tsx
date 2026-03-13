@@ -15,12 +15,13 @@ import { CurrentUsageStep } from './CurrentUsageStep';
 import { MindsetStep } from './MindsetStep';
 import { FeatureMatrixStep } from './FeatureMatrixStep';
 import { FreeTextStep } from './FreeTextStep';
+import { KnowledgeManagementStep } from './KnowledgeManagementStep';
 import { getCampaignFromSession } from '@/lib/campaign';
 import type { Track, SurveyFormData } from '@/types/survey';
 
-const TOTAL_STEPS = 8;
+const TOTAL_STEPS = 9;
 
-const STEP_IDS = ['track_select', 'profile', 'pre_assessment', 'current_usage', 'mindset', 'feature_matrix', 'post_assessment', 'free_text'] as const;
+const STEP_IDS = ['track_select', 'profile', 'pre_assessment', 'current_usage', 'mindset', 'knowledge_management', 'feature_matrix', 'post_assessment', 'free_text'] as const;
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -77,7 +78,15 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
       },
       openness: 3,
       barriers: [],
+      barriers_other: '',
       priority_areas: [],
+      knowledge_management: {
+        awareness: 3,
+        filtering: 3,
+        contextualization: 3,
+        overload: 3,
+        knowledge_transfer: 3,
+      },
       features: {},
       self_score_after: 5,
       utilization_after: 0,
@@ -198,12 +207,15 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   const isLastStep = step === TOTAL_STEPS - 1;
   const isFirstStep = step === 0;
 
-  const renderStep = () => {
+  // Guard: if track is lost (e.g. on direct URL access), reset to step 0
+  useEffect(() => {
     if (!track && step > 0) {
       setStep(0);
-      return null;
+      updateStepInUrl(0);
     }
+  }, [track, step, updateStepInUrl]);
 
+  const renderStep = () => {
     switch (step) {
       case 0:
         return <TrackSelector onSelect={handleTrackSelect} selected={track} />;
@@ -216,14 +228,12 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
       case 4:
         return <MindsetStep track={track!} />;
       case 5:
-        return <FeatureMatrixStep track={track!} />;
+        return <KnowledgeManagementStep />;
       case 6:
-        return (
-          <div className="space-y-10">
-            <SelfAssessmentStep variant="after" />
-          </div>
-        );
+        return <FeatureMatrixStep track={track!} />;
       case 7:
+        return <SelfAssessmentStep variant="after" />;
+      case 8:
         return <FreeTextStep track={track!} />;
       default:
         return null;

@@ -5,11 +5,11 @@ import { useTranslations } from 'next-intl';
 import { Lightbulb } from 'lucide-react';
 import { getCapabilitiesForTrack } from '@/lib/scoring';
 import { TIER_CONFIG } from '@/lib/features/types';
-import { FeatureValue } from '@/types/survey';
+import { FeatureEntry } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface OpportunitiesListProps {
-  features: Record<string, FeatureValue>;
+  features: Record<string, FeatureEntry>;
   track: 'dev' | 'business';
   locale: string;
 }
@@ -34,7 +34,7 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
       tier: cap.tier,
       capabilityName: cap[lang],
       firstAvailable: cap.firstAvailable,
-      value: features[cap.id] ?? 0,
+      value: (() => { const e = features[cap.id]; return (typeof e === 'object' ? e?.score : e) ?? 0; })(),
     }))
     .filter((o) => o.value < 3) // Not yet integrated
     .sort((a, b) => {

@@ -13,22 +13,26 @@ interface MindsetStepProps {
   track: Track;
 }
 
-export function MindsetStep({ track }: MindsetStepProps) {
+export function MindsetStep({ track: _track }: MindsetStepProps) {
   const t = useTranslations('survey.mindset');
   const locale = useLocale();
   const { setValue, watch } = useFormContext<SurveyFormData>();
 
   const openness = watch('openness') ?? 3;
   const barriers = watch('barriers') || [];
+  const barriersOther = watch('barriers_other') || '';
   const priorityAreas = watch('priority_areas') || [];
 
   const opennessLevels = t.raw('opennessLevels') as string[];
+  const barrierLabels = t.raw('barrierLabels') as Record<string, string>;
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
   const tierOptions = ([1, 2, 3, 4, 5] as const).map((tier) => ({
     key: `tier_${tier}`,
-    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]}`,
+    name: `${TIER_CONFIG[tier][lang]}`,
   }));
+
+  const showOtherField = barriers.includes('Other');
 
   return (
     <div className="space-y-8">
@@ -68,6 +72,7 @@ export function MindsetStep({ track }: MindsetStepProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {BARRIERS.map((barrier) => {
             const checked = barriers.includes(barrier);
+            const displayLabel = barrierLabels[barrier] ?? barrier;
             return (
               <label
                 key={barrier}
@@ -83,11 +88,22 @@ export function MindsetStep({ track }: MindsetStepProps) {
                     }
                   }}
                 />
-                <span className="text-sm">{barrier}</span>
+                <span className="text-sm">{displayLabel}</span>
               </label>
             );
           })}
         </div>
+
+        {/* Free text for "Other" */}
+        {showOtherField && (
+          <textarea
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+            rows={2}
+            placeholder={t('barriersOtherPlaceholder')}
+            value={barriersOther}
+            onChange={(e) => setValue('barriers_other', e.target.value)}
+          />
+        )}
       </div>
 
       {/* Priority Areas (top 3) */}

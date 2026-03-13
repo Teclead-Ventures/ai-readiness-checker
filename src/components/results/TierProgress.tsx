@@ -6,11 +6,12 @@ import { useTranslations } from 'next-intl';
 import { ChevronDown } from 'lucide-react';
 import { TIER_CONFIG, RESPONSE_SCALE } from '@/lib/features/types';
 import { getCapabilitiesForTrack } from '@/lib/scoring';
+import { FeatureEntry } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface TierProgressProps {
   tiers: Record<number, number>;
-  features: Record<string, number>;
+  features: Record<string, FeatureEntry>;
   track: 'dev' | 'business';
   locale: string;
 }
@@ -89,7 +90,8 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                   >
                     <div className="ml-12 pl-3 border-l-2 border-gray-200 space-y-1.5 py-2">
                       {caps.map((cap) => {
-                        const value = (features[cap.id] ?? 0) as 0 | 1 | 2 | 3;
+                        const entry = features[cap.id];
+                        const value = ((typeof entry === 'object' ? entry?.score : entry) ?? 0) as 0 | 1 | 2 | 3;
                         const scale = RESPONSE_SCALE[value];
                         return (
                           <div key={cap.id} className="flex items-center justify-between text-xs">

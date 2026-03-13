@@ -14,6 +14,7 @@ import { GapComparison } from '@/components/results/GapComparison';
 import { FeatureBreakdown } from '@/components/results/FeatureBreakdown';
 import { OpportunitiesList } from '@/components/results/OpportunitiesList';
 import { TeamCTA } from '@/components/results/TeamCTA';
+import { BookingCTA } from '@/components/results/BookingCTA';
 
 interface ResultsContentProps {
   response: SurveyResponse;
@@ -51,7 +52,6 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       {/* 3. Adaptation Projection (urgency driver) */}
       <AdaptationProjection
         adaptation={response.scores.adaptation}
-        timeline={response.scores.timeline}
         locale={locale}
       />
 
@@ -67,6 +67,7 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <RadarChart
           tiers={response.scores.tiers}
+          tiersNA={response.scores.tiersNA}
           locale={locale}
         />
         <FeatureBreakdown
@@ -94,6 +95,9 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
 
       {/* 10. Team CTA */}
       {!response.team_id && <TeamCTA />}
+
+      {/* 11. Booking CTA */}
+      <BookingCTA />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
+import Link from "next/link";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,7 +37,10 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <TooltipProvider>
             <header className="bg-[#121212] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-50">
-              <div className="font-bold text-lg tracking-tight">Teclead Ventures</div>
+              <Link href="/" className="flex flex-col leading-tight hover:opacity-80 transition-opacity">
+                <span className="font-bold text-base tracking-tight">Teclead Ventures</span>
+                <span className="text-xs text-white/60">AI Readiness Check</span>
+              </Link>
               <LanguageSwitcher />
             </header>
             <main className="flex-1">

@@ -3,9 +3,12 @@ import { z } from 'zod';
 import { nanoid } from 'nanoid';
 import { createServerClient } from '@/lib/supabase/server';
 import { calculateFullScores } from '@/lib/scoring';
-import type { FeatureValue } from '@/types/survey';
+import type { FeatureEntry } from '@/types/survey';
 
-const featureValueSchema = z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]);
+const featureEntrySchema = z.object({
+  score: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]).optional(),
+  relevant: z.enum(['yes', 'no', 'unsure']).optional(),
+});
 
 const surveySchema = z.object({
   track: z.enum(['dev', 'business']),
@@ -35,9 +38,18 @@ const surveySchema = z.object({
 
   openness: z.number().min(1).max(5),
   barriers: z.array(z.string()),
+  barriers_other: z.string().optional().default(''),
   priority_areas: z.array(z.string()),
 
-  features: z.record(z.string(), featureValueSchema),
+  knowledge_management: z.object({
+    awareness: z.number().min(1).max(5),
+    filtering: z.number().min(1).max(5),
+    contextualization: z.number().min(1).max(5),
+    overload: z.number().min(1).max(5),
+    knowledge_transfer: z.number().min(1).max(5),
+  }).optional().default({ awareness: 3, filtering: 3, contextualization: 3, overload: 3, knowledge_transfer: 3 }),
+
+  features: z.record(z.string(), featureEntrySchema),
 
   self_score_after: z.number().min(1).max(10),
   utilization_after: z.number().min(0).max(100),
@@ -55,13 +67,14 @@ export async function POST(request: NextRequest) {
     const parsed = surveySchema.parse(body);
 
     const scores = calculateFullScores(
-      parsed.features as Record<string, FeatureValue>,
+      parsed.features as Record<string, FeatureEntry>,
       parsed.track,
       {
         self_score_before: parsed.self_score_before,
         self_score_after: parsed.self_score_after,
         utilization_after: parsed.utilization_after,
         potential_utilization: parsed.potential_utilization,
+        knowledge_management: parsed.knowledge_management,
       },
     );
 
