@@ -4,33 +4,43 @@
 
 Umfassende Überarbeitung des AI Readiness Checkers: Sprache, Inhalte, Scoring, UI und Bugfixes. Zielgruppe: deutscher Mittelstand. Positionierung: Teclead Ventures als KI-Experten mit Prozessverständnis und Change-Management-Kompetenz.
 
+> **Hinweis:** Die Landing Page (`src/app/page.tsx`) wird in diesem Plan **nicht** verändert — sie bleibt wie sie ist.
+
 ---
 
 ## Phase 1: Datenmodell & Kategorie-Struktur (Fundament)
 
-### 1.1 Kategorie-Struktur von Tiers auf funktionale Bereiche umstellen
+### 1.1 Kategorie-Anzeigenamen aktualisieren
 
-**Dateien:** `src/lib/features/types.ts`, `dev-features.ts`, `business-features.ts`
+**Was sich ändert:** Nur die **Anzeigenamen** (Labels) der 5 Kategorien in der UI — sowohl Deutsch als auch Englisch. Die interne Code-Struktur (`tier`, `TIER_CONFIG`, etc.) bleibt unverändert.
 
-- Die 5 Tiers (Table Stakes → Frontier) werden durch **funktionale Kategorien** ersetzt, die von simpel zu komplex aufbauen:
+**Betroffene Stellen:** `TIER_CONFIG` in `src/lib/features/types.ts` (die `en`/`de` Label-Felder), Übersetzungsdateien (`de.json`, `en.json`), `FreeTextStep.tsx` (zeigt Tier-Namen an).
 
-**Developer-Track — Neue Kategorien:**
+**Neue Anzeigenamen:**
+
+| Tier | Deutsch (neu) | Englisch (neu) | Bisher |
+|------|--------------|----------------|--------|
+| 1 | KI-Grundlagen & Verständnis | AI Fundamentals & Understanding | Table Stakes / Grundlagen |
+| 2 | Grundlegendes Tooling | Basic Tooling | Productive Usage / Produktive Nutzung |
+| 3 | Produktive Nutzung | Productive Usage | Integrated Workflows / Integrierte Workflows |
+| 4 | Automatisierung & Workflows | Automation & Workflows | Advanced Configuration / Erweiterte Konfiguration |
+| 5 | Strategische KI-Kompetenz | Strategic AI Competence | Frontier / Frontier |
+
+- Jede Kategorie bekommt zusätzlich eine `description` (1-2 Sätze) die in der UI als erklärende Zeile unter dem Kategorienamen angezeigt wird (siehe 4.6).
+
+**Developer-Track — Kategorie-Beschreibungen:**
 1. **KI-Grundlagen & Verständnis** — Wie funktioniert KI? Was kann sie, was nicht? Grundlegendes Wissen.
 2. **Grundlegendes Tooling** — Alltägliche KI-Werkzeuge im Entwickleralltag (Code Completion, Chat, Fehlerdiagnose).
 3. **Produktive Nutzung** — Gezielte Nutzung für Code-Qualität, Tests, Reviews, Refactoring.
 4. **Automatisierung & Workflows** — Automatisierte Pipelines, Multi-File-Editing, App-Generierung, CI/CD-Integration.
 5. **Strategische KI-Kompetenz** — Kontext-Engineering, Prompt Libraries, Evaluation-Systeme, eigene Use Cases finden und umsetzen.
 
-**Business-Track — Neue Kategorien:**
+**Business-Track — Kategorie-Beschreibungen:**
 1. **KI-Grundlagen & Verständnis** — Basiswissen: Wie funktioniert KI? Möglichkeiten und Grenzen.
 2. **Grundlegendes Tooling** — Chat-Assistenten, Websuche, Schreibhilfe, Bildgenerierung.
 3. **Produktive Nutzung** — Meeting-Transkription, Dokumentenerstellung, Präsentationen, Datenanalyse.
 4. **Automatisierung & Workflows** — Content-Erstellungspipelines, automatisierte Berichte, Workflow-Automatisierung, Tool-Integrationen.
 5. **Strategische KI-Kompetenz** — Eigene KI-Agenten, persistenter Kontext, strategische Use-Case-Identifikation, KI-gestütztes Prozessdesign.
-
-- Jede Kategorie bekommt eine `description` (1-2 Sätze) die in der UI als erklärende Zeile unter dem Kategorienamen angezeigt wird.
-- `TIER_CONFIG` → `CATEGORY_CONFIG` umbenennen; Gewichtung beibehalten (aufsteigend nach Komplexität).
-- `tier`-Feld in `Capability` Interface → `category` umbenennen.
 
 ### 1.2 Capabilities inhaltlich aktualisieren (Stand: März 2026)
 
@@ -46,29 +56,37 @@ Umfassende Überarbeitung des AI Readiness Checkers: Sprache, Inhalte, Scoring, 
 
 **Datei:** `src/lib/features/types.ts`
 
-- "Integrated" → **"Regelmäßig genutzt"** (`de`) / "Regularly Used" (`en`)
-- "Unaware" → **"Nicht bekannt"**
-- "Aware" → **"Bekannt"**
-- "Tried" → **"Ausprobiert"**
+Anzeigenamen und Beschreibungen der 4-Punkte-Skala aktualisieren:
+
+| Wert | Deutsch (neu) | Englisch (neu) | Beschreibung DE | Bisher |
+|------|--------------|----------------|-----------------|--------|
+| 0 | Nicht bekannt | Not Aware | Kenne ich nicht | Unaware |
+| 1 | Bekannt | Aware | Kenne ich, noch nicht ausprobiert | Aware |
+| 2 | Ausprobiert | Tried | Mindestens einmal genutzt | Tried |
+| 3 | Regelmäßig genutzt | Regularly Used | Teil meines Arbeitsalltags | Integrated |
 
 ### 1.4 Job-Relevanz-Dimension hinzufügen
 
-**Dateien:** `types.ts`, `FeatureItem.tsx`, `FeatureMatrixStep.tsx`, `survey.ts`
+**Betroffene Stellen:** `types.ts`, `survey.ts`, `FeatureItem.tsx`, `FeatureMatrixStep.tsx`, API-Route (`src/app/api/responses/route.ts` — Zod-Schema), `scoring.ts`, `OpportunitiesList.tsx`, `FeatureBreakdown.tsx`, Supabase Schema.
 
 - Pro Capability eine zweite Bewertungszeile: **"Relevant für meinen Job?"** mit Optionen: Ja / Nein / Nicht sicher.
+- **Kein Default** — der Nutzer muss aktiv wählen. Ohne Auswahl bleibt das Feld leer.
 - `features`-Datenstruktur erweitern: `Record<string, { score: 0|1|2|3, relevant: 'yes'|'no'|'unsure' }>` statt `Record<string, 0|1|2|3>`.
 - UI: Kompaktes 2-Zeilen-Layout pro Capability (Zeile 1: Nutzungsgrad, Zeile 2: Relevanz).
+
+> **Breaking Change:** Dieses neue Format ist nicht abwärtskompatibel. → **Clean-Slate:** Bestehende Testdaten in Supabase vor Go-Live löschen.
 
 ### 1.5 Survey-Type-Definitionen aktualisieren
 
 **Datei:** `src/types/survey.ts`
 
 - `SurveyResponse` Interface anpassen für neue Felder:
-  - `features` → neues Format mit Relevanz
-  - `knowledge_management` → neuer Abschnitt (siehe Phase 2)
-  - `barriers` → erweiterte Optionen
+  - `features` → neues Format mit Relevanz (siehe 1.4)
+  - `knowledge_management` → neuer Abschnitt mit 5 Werten (siehe 2.3)
+  - `barriers` → erweiterte Optionen + Freitextfeld
 - Score-Labels Deutsch überarbeiten (kein "Frontier", kein "Pioneer")
 - Supabase Schema (`supabase/schema.sql`) entsprechend anpassen.
+- **API-Route** (`src/app/api/responses/route.ts`): Zod-Validierungsschema für das neue `features`-Format und `knowledge_management`-Felder aktualisieren.
 
 ---
 
@@ -112,7 +130,12 @@ Neuer Schritt zwischen Mindset und Feature Matrix (wird Schritt 5, Feature Matri
 4. **Überforderung:** "Wie stark empfinden Sie die Nachrichtendichte rund um KI als Überforderung?" (Skala 1-5)
 5. **Interner Wissenstransfer:** "Wie gut funktioniert der KI-Wissensaustausch in Ihrem Unternehmen?" (Skala 1-5)
 
-→ Ergebnis fließt als "Wissensmanagement-Score" in die Auswertung ein.
+**Scoring-Integration:** Der Wissensmanagement-Score wird als **eigene, separate Dimension** berechnet und angezeigt — er fließt **nicht** in den Gesamt-Readiness-Score ein. Begründung: Der Hauptscore misst "Wie gut nutzen Sie KI-Tools?" (praktische Fähigkeit), Wissensmanagement misst "Wie gut bleiben Sie informiert?" (Meta-Kompetenz). Das Vermischen würde beide Signale verwässern.
+
+Darstellung auf der Ergebnisseite:
+- Eigene Karte: "Wissensmanagement: X/100"
+- Zusätzlicher Balken in der Kategorie-Übersicht (neben den 5 Hauptkategorien)
+- Bei niedrigem Score: Gezielte Empfehlung (z.B. "Ein strukturierter Ansatz zum Filtern von KI-Neuigkeiten könnte Ihnen helfen")
 
 ### 2.4 Selbsteinschätzungsfragen spezifischer formulieren
 
@@ -150,11 +173,19 @@ Neue Schritt-Reihenfolge (9 Schritte):
 7. Selbsteinschätzung (nachher)
 8. Freitext & Abschluss
 
-**Validierung hinzufügen:**
-- Mindestens Track-Auswahl required vor "Weiter"
-- Profil: Mindestens Rolle und Unternehmensgröße required
-- Feature Matrix: Mindestens 50% der Capabilities bewertet
-- Aktuell kann man durch den gesamten Flow klicken ohne eine Eingabe → beheben.
+**Validierung — "Weiter"-Button bleibt deaktiviert bis Mindestanforderung erfüllt:**
+
+| Schritt | Pflichtfeld(er) | Begründung |
+|---------|-----------------|------------|
+| 0 — Track | Track muss gewählt sein | Bereits so implementiert (auto-advance) |
+| 1 — Profil | Rolle + Unternehmensgröße | Minimum für sinnvolle Auswertung |
+| 2 — Selbsteinschätzung (vorher) | Keine extra Pflicht | Schieberegler haben Startwerte, Nutzer sieht und bestätigt sie bewusst |
+| 3 — Aktuelle Nutzung | Nutzungshäufigkeit gewählt | Kern-Datenpunkt für Kontext |
+| 4 — Einstellung & Barrieren | Keine extra Pflicht | Offenheit hat Startwert, Barrieren sind optional |
+| 5 — Wissensmanagement | Keine extra Pflicht | Alle 5 Skalen haben Startwert (Mitte) |
+| 6 — Fähigkeiten-Matrix | Mind. **30%** der Capabilities bewertet | Balance zwischen Datenqualität und Nutzerfreundlichkeit (~15 bei Dev, ~9 bei Business) |
+| 7 — Selbsteinschätzung (nachher) | Keine extra Pflicht | Wie Schritt 2 |
+| 8 — Freitext | Keine Pflicht | Optional by Design |
 
 ---
 
@@ -164,15 +195,19 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 **Datei:** `src/lib/scoring.ts`
 
-- Tier-basierte Gewichtung → Kategorie-basierte Gewichtung (gleiche Logik, neue Namen).
-- **Job-Relevanz einbeziehen:** Capabilities die als "nicht relevant" markiert wurden, aus der Gewichtung herausnehmen (weder positiv noch negativ zählen). "Nicht sicher" wird normal gezählt.
-- **Wissensmanagement-Score** als eigene Dimension ins ScoreResult aufnehmen.
-- Timeline-Position beibehalten, aber Begriffe anpassen ("Frontier" → "Vorreiter").
+- Gewichtungslogik bleibt gleich (aufsteigende Gewichte pro Kategorie), nur Anzeigenamen ändern sich (siehe 1.1).
+- **Job-Relevanz einbeziehen:**
+  - Capabilities mit `relevant: 'no'` → komplett aus der Berechnung ausschließen (weder positiv noch negativ).
+  - Capabilities mit `relevant: 'yes'` oder `'unsure'` → normal gewichten.
+  - Capabilities ohne Relevanz-Angabe → normal gewichten (Fallback).
+- **Sonderfall "Alles irrelevant":** Wenn ein Nutzer alle Capabilities einer Kategorie als "nicht relevant" markiert, wird diese Kategorie als "N/A" angezeigt und aus dem Gesamtscore ausgeschlossen. Wenn über alle Kategorien hinweg weniger als 5 Capabilities als relevant/unsicher übrig bleiben, kann kein sinnvoller Score berechnet werden → Hinweis anzeigen: "Bitte bewerten Sie mehr Fähigkeiten als relevant, um ein aussagekräftiges Ergebnis zu erhalten."
+- **Wissensmanagement-Score** als eigene Dimension ins ScoreResult aufnehmen (Durchschnitt der 5 Fragen, normalisiert auf 0-100).
+- Timeline-Begriffe anpassen ("Frontier" → "Vorreiter" in Labels).
 - Gap-Analyse-Terminologie eindeutschen.
 
 ### 3.2 Opportunities-Logik verbessern
 
-- Opportunities nach Relevanz filtern (nur Capabilities die als "relevant" oder "nicht sicher" markiert sind).
+- Opportunities nach Relevanz filtern: Nur Capabilities die als `relevant: 'yes'` oder `'unsure'` markiert sind.
 - Opportunities mit konkreten, geschäftsrelevanten Handlungsempfehlungen anreichern (je Capability ein Satz warum das wertvoll ist).
 
 ---
@@ -183,20 +218,25 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 **Datei:** `AdaptationProjection.tsx`
 
-- Aktuell: Zwei Linien (current pace vs. improved) → verwirrend.
-- **Neu:** Einfacherer Ansatz — Balkendiagramm oder Bereichsdiagramm das zeigt:
-  - Branchenentwicklung (exponentielles Wachstum der KI-Möglichkeiten)
-  - Persönliche Position heute
-  - Projektion bei aktuellem Tempo vs. bei gezielter Weiterbildung
-- "X Monate hinterher"-Anzeige optional machen oder in eine Textbox unter dem Graph verschieben statt im Graph selbst.
+**Problem mit dem aktuellen Ansatz:** Die Y-Achse zeigt "Monate hinterher" — das wird aus dem Datum der neuesten integrierten Capability berechnet. Dadurch wirkt selbst ein 91%-Score wie "11 Monate Rückstand", was unverhältnismäßig dramatisch und verwirrend ist. Außerdem kann man "in der Zeit zurückfallen", was keinen intuitiven Sinn ergibt.
+
+**Neuer Ansatz — Prozentbasierte Projektion:**
+- Y-Achse: **"% der verfügbaren KI-Fähigkeiten genutzt"** (0–100%) statt "Monate hinterher"
+- Drei Elemente im Diagramm:
+  1. **Referenzlinie "Verfügbare KI-Fähigkeiten"** — steigt über Zeit (zeigt: das Feld wächst)
+  2. **Rote gestrichelte Linie "Bei aktuellem Tempo"** — Projektion des Nutzers bei unverändertem Verhalten
+  3. **Grüne Linie "Mit gezielter Weiterbildung"** — realistisches Verbesserungsszenario
+- Datenpunkte: Heute → 6 Monate → 12 Monate
+- Der visuelle Abstand zwischen persönlicher Linie und Referenzlinie zeigt die "Lücke" — intuitiv, ohne verwirrende Monatsangaben
+- Unterhalb des Diagramms: Ein-Satz-Zusammenfassung (z.B. "Bei gezielter Weiterbildung könnten Sie in 12 Monaten X% mehr Fähigkeiten aktiv nutzen")
 
 ### 4.2 Ergebniskarten überarbeiten
 
-**Dateien:** Alle `src/components/results/*.tsx`, `ResultsContent.tsx`
+**Dateien:** Alle `src/components/results/*.tsx`, `ResultsContent.tsx`, `src/components/team/*.tsx`
 
 - **"Zeitliche Einordnung"** (ehem. Timeline Position): Mehr Kontext, z.B. Branchendurchschnitt als Vergleich, klare Markierungen was jede Era bedeutet.
 - **"Team-Vergleich"** (ehem. Team Benchmarks): Nur anzeigen wenn Team-Daten vorliegen, sonst ausblenden.
-- **ReadinessRadar** kritisch prüfen: Wenn Kategorien aufeinander aufbauen, ist ein Radar-Chart irreführend → ggf. durch gestaffeltes Balkendiagramm oder Fortschrittsleiste ersetzen.
+- **Radar-Chart ersetzen** — überall (Einzelergebnis UND Team-Ansicht): Kategorien bauen aufeinander auf, daher ist ein Radar-Chart irreführend. Ersetzen durch **gestaffeltes Balkendiagramm** (horizontale Fortschrittsbalken pro Kategorie, von oben nach unten nach Komplexität sortiert). Betrifft: `RadarChart.tsx`, `CategoryHeatmap.tsx`, `ResultsContent.tsx`, `TeamOverview.tsx`.
 - **Fragezeichen-Icons** (ℹ️) an allen Karten: Tooltip mit kurzer Erklärung was die Karte zeigt und wie die Werte zu interpretieren sind.
 
 ### 4.3 "Top-Chancen"-Sektion implementieren
@@ -233,7 +273,7 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 **Datei:** `FeatureMatrixStep.tsx`
 
-- Jede Kategorie-Sektion bekommt einen erklärenden Untertitel (aus `CATEGORY_CONFIG.description`).
+- Jede Kategorie-Sektion bekommt einen erklärenden Untertitel (aus den in 1.1 definierten Beschreibungen).
 - Visuell sauber: Kategoriename (fett), darunter Beschreibung (kleiner, grau), dann die Capabilities.
 - Nicht überladen: Beschreibung nur 1-2 Zeilen, ggf. collapsible.
 
@@ -247,7 +287,7 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 - Nach den Ergebnissen prominent:
   - "Lassen Sie uns gemeinsam Ihre KI-Strategie entwickeln"
-  - Button → Calendly-Link (als Prop/Env-Variable konfigurierbar)
+  - Button → Buchungs-Link (konfigurierbar über Umgebungsvariable `NEXT_PUBLIC_BOOKING_URL` — so bleibt es flexibel falls der Anbieter wechselt)
   - Unterhalb des TeamCTA, aber über dem Footer.
 
 ### 5.2 Impressum & Datenschutz Seiten
@@ -257,25 +297,29 @@ Neue Schritt-Reihenfolge (9 Schritte):
 - Platzhalter-Seiten mit Standard-Layout.
 - Footer-Links bereits vorhanden → auf die neuen Routen verlinken.
 
-### 5.3 Navigation verbessern
+### 5.3 Navigation verbessern (konsistent auf allen Seiten)
 
 **Datei:** `src/app/layout.tsx`
 
-- **Header:** "Teclead Ventures — AI Readiness Check" als klickbarer Link zur Landing Page (oben links).
-- **Footer:** Link zu teclead-ventures.de (öffnet in neuem Tab).
-- **Ergebnisseite:** Button "Zurück zur Startseite".
+- **Header auf allen Seiten** (Landing, Survey, Ergebnis, Admin, Impressum, Datenschutz):
+  - "Teclead Ventures — AI Readiness Check" als klickbarer Link zur Landing Page (oben links).
+  - Während der Survey: minimaler Header (nur Logo/Name, keine weiteren Nav-Items) um nicht abzulenken.
+- **Footer auf allen Seiten:** Link zu teclead-ventures.de (öffnet in neuem Tab).
+- **Ergebnisseite:** Zusätzlich Button "Zurück zur Startseite" am Seitenende.
 
 ---
 
 ## Phase 6: Bugfixes & Polish
 
-### 6.1 Schritt 7 wird übersprungen
+> **Wichtig:** Bugfixes 6.1 und 6.2 müssen **vor Phase 2** (neuer Wissensmanagement-Schritt) erledigt werden, weil das Einfügen eines neuen Schritts die Step-Indices verschiebt und bestehende Bugs maskieren oder verschlimmern könnte.
+
+### 6.1 Post-Assessment-Schritt wird übersprungen
 
 **Datei:** `SurveyForm.tsx`
 
-- Step-Logik debuggen: Warum wird Post-Assessment übersprungen?
-- Vermutlich Off-by-one-Error bei Step-Index nach Einfügen/Entfernen von Steps.
-- Gründlich testen nach Umstellung auf 9 Steps.
+- **Symptom:** Der Schritt "Selbsteinschätzung (nachher)" (aktuell Step 6) wird kurz angezeigt und dann automatisch übersprungen — der Nutzer landet direkt beim Freitext-Schritt.
+- Mögliche Ursache: Animations-Timing (AnimatePresence), React-State-Problem, oder die extra `<div>`-Wrapper um den Post-Assessment-Schritt (die andere Steps nicht haben).
+- Fix priorisieren und testen bevor neue Steps hinzugefügt werden.
 
 ### 6.2 Zurück-Button speichert Zustand nicht
 
@@ -289,18 +333,14 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 **Datei:** `SurveyForm.tsx`, Step-Components
 
-- Pro Step Mindest-Validierung implementieren:
-  - Step 0: Track muss gewählt sein
-  - Step 1: Rolle + Unternehmensgröße required
-  - Step 3: Mindestens 1 Tool oder Frequenz
-  - Step 5: Mindestens 3 Capabilities bewertet
-  - Andere Steps: Mindest-Eingaben definieren
-- "Weiter"-Button disabled solange Validierung nicht bestanden.
+- Validierungsregeln wie in 2.6 definiert implementieren.
+- "Weiter"-Button bleibt deaktiviert solange Pflichtfelder nicht ausgefüllt sind.
 
 ### 6.4 Seiten-Reload / Versehentlich Zurück
 
-- Service Worker oder `beforeunload`-Event um bei versehentlichem Seiten-Reload zu warnen.
-- Survey-Zustand in `sessionStorage` persistieren, bei Reload wiederherstellen.
+- Survey-Zustand bei jedem Schrittwechsel automatisch in `sessionStorage` speichern.
+- Bei Seiten-Reload: Gespeicherten Zustand aus `sessionStorage` wiederherstellen und beim letzten Schritt fortfahren.
+- Kein `beforeunload`-Dialog nötig (unzuverlässig auf mobilen Geräten).
 
 ---
 
@@ -319,30 +359,32 @@ Neue Schritt-Reihenfolge (9 Schritte):
 
 **Dateien:** `dev-features.ts`, `business-features.ts`
 
-- Alle `en`/`de` Texte aktualisieren für neue Kategoriestruktur.
+- Alle `en`/`de` Texte aktualisieren für neue Kategorienamen.
 - Beispiele (`examples`-Feld) auf Aktualität prüfen (Stand März 2026).
 
 ### 7.3 End-to-End Test (manuell)
 
 - Kompletten Flow durchspielen: Landing → Survey (beide Tracks) → Ergebnisse
-- Validierung testen
+- Validierung testen (Weiter-Button deaktiviert ohne Pflichtfelder)
 - Sprache umschalten testen
 - Mobile Responsiveness prüfen
+- Sonderfälle testen: Alles als "nicht relevant" markieren, minimale Eingaben, Zurück-Navigation
 - Build (`npm run build`) ohne Fehler sicherstellen
 
 ---
 
 ## Implementierungsreihenfolge
 
-Die Phasen bauen aufeinander auf:
+Die Phasen bauen aufeinander auf. Bugfixes vor inhaltlichen Änderungen:
 
-1. **Phase 1** — Datenmodell (Fundament, alles andere hängt davon ab)
-2. **Phase 2** — Survey-Inhalte (nutzt neues Datenmodell)
-3. **Phase 3** — Scoring (nutzt neue Datenstrukturen)
-4. **Phase 6** — Bugfixes (parallel möglich, teilweise vor UI-Arbeit)
-5. **Phase 4** — UI/Visualisierung (nutzt neues Scoring)
-6. **Phase 5** — Neue Seiten (unabhängig)
-7. **Phase 7** — i18n & QA (zum Schluss, alles zusammen prüfen)
+1. **Phase 6.1 + 6.2** — Bugfixes (Step-Skip und Zurück-Button) zuerst beheben
+2. **Phase 1** — Datenmodell (Anzeigenamen, Response Scale, Relevanz-Feld, Type-Definitionen)
+3. **Phase 2** — Survey-Inhalte (neue Fragen, Wissensmanagement, Freitextfelder)
+4. **Phase 6.3 + 6.4** — Validierung und Session-Persistenz
+5. **Phase 3** — Scoring (Relevanz-Logik, Wissensmanagement-Score)
+6. **Phase 4** — UI/Visualisierung (Prozent-Projektion, Balkendiagramm statt Radar, Tooltips)
+7. **Phase 5** — Neue Seiten & Navigation (Booking CTA, Impressum, Header/Footer)
+8. **Phase 7** — i18n & QA (zum Schluss, alles zusammen prüfen)
 
 ---
 
@@ -353,16 +395,19 @@ Die Phasen bauen aufeinander auf:
 | Datenmodell | `types.ts`, `dev-features.ts`, `business-features.ts`, `survey.ts`, `schema.sql` |
 | Survey | `SurveyForm.tsx`, alle `*Step.tsx`, neuer `KnowledgeManagementStep.tsx` |
 | Scoring | `scoring.ts` |
+| API | `src/app/api/responses/route.ts` (Zod-Schema) |
 | Ergebnisse | Alle `results/*.tsx`, `ResultsContent.tsx` |
+| Team | `CategoryHeatmap.tsx`, `TeamOverview.tsx`, `MemberTable.tsx` |
 | UI | `button.tsx`, `globals.css`, neuer `InfoTooltip.tsx`, neuer `BookingCTA.tsx` |
-| Seiten | `layout.tsx`, `page.tsx`, neue `impressum/`, `datenschutz/` |
+| Seiten | `layout.tsx`, neue `impressum/`, `datenschutz/` |
 | i18n | `de.json`, `en.json` |
-| Config | `schema.sql`, ggf. Env-Variablen |
+| Config | `schema.sql`, Env-Variable `NEXT_PUBLIC_BOOKING_URL` |
 
 ---
 
 ## Risiken & Anmerkungen
 
-- **Breaking Change für bestehende Daten:** Die Umstellung von Tiers auf Kategorien und das neue Features-Format (mit Relevanz) ist nicht abwärtskompatibel. Bestehende Responses in Supabase können die neuen Ergebnisseiten nicht rendern. → Migrations-Strategie nötig oder Clean-Slate.
-- **Umfang:** Die Survey sollte trotz neuer Fragen nicht zu lang werden. Wissensmanagement-Schritt kurz halten (5 Fragen à 1-5 Skala = schnell). Feature Matrix durch Relevanz-Zeile etwas länger → ggf. "Nicht relevant" als Default und nur explizit markieren wenn relevant.
+- **Breaking Change für bestehende Daten:** Das neue Features-Format (mit Relevanz) ist nicht abwärtskompatibel. → **Clean-Slate:** Bestehende Testdaten in Supabase löschen bevor das neue Format live geht. Kein Migrationsskript nötig.
+- **Umfang der Survey:** Die Survey sollte trotz neuer Fragen nicht zu lang werden. Wissensmanagement-Schritt ist kurz (5 Fragen à 1-5 Skala = schnell). Feature Matrix wird durch Relevanz-Zeile etwas länger — die Relevanz-Frage muss aktiv beantwortet werden (kein Default), was den Zeitaufwand leicht erhöht.
 - **Fachliche Korrektheit:** Alle KI-Capabilities und Beispiele müssen auf Stand März 2026 geprüft werden. Keine veralteten Tool-Namen oder Features.
+- **Radar-Chart Entfernung:** Der Radar-Chart wird überall durch Balkendiagramme ersetzt (Einzel- und Team-Ansicht). Das verändert die visuelle Identität der Ergebnisseite deutlich — sieht aber fachlich korrekter aus.
