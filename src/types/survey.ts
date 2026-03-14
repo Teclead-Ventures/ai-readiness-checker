@@ -1,7 +1,13 @@
 import type { ScoreResult } from '@/lib/scoring';
 
 export type Track = 'dev' | 'business';
-export type FeatureValue = 0 | 1 | 2 | 3; // 0=unaware, 1=aware, 2=tried, 3=integrated
+export type FeatureValue = 0 | 1 | 2 | 3; // 0=not aware, 1=aware, 2=tried, 3=regularly used
+export type FeatureRelevance = 'yes' | 'no' | 'unsure';
+
+export interface FeatureEntry {
+  score?: FeatureValue;
+  relevant?: FeatureRelevance;
+}
 
 export interface DevProfile {
   role: string;
@@ -50,10 +56,20 @@ export interface SurveyFormData {
   // Mindset
   openness: number;
   barriers: string[];
+  barriers_other?: string;
   priority_areas: string[];
 
+  // Knowledge management (new step)
+  knowledge_management: {
+    awareness: number;         // 1-5: staying informed about AI developments
+    filtering: number;         // 1-5: separating signal from hype
+    contextualization: number; // 1-5: applying new AI to own context
+    overload: number;          // 1-5: feeling overwhelmed by AI news
+    knowledge_transfer: number;// 1-5: internal knowledge sharing
+  };
+
   // Feature matrix
-  features: Record<string, FeatureValue>;
+  features: Record<string, FeatureEntry>;
 
   // Post-assessment
   self_score_after: number;
@@ -92,12 +108,12 @@ export interface TeamWithResponses extends Team {
 }
 
 export const SCORE_LABELS = [
-  { min: 0, max: 20, label: { en: 'Getting Started', de: 'Erste Schritte' }, color: '#ef4444' },
-  { min: 21, max: 40, label: { en: 'Building Foundations', de: 'Grundlagen aufbauen' }, color: '#f97316' },
-  { min: 41, max: 60, label: { en: 'Developing', de: 'Entwickelnd' }, color: '#eab308' },
-  { min: 61, max: 80, label: { en: 'Proficient', de: 'Kompetent' }, color: '#22c55e' },
-  { min: 81, max: 95, label: { en: 'Advanced', de: 'Fortgeschritten' }, color: '#3b82f6' },
-  { min: 96, max: 100, label: { en: 'Pioneer', de: 'Pionier' }, color: '#a855f7' },
+  { min: 0,  max: 20,  label: { en: 'Getting Started',      de: 'Erste Schritte'       }, color: '#ef4444' },
+  { min: 21, max: 40,  label: { en: 'Building Foundations', de: 'Grundlagen aufbauen'  }, color: '#f97316' },
+  { min: 41, max: 60,  label: { en: 'Developing',           de: 'Im Aufbau'            }, color: '#eab308' },
+  { min: 61, max: 80,  label: { en: 'Proficient',           de: 'Kompetent'            }, color: '#22c55e' },
+  { min: 81, max: 95,  label: { en: 'Advanced',             de: 'Fortgeschritten'      }, color: '#3b82f6' },
+  { min: 96, max: 100, label: { en: 'Pioneer',              de: 'Vorreiter'            }, color: '#a855f7' },
 ] as const;
 
 export function getScoreLabel(score: number) {
@@ -154,7 +170,8 @@ export const FREQUENCIES = [
 ] as const;
 
 export const BARRIERS = [
-  'Client restrictions', 'Security concerns', 'Quality concerns',
-  'No time', 'Tools sufficient', 'Slow hardware', 'Cost',
+  'Client restrictions', 'Security concerns', 'Privacy concerns',
+  'Quality concerns', 'No time', 'Unsure where to start',
+  'Tools sufficient', 'Slow hardware', 'Cost',
   'Philosophical concerns', 'Nothing blocks me', 'Other'
 ] as const;

@@ -9,7 +9,7 @@ import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
 import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
 import { TIER_CONFIG, RESPONSE_SCALE, Capability } from '@/lib/features/types';
 import { FeatureItem } from './FeatureItem';
-import type { FeatureValue, SurveyFormData, Track } from '@/types/survey';
+import type { FeatureEntry, SurveyFormData, Track } from '@/types/survey';
 
 interface FeatureMatrixStepProps {
   track: Track;
@@ -20,28 +20,28 @@ interface TierSectionProps {
   tierName: string;
   era: string;
   capabilities: { id: string; label: string; examples: string }[];
-  features: Record<string, FeatureValue>;
-  onFeatureChange: (featureId: string, value: FeatureValue) => void;
+  features: Record<string, FeatureEntry>;
+  onFeatureChange: (featureId: string, entry: FeatureEntry) => void;
   defaultExpanded: boolean;
 }
 
 function computeTierScore(
   capabilities: { id: string }[],
-  features: Record<string, FeatureValue>,
+  features: Record<string, FeatureEntry>,
 ): { answered: number; total: number; score: number } {
   let answered = 0;
   let sum = 0;
   const total = capabilities.length;
 
   for (const cap of capabilities) {
-    const val = features[cap.id];
-    if (val !== undefined && val !== null) {
+    const entry = features[cap.id];
+    const score = typeof entry === 'object' ? entry?.score : (entry as number | undefined);
+    if (score !== undefined && score !== null) {
       answered++;
-      sum += val;
+      sum += score;
     }
   }
 
-  // Score: each item max 3, so percentage = sum / (total * 3) * 100
   const score = total > 0 ? Math.round((sum / (total * 3)) * 100) : 0;
   return { answered, total, score };
 }
@@ -112,7 +112,7 @@ function TierSection({
               featureId={cap.id}
               label={cap.label}
               examples={cap.examples}
-              value={features[cap.id]}
+              entry={features[cap.id]}
               onChange={onFeatureChange}
             />
           ))}
@@ -128,27 +128,30 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
   const { setValue } = useFormContext<SurveyFormData>();
 
   const capabilities: Capability[] = track === 'dev' ? DEV_CAPABILITIES : BUSINESS_CAPABILITIES;
-  const features: Record<string, FeatureValue> =
+  const features: Record<string, FeatureEntry> =
     useWatch<SurveyFormData, 'features'>({ name: 'features' }) ?? {};
 
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
-  // Build flat list of all capability ids for progress count
   const allIds = useMemo(() => capabilities.map((c) => c.id), [capabilities]);
 
   const answeredCount = useMemo(
-    () => allIds.filter((id) => features[id] !== undefined && features[id] !== null).length,
+    () =>
+      allIds.filter((id) => {
+        const entry = features[id];
+        const score = typeof entry === 'object' ? entry?.score : (entry as number | undefined);
+        return score !== undefined && score !== null;
+      }).length,
     [allIds, features],
   );
 
   const handleFeatureChange = useCallback(
-    (featureId: string, value: FeatureValue) => {
-      setValue(`features.${featureId}`, value, { shouldDirty: true, shouldValidate: true });
+    (featureId: string, entry: FeatureEntry) => {
+      setValue(`features.${featureId}`, entry, { shouldDirty: true, shouldValidate: true });
     },
     [setValue],
   );
 
-  // Group capabilities by tier
   const tierEntries = useMemo(() => {
     const tiers = [1, 2, 3, 4, 5] as const;
     return tiers

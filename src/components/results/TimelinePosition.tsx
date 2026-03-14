@@ -36,20 +36,6 @@ export function dateToMonth(dateStr: string): number {
   return y * 12 + m;
 }
 
-function subtractMonths(dateStr: string, months: number): string {
-  const [y, m] = dateStr.split('-').map(Number);
-  const totalMonths = y * 12 + m - months;
-  const newYear = Math.floor(totalMonths / 12);
-  const newMonth = totalMonths % 12 || 12;
-  return `${newYear}-${String(newMonth).padStart(2, '0')}`;
-}
-
-const DIRECTION_COLORS: Record<string, string> = {
-  closing: '#22c55e',
-  stable: '#eab308',
-  widening: '#ef4444',
-};
-
 const MIN_MONTH = 2022 * 12 + 1;
 const MAX_MONTH = 2027 * 12 + 1;
 
@@ -107,15 +93,6 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
   const userMonth = dateToMonth(timeline.timelinePosition);
   const frontierMonth = dateToMonth(timeline.frontier);
   const markersAreClose = Math.abs(frontierMonth - userMonth) < CLOSE_THRESHOLD_MONTHS;
-
-  // Projected position
-  let projectedMonth: number | null = null;
-  let projectedColor = '#eab308';
-  if (adaptation) {
-    const projectedDate = subtractMonths(timeline.frontier, adaptation.projectedGap12Months);
-    projectedMonth = Math.max(MIN_MONTH, Math.min(dateToMonth(projectedDate), MAX_MONTH));
-    projectedColor = DIRECTION_COLORS[adaptation.direction] ?? '#eab308';
-  }
 
   // Two invisible data points spanning the full domain to anchor the chart area
   const data = [
@@ -223,37 +200,6 @@ export function TimelinePosition({ timeline, adaptation, locale }: TimelinePosit
                     }}
                   />
                 </ReferenceArea>
-              )}
-
-              {/* Projected dashed line */}
-              {projectedMonth !== null && (
-                <ReferenceLine
-                  x={projectedMonth}
-                  stroke={projectedColor}
-                  strokeDasharray="4 4"
-                  strokeWidth={2}
-                >
-                  <Label
-                    value={lang === 'de' ? 'Prognose' : 'Projected'}
-                    position="top"
-                    offset={15}
-                    style={{ fontSize: 10, fill: projectedColor, fontWeight: 600 }}
-                  />
-                </ReferenceLine>
-              )}
-
-              {/* Dashed connector from user to projected */}
-              {projectedMonth !== null && (
-                <ReferenceArea
-                  x1={Math.min(userMonth, projectedMonth)}
-                  x2={Math.max(userMonth, projectedMonth)}
-                  y1={0.48}
-                  y2={0.52}
-                  fill="transparent"
-                  stroke={projectedColor}
-                  strokeDasharray="4 4"
-                  strokeOpacity={0.5}
-                />
               )}
 
               {/* User marker line — always labeled above */}

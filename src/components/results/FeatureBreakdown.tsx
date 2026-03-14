@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { TIER_CONFIG, RESPONSE_SCALE } from '@/lib/features/types';
 import { getCapabilitiesForTrack } from '@/lib/scoring';
-import { FeatureValue } from '@/types/survey';
+import { FeatureEntry } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface FeatureBreakdownProps {
-  features: Record<string, FeatureValue>;
+  features: Record<string, FeatureEntry>;
   track: 'dev' | 'business';
   locale: string;
 }
@@ -36,7 +36,8 @@ export function FeatureBreakdown({ features, track, locale }: FeatureBreakdownPr
     let integrated = 0;
 
     for (const cap of tierCaps) {
-      const val = features[cap.id] ?? 0;
+      const rawEntry = features[cap.id];
+      const val = (typeof rawEntry === 'object' ? rawEntry?.score : rawEntry) ?? 0;
       if (val === 0) unaware++;
       else if (val === 1) aware++;
       else if (val === 2) tried++;

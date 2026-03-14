@@ -5,18 +5,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TeamWithResponses, getScoreLabel } from '@/types/survey';
 import { TIER_CONFIG } from '@/lib/features/types';
-import {
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar,
-  ResponsiveContainer,
-} from 'recharts';
 
 interface TeamOverviewProps {
   team: TeamWithResponses;
   locale: string;
+}
+
+function scoreToColor(score: number): string {
+  if (score >= 80) return '#22c55e';
+  if (score >= 60) return '#84cc16';
+  if (score >= 40) return '#eab308';
+  if (score >= 20) return '#f97316';
+  return '#ef4444';
 }
 
 export function TeamOverview({ team, locale }: TeamOverviewProps) {
@@ -25,14 +25,12 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
 
   if (responses.length === 0) return null;
 
-  // Calculate team average overall score
   const avgScore = Math.round(
     responses.reduce((sum, r) => sum + r.scores.overall, 0) / responses.length
   );
   const scoreLabel = getScoreLabel(avgScore);
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
-  // Calculate average tier scores across all members
   const tierAverages = ([1, 2, 3, 4, 5] as const).map((tier) => {
     const values = responses
       .filter((r) => r.scores.tiers[tier] !== undefined)
@@ -41,8 +39,12 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
       ? Math.round(values.reduce((s, v) => s + v, 0) / values.length)
       : 0;
     const config = TIER_CONFIG[tier];
-    const label = config[lang];
-    return { tier: `T${tier}`, fullLabel: `${label} (${config.era})`, score: avg };
+    return {
+      tier,
+      name: config[lang],
+      era: config.era,
+      score: avg,
+    };
   });
 
   return (
@@ -68,31 +70,32 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
         </CardContent>
       </Card>
 
-      {/* Radar Chart */}
+      {/* Category Overview */}
       <Card>
         <CardHeader>
-          <CardTitle>Readiness Radar</CardTitle>
+          <CardTitle>{t('heatmap')}</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={280}>
-            <RadarChart data={tierAverages} cx="50%" cy="50%" outerRadius="70%">
-              <PolarGrid />
-              <PolarAngleAxis dataKey="tier" tick={{ fontSize: 12 }} />
-              <PolarRadiusAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
-              <Radar
-                dataKey="score"
-                stroke="#FFAB54"
-                fill="#FFAB54"
-                fillOpacity={0.3}
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-          {/* Tier legend */}
-          <div className="flex gap-3 text-xs text-muted-foreground flex-wrap mt-2">
-            {tierAverages.map((t) => (
-              <span key={t.tier}>
-                <strong>{t.tier}</strong> = {t.fullLabel}
-              </span>
+          <div className="flex flex-col gap-3">
+            {tierAverages.map(({ tier, name, era, score }) => (
+              <div key={tier} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium text-foreground">{name}</span>
+                  <span className="shrink-0 text-xs text-muted-foreground tabular-nums ml-2">
+                    {score}%
+                  </span>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full transition-all duration-500"
+                    style={{
+                      width: `${score}%`,
+                      backgroundColor: scoreToColor(score),
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">{era}</p>
+              </div>
             ))}
           </div>
         </CardContent>
