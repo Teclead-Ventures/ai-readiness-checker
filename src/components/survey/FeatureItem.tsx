@@ -68,7 +68,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
 
       {/* Usage row */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-xs font-medium text-muted-foreground shrink-0 w-[52px]">
+        <span className="text-xs font-medium text-muted-foreground shrink-0">
           {t('usageLabel')}
         </span>
         <div className="inline-flex rounded-lg border border-border bg-background p-0.5 flex-wrap gap-0.5">
@@ -100,7 +100,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
 
       {/* Relevance row */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0 w-[52px]">
+        <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0">
           {t('relevanceLabel')}
           <InfoTooltip content={t('relevanceTooltip')} side="top" />
         </span>

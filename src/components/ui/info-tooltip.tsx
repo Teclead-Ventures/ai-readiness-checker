@@ -22,8 +22,8 @@ export function InfoTooltip({ content, side = 'top' }: InfoTooltipProps) {
               type="button"
               aria-label="Mehr Informationen"
               className="inline-flex h-[18px] w-[18px] shrink-0 cursor-help items-center justify-center rounded-full
-                bg-primary/15 border border-primary/30 text-primary/80
-                transition-all hover:bg-primary/25 hover:text-primary hover:border-primary/60
+                bg-primary/15 text-primary/80
+                transition-all hover:bg-primary/25 hover:text-primary
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
                 align-middle relative top-[-1px]"
             >

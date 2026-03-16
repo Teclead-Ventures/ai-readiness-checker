@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { useTranslations, useLocale } from 'next-intl';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, CheckCircle2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
 import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
@@ -30,29 +31,39 @@ interface TierSectionProps {
 /** Visual identity per tier: badge color, progress bar color, left border accent (dark mode) */
 const TIER_STYLES = {
   1: {
-    badge:    'bg-blue-500/15 text-blue-300 border border-blue-500/30',
-    bar:      'bg-blue-500',
-    border:   'border-l-4 border-l-blue-500/60',
+    badge:       'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+    bar:         'bg-blue-500',
+    border:      'border-l-4 border-l-blue-500/60',
+    celebration: 'bg-blue-500/20 text-blue-200 border-t border-blue-500/30',
+    dot:         'bg-blue-400',
   },
   2: {
-    badge:    'bg-teal-500/15 text-teal-300 border border-teal-500/30',
-    bar:      'bg-teal-500',
-    border:   'border-l-4 border-l-teal-500/60',
+    badge:       'bg-teal-500/15 text-teal-300 border border-teal-500/30',
+    bar:         'bg-teal-500',
+    border:      'border-l-4 border-l-teal-500/60',
+    celebration: 'bg-teal-500/20 text-teal-200 border-t border-teal-500/30',
+    dot:         'bg-teal-400',
   },
   3: {
-    badge:    'bg-green-500/15 text-green-300 border border-green-500/30',
-    bar:      'bg-green-500',
-    border:   'border-l-4 border-l-green-500/60',
+    badge:       'bg-green-500/15 text-green-300 border border-green-500/30',
+    bar:         'bg-green-500',
+    border:      'border-l-4 border-l-green-500/60',
+    celebration: 'bg-green-500/20 text-green-200 border-t border-green-500/30',
+    dot:         'bg-green-400',
   },
   4: {
-    badge:    'bg-primary/15 text-primary border border-primary/30',
-    bar:      'bg-primary',
-    border:   'border-l-4 border-l-primary/60',
+    badge:       'bg-primary/15 text-primary border border-primary/30',
+    bar:         'bg-primary',
+    border:      'border-l-4 border-l-primary/60',
+    celebration: 'bg-primary/20 text-amber-200 border-t border-primary/30',
+    dot:         'bg-primary',
   },
   5: {
-    badge:    'bg-purple-500/15 text-purple-300 border border-purple-500/30',
-    bar:      'bg-purple-500',
-    border:   'border-l-4 border-l-purple-500/60',
+    badge:       'bg-purple-500/15 text-purple-300 border border-purple-500/30',
+    bar:         'bg-purple-500',
+    border:      'border-l-4 border-l-purple-500/60',
+    celebration: 'bg-purple-500/20 text-purple-200 border-t border-purple-500/30',
+    dot:         'bg-purple-400',
   },
 } as const;
 
@@ -88,6 +99,8 @@ function TierSection({
   defaultExpanded,
 }: TierSectionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const prevAnsweredRef = useRef<number | null>(null);
   const t = useTranslations('survey.features');
 
   const { answered, total, score } = useMemo(
@@ -95,11 +108,32 @@ function TierSection({
     [capabilities, features],
   );
 
+  // Fire celebration when the LAST item of this tier gets answered
+  useEffect(() => {
+    // Skip on first render (prevAnsweredRef starts null)
+    if (prevAnsweredRef.current === null) {
+      prevAnsweredRef.current = answered;
+      return;
+    }
+    if (answered === total && total > 0 && prevAnsweredRef.current < total) {
+      setShowCelebration(true);
+      // Auto-collapse after banner has been visible briefly
+      const collapseTimer = setTimeout(() => setExpanded(false), 700);
+      const hideTimer = setTimeout(() => setShowCelebration(false), 2400);
+      return () => {
+        clearTimeout(collapseTimer);
+        clearTimeout(hideTimer);
+      };
+    }
+    prevAnsweredRef.current = answered;
+  }, [answered, total]);
+
   const styles = TIER_STYLES[tier];
+  const isComplete = answered === total && total > 0;
 
   return (
-    <div className={cn('overflow-hidden rounded-lg border border-border bg-card', styles.border)}>
-      {/* Header — InfoTooltip lives outside the <button> to avoid nested buttons */}
+    <div className={cn('rounded-lg border border-border bg-card overflow-hidden', styles.border)}>
+      {/* Header */}
       <div className="flex w-full items-center hover:bg-muted/40 transition-colors">
         <button
           type="button"
@@ -129,10 +163,14 @@ function TierSection({
             </span>
           </div>
 
-          {/* Score */}
-          <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-            {score}%
-          </span>
+          {/* Complete checkmark OR score */}
+          {isComplete ? (
+            <CheckCircle2 className={cn('h-4 w-4 shrink-0', styles.dot === 'bg-primary' ? 'text-primary' : 'text-green-400')} />
+          ) : (
+            <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+              {score}%
+            </span>
+          )}
         </button>
 
         {/* Tooltip sits outside the button — no nested button issue */}
@@ -148,6 +186,25 @@ function TierSection({
           style={{ width: `${score}%` }}
         />
       </div>
+
+      {/* Tier completion celebration banner */}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div className={cn('flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold', styles.celebration)}>
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span>{tierName} — abgeschlossen!</span>
+              {/* Progress dots showing which tiers are done */}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Capabilities list */}
       {expanded && (
@@ -243,7 +300,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>{t('progress', { count: answeredCount, total: allIds.length })}</span>
           {!hasEnough && (
-            <span className="text-amber-600 font-medium">
+            <span className="text-amber-500 font-medium">
               {t('minRequired', { min: minRequired })}
             </span>
           )}
