@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
 import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
 import { TIER_CONFIG, RESPONSE_SCALE, Capability } from '@/lib/features/types';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { FeatureItem } from './FeatureItem';
 import type { FeatureEntry, SurveyFormData, Track } from '@/types/survey';
 
@@ -18,12 +19,42 @@ interface FeatureMatrixStepProps {
 interface TierSectionProps {
   tier: 1 | 2 | 3 | 4 | 5;
   tierName: string;
+  tierTooltip: string;
   era: string;
   capabilities: { id: string; label: string; examples: string }[];
   features: Record<string, FeatureEntry>;
   onFeatureChange: (featureId: string, entry: FeatureEntry) => void;
   defaultExpanded: boolean;
 }
+
+/** Visual identity per tier: badge color, progress bar color, left border accent */
+const TIER_STYLES = {
+  1: {
+    badge:    'bg-blue-100 text-blue-700 border border-blue-200',
+    bar:      'bg-blue-500',
+    border:   'border-l-4 border-l-blue-400',
+  },
+  2: {
+    badge:    'bg-teal-100 text-teal-700 border border-teal-200',
+    bar:      'bg-teal-500',
+    border:   'border-l-4 border-l-teal-400',
+  },
+  3: {
+    badge:    'bg-green-100 text-green-700 border border-green-200',
+    bar:      'bg-green-500',
+    border:   'border-l-4 border-l-green-400',
+  },
+  4: {
+    badge:    'bg-orange-100 text-orange-700 border border-orange-200',
+    bar:      'bg-orange-500',
+    border:   'border-l-4 border-l-orange-400',
+  },
+  5: {
+    badge:    'bg-purple-100 text-purple-700 border border-purple-200',
+    bar:      'bg-purple-500',
+    border:   'border-l-4 border-l-purple-400',
+  },
+} as const;
 
 function computeTierScore(
   capabilities: { id: string }[],
@@ -46,16 +77,10 @@ function computeTierScore(
   return { answered, total, score };
 }
 
-function scoreToColor(score: number): string {
-  if (score <= 25) return 'bg-red-500';
-  if (score <= 50) return 'bg-orange-500';
-  if (score <= 75) return 'bg-yellow-400';
-  return 'bg-green-500';
-}
-
 function TierSection({
   tier,
   tierName,
+  tierTooltip,
   era,
   capabilities,
   features,
@@ -63,47 +88,62 @@ function TierSection({
   defaultExpanded,
 }: TierSectionProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
+  const t = useTranslations('survey.features');
 
   const { answered, total, score } = useMemo(
     () => computeTierScore(capabilities, features),
     [capabilities, features],
   );
 
+  const styles = TIER_STYLES[tier];
+
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card">
+    <div className={cn('overflow-hidden rounded-lg border border-border bg-card', styles.border)}>
+      {/* Header */}
       <button
         type="button"
         onClick={() => setExpanded((prev) => !prev)}
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50"
+        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
         aria-expanded={expanded}
       >
         <ChevronDown
           className={cn(
-            'h-4 w-4 shrink-0 text-muted-foreground transition-transform',
+            'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
             expanded && 'rotate-180',
           )}
         />
-        <div className="flex flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-3">
-          <span className="text-sm font-semibold text-foreground">
-            Tier {tier} — {tierName}
+
+        {/* Tier badge */}
+        <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums', styles.badge)}>
+          T{tier}
+        </span>
+
+        {/* Title + tooltip */}
+        <div className="flex flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2 min-w-0">
+          <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
+            {tierName}
+            <InfoTooltip content={tierTooltip} side="top" />
           </span>
           <span className="text-xs text-muted-foreground">
-            {answered}/{total} done
+            {era} · {answered}/{total} {t('answered')}
           </span>
         </div>
+
+        {/* Score */}
         <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
           {score}%
         </span>
       </button>
 
-      {/* Score bar */}
+      {/* Progress bar in tier color */}
       <div className="h-1 w-full bg-muted">
         <div
-          className={cn('h-full transition-all duration-300', scoreToColor(score))}
+          className={cn('h-full transition-all duration-500', styles.bar)}
           style={{ width: `${score}%` }}
         />
       </div>
 
+      {/* Capabilities list */}
       {expanded && (
         <div className="divide-y divide-border/50 px-4">
           {capabilities.map((cap) => (
@@ -162,6 +202,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         return {
           tier,
           tierName: config[lang],
+          tierTooltip: t(`tierTooltip${tier}`),
           era: config.era,
           capabilities: tierCaps.map((c) => ({
             id: c.id,
@@ -171,12 +212,17 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         };
       })
       .filter(Boolean) as {
-      tier: 1 | 2 | 3 | 4 | 5;
-      tierName: string;
-      era: string;
-      capabilities: { id: string; label: string; examples: string }[];
-    }[];
-  }, [capabilities, lang]);
+        tier: 1 | 2 | 3 | 4 | 5;
+        tierName: string;
+        tierTooltip: string;
+        era: string;
+        capabilities: { id: string; label: string; examples: string }[];
+      }[];
+  }, [capabilities, lang, t]);
+
+  const progressPct = allIds.length > 0 ? (answeredCount / allIds.length) * 100 : 0;
+  const minRequired = Math.ceil(allIds.length * 0.5);
+  const hasEnough = answeredCount >= minRequired;
 
   return (
     <div className="flex flex-col gap-4">
@@ -186,47 +232,57 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      {/* Progress */}
-      <div className="flex items-center gap-2 rounded-lg bg-muted/60 px-3 py-2">
-        <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+      {/* Progress bar */}
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <span>{t('progress', { count: answeredCount, total: allIds.length })}</span>
+          {!hasEnough && (
+            <span className="text-amber-600 font-medium">
+              {t('minRequired', { min: minRequired })}
+            </span>
+          )}
+        </div>
+        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full bg-primary transition-all duration-300"
-            style={{ width: `${allIds.length > 0 ? (answeredCount / allIds.length) * 100 : 0}%` }}
+            className={cn(
+              'h-full rounded-full transition-all duration-300',
+              hasEnough ? 'bg-green-500' : 'bg-[#FFAB54]',
+            )}
+            style={{ width: `${progressPct}%` }}
           />
         </div>
-        <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-          {t('progress', { count: answeredCount, total: allIds.length })}
-        </span>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+      {/* Usage scale legend */}
+      <div className="flex flex-wrap gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
         {([0, 1, 2, 3] as const).map((level) => {
           const scale = RESPONSE_SCALE[level];
           return (
             <span key={level} className="flex items-center gap-1.5">
               <span
-                className="inline-block h-3 w-3 rounded-sm"
+                className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
                 style={{ backgroundColor: scale.color }}
               />
-              {scale[lang]}
+              <span>{scale[lang]}</span>
+              <InfoTooltip content={scale.description[lang]} side="top" />
             </span>
           );
         })}
       </div>
 
-      {/* Tiers */}
+      {/* Tier sections */}
       <div className="flex flex-col gap-3">
         {tierEntries.map((entry) => (
           <TierSection
             key={entry.tier}
             tier={entry.tier}
             tierName={entry.tierName}
+            tierTooltip={entry.tierTooltip}
             era={entry.era}
             capabilities={entry.capabilities}
             features={features}
             onFeatureChange={handleFeatureChange}
-            defaultExpanded={true}
+            defaultExpanded={entry.tier <= 2}
           />
         ))}
       </div>

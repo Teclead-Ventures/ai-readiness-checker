@@ -12,6 +12,23 @@ interface FreeTextStepProps {
   track: Track;
 }
 
+/** Visual accent per tier — consistent with FeatureMatrixStep */
+const TIER_ACCENT = {
+  1: 'border-blue-300 bg-blue-50 data-[checked]:border-blue-400 data-[checked]:bg-blue-50',
+  2: 'border-teal-300 bg-teal-50 data-[checked]:border-teal-400 data-[checked]:bg-teal-50',
+  3: 'border-green-300 bg-green-50 data-[checked]:border-green-400 data-[checked]:bg-green-50',
+  4: 'border-orange-300 bg-orange-50 data-[checked]:border-orange-400 data-[checked]:bg-orange-50',
+  5: 'border-purple-300 bg-purple-50 data-[checked]:border-purple-400 data-[checked]:bg-purple-50',
+} as const;
+
+const TIER_BADGE = {
+  1: 'bg-blue-100 text-blue-700',
+  2: 'bg-teal-100 text-teal-700',
+  3: 'bg-green-100 text-green-700',
+  4: 'bg-orange-100 text-orange-700',
+  5: 'bg-purple-100 text-purple-700',
+} as const;
+
 export function FreeTextStep({ track }: FreeTextStepProps) {
   const t = useTranslations('survey.postAssessment');
   const locale = useLocale();
@@ -21,45 +38,57 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
 
   const tierOptions = ([1, 2, 3, 4, 5] as const).map((tier) => ({
-    key: `tier_${tier}`,
-    name: `Tier ${tier} — ${TIER_CONFIG[tier][lang]}`,
+    key: `tier_${tier}` as string,
+    tier,
+    name: TIER_CONFIG[tier][lang],
   }));
+
+  const atLeastOneSelected = topCategories.length >= 1;
 
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold">{t('title')}</h2>
 
-      {/* Top Impact Tiers (select 3) */}
+      {/* Top Impact Tiers — select at least 1, no upper limit */}
       <div className="space-y-3">
-        <Label className="text-base font-medium">{t('topCategories')}</Label>
+        <div className="space-y-0.5">
+          <Label className="text-base font-medium">{t('topCategories')}</Label>
+          {!atLeastOneSelected && (
+            <p className="text-xs text-amber-600">{t('topCategoriesHint')}</p>
+          )}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {tierOptions.map(({ key, name }) => {
+          {tierOptions.map(({ key, tier, name }) => {
             const checked = topCategories.includes(key);
-            const atLimit = topCategories.length >= 3 && !checked;
             return (
               <label
                 key={key}
-                className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors min-h-[44px] ${
-                  atLimit
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'hover:bg-muted/50'
-                } ${checked ? 'border-[#FFAB54] bg-[#FFAB54]/5' : ''}`}
+                data-checked={checked || undefined}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all min-h-[44px] hover:shadow-sm ${
+                  checked
+                    ? 'border-[#FFAB54] bg-[#FFAB54]/5 shadow-sm'
+                    : 'border-border hover:bg-muted/50'
+                }`}
               >
                 <Checkbox
                   checked={checked}
-                  disabled={atLimit}
                   onCheckedChange={(isChecked) => {
-                    if (isChecked && topCategories.length < 3) {
+                    if (isChecked) {
                       setValue('top_impact_categories', [...topCategories, key]);
-                    } else if (!isChecked) {
+                    } else {
                       setValue(
                         'top_impact_categories',
-                        topCategories.filter((c) => c !== key)
+                        topCategories.filter((c) => c !== key),
                       );
                     }
                   }}
                 />
-                <span className="text-sm">{name}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${TIER_BADGE[tier]}`}>
+                    T{tier}
+                  </span>
+                  <span className="text-sm truncate">{name}</span>
+                </div>
               </label>
             );
           })}

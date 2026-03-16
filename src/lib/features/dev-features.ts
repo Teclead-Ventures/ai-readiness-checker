@@ -1,7 +1,7 @@
 import { Capability } from './types';
 
 export const DEV_CAPABILITIES: Capability[] = [
-  // ── TIER 1: TABLE STAKES (2022–2023) ─────────────────────────────
+  // ── TIER 1: AI FUNDAMENTALS & UNDERSTANDING (2022–2023) ──────────
   { id: "T1_01", tier: 1, firstAvailable: "2022-06",
     en: "Inline code completions",
     de: "Inline Code-Vervollständigung",
@@ -19,7 +19,7 @@ export const DEV_CAPABILITIES: Capability[] = [
     de: "KI-generierte Dokumentation und Docstrings",
     examples: { en: "Auto-generated from function signatures via any AI tool", de: "Automatisch generiert aus Funktionssignaturen" } },
 
-  // ── TIER 2: PRODUCTIVE USAGE (2023–2024) ─────────────────────────
+  // ── TIER 2: BASIC TOOLING (2023–2024) ────────────────────────────
   { id: "T2_01", tier: 2, firstAvailable: "2023-06",
     en: "Codebase Q&A and exploration",
     de: "Codebase-Fragen und -Erkundung",
@@ -41,7 +41,7 @@ export const DEV_CAPABILITIES: Capability[] = [
     de: "KI-gestütztes Code-Review",
     examples: { en: "Automated PR review for bugs, style, security", de: "Automatisiertes PR-Review für Bugs, Stil, Sicherheit" } },
 
-  // ── TIER 3: INTEGRATED WORKFLOWS (2024) ──────────────────────────
+  // ── TIER 3: PRODUCTIVE USAGE (2024) ──────────────────────────────
   { id: "T3_01", tier: 3, firstAvailable: "2024-07",
     en: "Multi-file agentic editing",
     de: "Multi-Datei-agentische Bearbeitung",
@@ -67,7 +67,7 @@ export const DEV_CAPABILITIES: Capability[] = [
     de: "KI-gestützte Incident-Triage und Log-Analyse",
     examples: { en: "Automated root cause analysis from logs and alerts", de: "Automatisierte Ursachenanalyse aus Logs und Alerts" } },
 
-  // ── TIER 4: ADVANCED CONFIGURATION (2025) ────────────────────────
+  // ── TIER 4: AUTOMATION & WORKFLOWS (2025) ────────────────────────
   { id: "T4_01", tier: 4, firstAvailable: "2023-06",
     en: "Custom AI instruction files",
     de: "Benutzerdefinierte KI-Instruktionsdateien",
@@ -93,7 +93,7 @@ export const DEV_CAPABILITIES: Capability[] = [
     de: "Checkpoint- und Undo-Systeme für KI-Änderungen",
     examples: { en: "Automatic snapshots, instant rollback of AI edits", de: "Automatische Snapshots, sofortiges Rollback" } },
 
-  // ── TIER 5: FRONTIER (2026) ──────────────────────────────────────
+  // ── TIER 5: ADVANCED AI INTEGRATION (2026) ───────────────────────
   { id: "T5_01", tier: 5, firstAvailable: "2025-02",
     en: "Custom slash commands and reusable AI skills",
     de: "Benutzerdefinierte Slash-Commands und KI-Skills",

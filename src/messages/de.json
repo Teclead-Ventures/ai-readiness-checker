@@ -14,20 +14,22 @@
     "required": "Pflichtfeld",
     "optional": "Optional",
     "of": "von",
-    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment"
+    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment",
+    "answerMoreFeatures": "Bitte mindestens 50% der Fähigkeiten beantworten um fortzufahren",
+    "selectAtLeastOne": "Bitte mindestens eine Kategorie auswählen"
   },
   "landing": {
-    "headline": "Wie AI-ready ist dein Team?",
-    "subhead": "Finde es in 5 Minuten heraus. Erhalte deinen persönlichen Readiness-Score — und benchmarke dann dein ganzes Team.",
+    "headline": "Wie AI-ready bist du?",
+    "subhead": "Finde es in 5 Minuten heraus. Erhalte deinen persönlichen Readiness-Score — und vergleiche dich optional mit deinem Team.",
     "cta": "Assessment starten",
     "teamLink": "Bereits einen Team-Link?",
     "teamLinkPlaceholder": "Team-Link hier einfügen",
     "feature1Title": "5-Minuten-Assessment",
-    "feature1Desc": "Bewerte die AI-Fähigkeiten deines Teams über 50+ Tools und Praktiken.",
-    "feature2Title": "Timeline-Positionierung",
-    "feature2Desc": "Sieh, wo dein Team auf der AI-Adoption-Timeline steht — und wie schnell sich die Lücke schließt.",
-    "feature3Title": "Team-Benchmarks",
-    "feature3Desc": "Vergleiche individuelle Scores, erkenne Stärken und identifiziere Wachstumsbereiche im Team."
+    "feature1Desc": "Bewerte deine KI-Fähigkeiten über 50+ Tools und Praktiken — schnell und praxisnah.",
+    "feature2Title": "Zeitliche Einordnung",
+    "feature2Desc": "Sieh, wo du auf der KI-Entwicklungslinie stehst — und wie schnell sich die Lücke schließt.",
+    "feature3Title": "Vergleiche dich mit deinem Team",
+    "feature3Desc": "Optional: Lade dein Team ein und vergleicht eure Scores, erkennt Stärken und Wachstumsbereiche."
   },
   "survey": {
     "title": "AI Readiness Assessment",
@@ -110,18 +112,27 @@
     },
     "features": {
       "title": "Fähigkeiten-Bewertung",
-      "subtitle": "Für jede Fähigkeit: Wähle deinen Level — Nicht bekannt, Bekannt, Ausprobiert oder Regelmäßig genutzt",
+      "subtitle": "Für jede Fähigkeit: Wähle deinen Level und gib an, ob sie für dich relevant ist.",
       "progress": "{count} von {total} beantwortet",
+      "answered": "beantwortet",
+      "minRequired": "Bitte mindestens {min} beantworten um fortzufahren",
       "tierScore": "Kategorie-Score: {score}%",
       "usageLabel": "Nutzung:",
       "relevanceLabel": "Relevant:",
+      "relevanceTooltip": "Ist diese Fähigkeit für deinen Arbeitsalltag relevant? Falls nicht, wird sie bei der Berechnung deines Scores nicht berücksichtigt.",
       "relevanceYes": "Ja",
       "relevanceUnsure": "Unsicher",
-      "relevanceNo": "Nein"
+      "relevanceNo": "Nein",
+      "tierTooltip1": "Grundlegende KI-Kenntnisse, die heute für jeden Berufsalltag relevant sind — verfügbar seit 2022.",
+      "tierTooltip2": "KI-Tools die produktiv eingesetzt werden und den Arbeitsalltag messbar verbessern — verfügbar seit 2023.",
+      "tierTooltip3": "KI ist fest in den Arbeitsablauf integriert und wird täglich professionell genutzt — verfügbar seit 2024.",
+      "tierTooltip4": "KI automatisiert wiederkehrende Prozesse und orchestriert komplexe Workflows — verfügbar seit 2025.",
+      "tierTooltip5": "Fortgeschrittene KI-Integration: autonome Agenten, systemübergreifende Vernetzung und organisatorische Verankerung — verfügbar seit 2026."
     },
     "postAssessment": {
       "title": "Abschließende Gedanken",
-      "topCategories": "Welche 3 Kategorien hätten den größten Impact auf deine Arbeit?",
+      "topCategories": "Welche Kategorien hätten den größten Impact auf deine Arbeit?",
+      "topCategoriesHint": "Bitte mindestens eine Kategorie auswählen.",
       "freeText": "Möchtest du noch etwas teilen?",
       "freeTextPlaceholder": "Optional: Deine Gedanken zu KI in deinem Arbeitsalltag..."
     },

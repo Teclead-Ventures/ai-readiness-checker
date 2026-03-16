@@ -12,7 +12,7 @@ export const TIER_CONFIG = {
   2: { weight: 1.2, en: "Basic Tooling",                   de: "Grundlegendes Tooling",         era: "2023–2024" },
   3: { weight: 1.5, en: "Productive Usage",                de: "Produktive Nutzung",            era: "2024" },
   4: { weight: 2.0, en: "Automation & Workflows",          de: "Automatisierung & Workflows",   era: "2025" },
-  5: { weight: 2.5, en: "Strategic AI Competence",         de: "Strategische KI-Kompetenz",     era: "2026" },
+  5: { weight: 2.5, en: "Advanced AI Integration",          de: "Fortgeschrittene KI-Integration", era: "2026" },
 } as const;
 
 // 4-point response scale
