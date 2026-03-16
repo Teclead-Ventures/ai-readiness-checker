@@ -1,10 +1,11 @@
 'use client';
 
 import { HelpCircle } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
 interface InfoTooltipProps {
-  content: string;
+  content: string | ReactNode;
   side?: 'top' | 'bottom' | 'left' | 'right';
 }
 

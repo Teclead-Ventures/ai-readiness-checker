@@ -316,8 +316,8 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
         </div>
       </div>
 
-      {/* Usage scale legend */}
-      <div className="flex flex-wrap gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+      {/* Usage scale legend — single ? explains all levels */}
+      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
         {([0, 1, 2, 3] as const).map((level) => {
           const scale = RESPONSE_SCALE[level];
           return (
@@ -327,10 +327,32 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
                 style={{ backgroundColor: scale.color }}
               />
               <span>{scale[lang]}</span>
-              <InfoTooltip content={scale.description[lang]} side="top" />
             </span>
           );
         })}
+        {/* One tooltip explaining all 4 levels */}
+        <InfoTooltip
+          side="top"
+          content={
+            <div className="text-left space-y-1.5 py-0.5">
+              {([0, 1, 2, 3] as const).map((level) => {
+                const scale = RESPONSE_SCALE[level];
+                return (
+                  <div key={level} className="flex items-start gap-2">
+                    <span
+                      className="mt-0.5 h-2 w-2 rounded-sm shrink-0"
+                      style={{ backgroundColor: scale.color }}
+                    />
+                    <span>
+                      <span className="font-semibold">{scale[lang]}:</span>{' '}
+                      {scale.description[lang]}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          }
+        />
       </div>
 
       {/* Tier sections */}
