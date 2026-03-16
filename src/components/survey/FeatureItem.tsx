@@ -79,7 +79,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isActive
                     ? cn(scaleEntry.activeBg, scaleEntry.activeText, 'ring-2', scaleEntry.activeRing, 'shadow-sm')
-                    : 'bg-gray-100 text-[#444D69] hover:text-foreground hover:bg-muted',
+                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80',
                 )}
               >
                 {scaleItem[lang]}
@@ -113,7 +113,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                   isActive
                     ? cn(relEntry.activeBg, relEntry.activeText, 'ring-2', relEntry.activeRing, 'shadow-sm')
-                    : 'bg-gray-100 text-[#444D69] hover:text-foreground hover:bg-muted',
+                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80',
                 )}
               >
                 {t(labelKey)}

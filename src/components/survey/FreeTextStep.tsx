@@ -12,21 +12,21 @@ interface FreeTextStepProps {
   track: Track;
 }
 
-/** Visual accent per tier — consistent with FeatureMatrixStep */
+/** Visual accent per tier — dark mode, consistent with FeatureMatrixStep */
 const TIER_ACCENT = {
-  1: 'border-blue-300 bg-blue-50 data-[checked]:border-blue-400 data-[checked]:bg-blue-50',
-  2: 'border-teal-300 bg-teal-50 data-[checked]:border-teal-400 data-[checked]:bg-teal-50',
-  3: 'border-green-300 bg-green-50 data-[checked]:border-green-400 data-[checked]:bg-green-50',
-  4: 'border-orange-300 bg-orange-50 data-[checked]:border-orange-400 data-[checked]:bg-orange-50',
-  5: 'border-purple-300 bg-purple-50 data-[checked]:border-purple-400 data-[checked]:bg-purple-50',
+  1: 'border-blue-500/30 bg-blue-500/10 data-[checked]:border-blue-400 data-[checked]:bg-blue-500/15',
+  2: 'border-teal-500/30 bg-teal-500/10 data-[checked]:border-teal-400 data-[checked]:bg-teal-500/15',
+  3: 'border-green-500/30 bg-green-500/10 data-[checked]:border-green-400 data-[checked]:bg-green-500/15',
+  4: 'border-primary/30 bg-primary/10 data-[checked]:border-primary data-[checked]:bg-primary/15',
+  5: 'border-purple-500/30 bg-purple-500/10 data-[checked]:border-purple-400 data-[checked]:bg-purple-500/15',
 } as const;
 
 const TIER_BADGE = {
-  1: 'bg-blue-100 text-blue-700',
-  2: 'bg-teal-100 text-teal-700',
-  3: 'bg-green-100 text-green-700',
-  4: 'bg-orange-100 text-orange-700',
-  5: 'bg-purple-100 text-purple-700',
+  1: 'bg-blue-500/15 text-blue-300',
+  2: 'bg-teal-500/15 text-teal-300',
+  3: 'bg-green-500/15 text-green-300',
+  4: 'bg-primary/15 text-primary',
+  5: 'bg-purple-500/15 text-purple-300',
 } as const;
 
 export function FreeTextStep({ track }: FreeTextStepProps) {
@@ -64,10 +64,10 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
               <label
                 key={key}
                 data-checked={checked || undefined}
-                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all min-h-[44px] hover:shadow-sm ${
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all min-h-[44px] ${
                   checked
-                    ? 'border-[#FFAB54] bg-[#FFAB54]/5 shadow-sm'
-                    : 'border-border hover:bg-muted/50'
+                    ? 'border-primary/60 bg-primary/10 shadow-sm shadow-primary/10'
+                    : 'border-border bg-card hover:border-border/80 hover:bg-secondary/50'
                 }`}
               >
                 <Checkbox
@@ -100,7 +100,7 @@ export function FreeTextStep({ track }: FreeTextStepProps) {
         <Label className="text-base font-medium">{t('freeText')}</Label>
         <Textarea
           placeholder={t('freeTextPlaceholder')}
-          className="min-h-[120px] rounded-lg border-gray-300 px-4 py-3 focus:ring-[#FFAB54] focus:border-[#FFAB54]"
+          className="min-h-[120px] rounded-lg bg-card border-border px-4 py-3 focus-visible:ring-primary focus-visible:border-primary placeholder:text-muted-foreground/40"
           {...register('free_text')}
         />
       </div>

@@ -27,32 +27,32 @@ interface TierSectionProps {
   defaultExpanded: boolean;
 }
 
-/** Visual identity per tier: badge color, progress bar color, left border accent */
+/** Visual identity per tier: badge color, progress bar color, left border accent (dark mode) */
 const TIER_STYLES = {
   1: {
-    badge:    'bg-blue-100 text-blue-700 border border-blue-200',
+    badge:    'bg-blue-500/15 text-blue-300 border border-blue-500/30',
     bar:      'bg-blue-500',
-    border:   'border-l-4 border-l-blue-400',
+    border:   'border-l-4 border-l-blue-500/60',
   },
   2: {
-    badge:    'bg-teal-100 text-teal-700 border border-teal-200',
+    badge:    'bg-teal-500/15 text-teal-300 border border-teal-500/30',
     bar:      'bg-teal-500',
-    border:   'border-l-4 border-l-teal-400',
+    border:   'border-l-4 border-l-teal-500/60',
   },
   3: {
-    badge:    'bg-green-100 text-green-700 border border-green-200',
+    badge:    'bg-green-500/15 text-green-300 border border-green-500/30',
     bar:      'bg-green-500',
-    border:   'border-l-4 border-l-green-400',
+    border:   'border-l-4 border-l-green-500/60',
   },
   4: {
-    badge:    'bg-orange-100 text-orange-700 border border-orange-200',
-    bar:      'bg-orange-500',
-    border:   'border-l-4 border-l-orange-400',
+    badge:    'bg-primary/15 text-primary border border-primary/30',
+    bar:      'bg-primary',
+    border:   'border-l-4 border-l-primary/60',
   },
   5: {
-    badge:    'bg-purple-100 text-purple-700 border border-purple-200',
+    badge:    'bg-purple-500/15 text-purple-300 border border-purple-500/30',
     bar:      'bg-purple-500',
-    border:   'border-l-4 border-l-purple-400',
+    border:   'border-l-4 border-l-purple-500/60',
   },
 } as const;
 
@@ -252,7 +252,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
           <div
             className={cn(
               'h-full rounded-full transition-all duration-300',
-              hasEnough ? 'bg-green-500' : 'bg-[#FFAB54]',
+              hasEnough ? 'bg-green-500' : 'bg-primary',
             )}
             style={{ width: `${progressPct}%` }}
           />

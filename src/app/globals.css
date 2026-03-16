@@ -8,6 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-dm-sans);
+  --font-display: var(--font-barlow-condensed);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -47,76 +48,95 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─────────────────────────────────────────
+   Teclead dark-first design system
+   Primary: #F5A623 (oklch 0.76 0.16 62)
+   Background: #0D0D0D
+───────────────────────────────────────── */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  /* TLV Brand: #FFAB54 orange as primary accent, #121212 as foreground on orange */
-  --primary: oklch(0.78 0.155 58);
-  --primary-foreground: oklch(0.1 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.145 0 0);
-  --muted: oklch(0.97 0 0);
-  /* TLV Grey #444D69 */
-  --muted-foreground: oklch(0.42 0.035 255);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.145 0 0);
+  /* Base */
+  --background: oklch(0.09 0 0);          /* #0D0D0D */
+  --foreground: oklch(0.97 0 0);          /* #F7F7F7 */
+
+  /* Cards / Surfaces */
+  --card: oklch(0.12 0 0);               /* #141414 */
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.14 0 0);            /* #1A1A1A */
+  --popover-foreground: oklch(0.97 0 0);
+
+  /* Teclead Orange — #F5A623 */
+  --primary: oklch(0.76 0.16 62);
+  --primary-foreground: oklch(0.1 0 0);  /* Dark text on orange */
+
+  /* Secondary / Muted */
+  --secondary: oklch(0.18 0 0);          /* #222 */
+  --secondary-foreground: oklch(0.85 0 0);
+  --muted: oklch(0.16 0 0);             /* #1D1D1D */
+  --muted-foreground: oklch(0.58 0 0);   /* #888 */
+
+  /* Accent = orange */
+  --accent: oklch(0.76 0.16 62);
+  --accent-foreground: oklch(0.1 0 0);
+
+  /* Utility */
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  /* Ring matches primary orange */
-  --ring: oklch(0.78 0.155 58);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --border: oklch(0.22 0 0);             /* #2A2A2A */
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.76 0.16 62);           /* Orange focus ring */
+
+  /* Chart colors — orange-led range */
+  --chart-1: oklch(0.76 0.16 62);        /* orange */
+  --chart-2: oklch(0.68 0.13 200);       /* teal */
+  --chart-3: oklch(0.65 0.15 145);       /* green */
+  --chart-4: oklch(0.62 0.18 280);       /* violet */
+  --chart-5: oklch(0.55 0.19 30);        /* red-orange */
+
+  --radius: 0.5rem;
+
+  /* Sidebar */
+  --sidebar: oklch(0.12 0 0);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.76 0.16 62);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.85 0 0);
+  --sidebar-border: oklch(0.22 0 0);
+  --sidebar-ring: oklch(0.76 0.16 62);
 }
 
+/* Keep .dark identical — app is always dark */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.809 0.105 251.813);
-  --chart-2: oklch(0.623 0.214 259.815);
-  --chart-3: oklch(0.546 0.245 262.881);
-  --chart-4: oklch(0.488 0.243 264.376);
-  --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: oklch(0.09 0 0);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.12 0 0);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.14 0 0);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.76 0.16 62);
+  --primary-foreground: oklch(0.1 0 0);
+  --secondary: oklch(0.18 0 0);
+  --secondary-foreground: oklch(0.85 0 0);
+  --muted: oklch(0.16 0 0);
+  --muted-foreground: oklch(0.58 0 0);
+  --accent: oklch(0.76 0.16 62);
+  --accent-foreground: oklch(0.1 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.22 0 0);
+  --input: oklch(0.18 0 0);
+  --ring: oklch(0.76 0.16 62);
+  --chart-1: oklch(0.76 0.16 62);
+  --chart-2: oklch(0.68 0.13 200);
+  --chart-3: oklch(0.65 0.15 145);
+  --chart-4: oklch(0.62 0.18 280);
+  --chart-5: oklch(0.55 0.19 30);
+  --sidebar: oklch(0.12 0 0);
+  --sidebar-foreground: oklch(0.97 0 0);
+  --sidebar-primary: oklch(0.76 0.16 62);
+  --sidebar-primary-foreground: oklch(0.1 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.85 0 0);
+  --sidebar-border: oklch(0.22 0 0);
+  --sidebar-ring: oklch(0.76 0.16 62);
 }
 
 @layer base {
@@ -129,4 +149,36 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ── Orange glow utilities ── */
+.glow-orange {
+  box-shadow: 0 0 20px oklch(0.76 0.16 62 / 0.35), 0 0 60px oklch(0.76 0.16 62 / 0.1);
+}
+.glow-orange-sm {
+  box-shadow: 0 0 12px oklch(0.76 0.16 62 / 0.25);
+}
+
+/* ── Dot grid background ── */
+.dot-grid {
+  background-image: radial-gradient(circle, oklch(1 0 0 / 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ── Subtle horizontal scan line for cards ── */
+.scan-line {
+  position: relative;
+  overflow: hidden;
+}
+.scan-line::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    oklch(1 0 0 / 0.02) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
 }

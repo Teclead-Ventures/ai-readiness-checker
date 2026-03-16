@@ -294,7 +294,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
               size="lg"
               onClick={goBack}
               disabled={isFirstStep}
-              className="min-w-[100px] h-11 bg-white text-[#121212] border border-gray-300 hover:bg-gray-50 rounded-lg px-8 py-3"
+              className="min-w-[100px] h-11 border-border bg-secondary text-foreground hover:border-primary/40 hover:text-primary rounded-lg px-8 py-3 transition-colors"
             >
               {tCommon('back')}
             </Button>
@@ -305,7 +305,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 size="lg"
                 disabled={submitting || submitBlocked}
                 title={submitBlocked ? (tCommon('selectAtLeastOne')) : undefined}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {submitting ? t('submitting') : tCommon('submit')}
               </Button>
@@ -316,7 +316,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 onClick={goNext}
                 disabled={featureMatrixBlocked}
                 title={featureMatrixBlocked ? (tCommon('answerMoreFeatures')) : undefined}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {tCommon('next')}
               </Button>
