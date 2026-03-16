@@ -18,20 +18,22 @@ interface FeatureItemProps {
 const SCALE_ENTRIES = [
   { value: 0 as const, activeBg: 'bg-red-500',    activeRing: 'ring-red-500/30',    activeText: 'text-white' },
   { value: 1 as const, activeBg: 'bg-orange-500', activeRing: 'ring-orange-500/30', activeText: 'text-white' },
-  { value: 2 as const, activeBg: 'bg-yellow-500', activeRing: 'ring-yellow-500/30', activeText: 'text-white' },
+  { value: 2 as const, activeBg: 'bg-yellow-500', activeRing: 'ring-yellow-500/30', activeText: 'text-black' },
   { value: 3 as const, activeBg: 'bg-green-500',  activeRing: 'ring-green-500/30',  activeText: 'text-white' },
 ] as const;
 
 const RELEVANCE_ENTRIES = [
   { value: 'yes'    as const, activeBg: 'bg-blue-500',  activeRing: 'ring-blue-500/30',  activeText: 'text-white' },
-  { value: 'unsure' as const, activeBg: 'bg-gray-400',  activeRing: 'ring-gray-400/30',  activeText: 'text-white' },
-  { value: 'no'     as const, activeBg: 'bg-slate-500', activeRing: 'ring-slate-500/30', activeText: 'text-white' },
+  { value: 'unsure' as const, activeBg: 'bg-zinc-500',  activeRing: 'ring-zinc-500/30',  activeText: 'text-white' },
+  { value: 'no'     as const, activeBg: 'bg-slate-600', activeRing: 'ring-slate-600/30', activeText: 'text-white' },
 ] as const;
 
 function FeatureItemInner({ featureId, label, examples, entry, onChange }: FeatureItemProps) {
   const locale = useLocale();
   const t = useTranslations('survey.features');
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
+
+  const isAnswered = entry?.score !== undefined && entry.score !== null;
 
   const handleScoreSelect = useCallback(
     (val: FeatureValue) => {
@@ -48,8 +50,15 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
   );
 
   return (
-    <div className="py-4 space-y-3">
-      {/* Capability label + examples — always full width, never squeezed */}
+    <div
+      className={cn(
+        'rounded-lg border p-3 space-y-3 transition-colors',
+        isAnswered
+          ? 'border-border/70 bg-card'
+          : 'border-border/40 bg-muted/30',
+      )}
+    >
+      {/* Label */}
       <div>
         <p className="text-sm font-medium leading-snug text-foreground">{label}</p>
         {examples && (
@@ -58,11 +67,11 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
       </div>
 
       {/* Usage row */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        <span className="text-xs text-muted-foreground shrink-0 min-w-[56px]">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="text-xs font-medium text-muted-foreground shrink-0 w-[52px]">
           {t('usageLabel')}
         </span>
-        <div className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5 flex-wrap gap-0.5">
+        <div className="inline-flex rounded-lg border border-border bg-background p-0.5 flex-wrap gap-0.5">
           {SCALE_ENTRIES.map((scaleEntry) => {
             const isActive = entry?.score === scaleEntry.value;
             const scaleItem = RESPONSE_SCALE[scaleEntry.value];
@@ -75,11 +84,11 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                 aria-label={scaleItem[lang]}
                 onClick={() => handleScoreSelect(scaleEntry.value)}
                 className={cn(
-                  'min-h-[36px] cursor-pointer rounded-md px-2.5 py-1.5 text-xs font-medium transition-all select-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                  'min-h-[32px] cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-all select-none',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive
                     ? cn(scaleEntry.activeBg, scaleEntry.activeText, 'ring-2', scaleEntry.activeRing, 'shadow-sm')
-                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80',
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
                 )}
               >
                 {scaleItem[lang]}
@@ -90,12 +99,12 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
       </div>
 
       {/* Relevance row */}
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        <span className="flex items-center gap-1 text-xs text-muted-foreground shrink-0 min-w-[56px]">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0 w-[52px]">
           {t('relevanceLabel')}
           <InfoTooltip content={t('relevanceTooltip')} side="top" />
         </span>
-        <div className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5 gap-0.5">
+        <div className="inline-flex rounded-lg border border-border bg-background p-0.5 gap-0.5">
           {RELEVANCE_ENTRIES.map((relEntry) => {
             const isActive = entry?.relevant === relEntry.value;
             const labelKey =
@@ -109,11 +118,11 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                 aria-checked={isActive}
                 onClick={() => handleRelevanceSelect(relEntry.value)}
                 className={cn(
-                  'min-h-[36px] cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium transition-all select-none',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
+                  'min-h-[32px] cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all select-none',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive
                     ? cn(relEntry.activeBg, relEntry.activeText, 'ring-2', relEntry.activeRing, 'shadow-sm')
-                    : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80',
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary',
                 )}
               >
                 {t(labelKey)}

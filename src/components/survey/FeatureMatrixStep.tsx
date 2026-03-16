@@ -151,7 +151,7 @@ function TierSection({
 
       {/* Capabilities list */}
       {expanded && (
-        <div className="divide-y divide-border/50 px-4">
+        <div className="flex flex-col gap-2 px-3 pb-3 pt-1">
           {capabilities.map((cap) => (
             <FeatureItem
               key={cap.id}

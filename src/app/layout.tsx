@@ -29,22 +29,26 @@ export const metadata: Metadata = {
   },
 };
 
-/** Teclead V-mark — angular chevron in brand orange */
+/**
+ * Teclead V-mark — two angular stripes forming a downward V/chevron.
+ * Left arm: tall parallelogram from top-left to bottom-center.
+ * Right arm: same width, mirrored, top-right to bottom-center.
+ */
 function TecleadMark({ className }: { className?: string }) {
   return (
     <svg
-      width="28"
-      height="22"
-      viewBox="0 0 28 22"
+      width="34"
+      height="26"
+      viewBox="0 0 34 26"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
-      {/* Left arm */}
-      <path d="M0 1 L5.5 0 L14 18 L8.5 19 Z" fill="#F5A623" />
-      {/* Right arm (shorter) */}
-      <path d="M11 5.5 L16.5 4.5 L22 18 L14 18 Z" fill="#F5A623" />
+      {/* Left arm: top-left → bottom-center */}
+      <path d="M0 0 L9 0 L17 24 L8 24 Z" fill="#F5A623" />
+      {/* Right arm: top-right → bottom-center */}
+      <path d="M17 24 L26 24 L34 0 L25 0 Z" fill="#F5A623" />
     </svg>
   );
 }
