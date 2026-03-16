@@ -62,7 +62,7 @@ export function CategoryHeatmap({
                     <th
                       key={tier}
                       className="p-1.5 text-center font-medium text-muted-foreground min-w-[60px]"
-                      title={`${config[lang]} (${config.era})`}
+                      title={config[lang]}
                     >
                       T{tier}
                     </th>
@@ -112,7 +112,7 @@ export function CategoryHeatmap({
             const config = TIER_CONFIG[tier];
             return (
               <span key={tier}>
-                <strong>T{tier}</strong> = {config[lang]} ({config.era})
+                <strong>T{tier}</strong> = {config[lang]}
               </span>
             );
           })}

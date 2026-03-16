@@ -1,7 +1,7 @@
 import { Capability } from './types';
 
 export const BUSINESS_CAPABILITIES: Capability[] = [
-  // ── TIER 1: AI FUNDAMENTALS & UNDERSTANDING (2022–2023) ─────────────
+  // ── TIER 1: AI FUNDAMENTALS & UNDERSTANDING ───────────────────────
   { id: "T1_01", tier: 1, firstAvailable: "2022-11",
     en: "AI chat assistants for questions and research",
     de: "KI-Chat-Assistenten für Fragen und Recherche",
@@ -14,8 +14,12 @@ export const BUSINESS_CAPABILITIES: Capability[] = [
     en: "AI writing and grammar assistance",
     de: "KI-Schreib- und Grammatikhilfe",
     examples: { en: "e.g. Grammarly, LanguageTool, DeepL", de: "z.B. Grammarly, LanguageTool, DeepL" } },
+  { id: "T1_04", tier: 1, firstAvailable: "2022-09",
+    en: "AI image and visual content generation",
+    de: "KI-Bild- und visuelle Inhaltsgenerierung",
+    examples: { en: "e.g. DALL-E, Midjourney, Stable Diffusion, Canva AI", de: "z.B. DALL-E, Midjourney, Stable Diffusion, Canva AI" } },
 
-  // ── TIER 2: BASIC TOOLING (2023–2024) ───────────────────────────────
+  // ── TIER 2: BASIC TOOLING ─────────────────────────────────────────
   { id: "T2_01", tier: 2, firstAvailable: "2023-02",
     en: "AI-integrated note-taking and knowledge management",
     de: "KI-integrierte Notizen und Wissensmanagement",
@@ -24,16 +28,12 @@ export const BUSINESS_CAPABILITIES: Capability[] = [
     en: "AI meeting transcription and summaries",
     de: "KI-Meeting-Transkription und Zusammenfassungen",
     examples: { en: "e.g. Otter.ai, Fireflies, tl;dv, Copilot in Teams", de: "z.B. Otter.ai, Fireflies, tl;dv, Copilot in Teams" } },
-  { id: "T2_03", tier: 2, firstAvailable: "2022-09",
-    en: "AI image and visual content generation",
-    de: "KI-Bild- und visuelle Inhaltsgenerierung",
-    examples: { en: "e.g. DALL-E, Midjourney, Stable Diffusion, Canva AI", de: "z.B. DALL-E, Midjourney, Stable Diffusion, Canva AI" } },
-  { id: "T2_04", tier: 2, firstAvailable: "2024-02",
+  { id: "T2_03", tier: 2, firstAvailable: "2024-02",
     en: "AI-powered team communication",
     de: "KI-gestützte Teamkommunikation",
     examples: { en: "e.g. Slack AI summaries, Teams AI", de: "z.B. Slack AI Zusammenfassungen, Teams AI" } },
 
-  // ── TIER 3: PRODUCTIVE USAGE (2024) ─────────────────────────────────
+  // ── TIER 3: PRODUCTIVE USAGE ──────────────────────────────────────
   { id: "T3_01", tier: 3, firstAvailable: "2023-11",
     en: "AI in office applications — documents, spreadsheets, presentations",
     de: "KI in Office-Anwendungen — Dokumente, Tabellen, Präsentationen",
@@ -50,26 +50,26 @@ export const BUSINESS_CAPABILITIES: Capability[] = [
     en: "Interactive AI artifacts and prototypes",
     de: "Interaktive KI-Artefakte und Prototypen",
     examples: { en: "Build calculators, dashboards, tools by describing them (Claude Artifacts, ChatGPT Canvas)", de: "Rechner, Dashboards, Tools durch Beschreibung bauen (Claude Artifacts, ChatGPT Canvas)" } },
+  { id: "T3_05", tier: 3, firstAvailable: "2024-01",
+    en: "AI ticket and specification writing",
+    de: "KI-gestützte Ticket- und Spezifikationserstellung",
+    examples: { en: "AI-generated user stories, PRDs, acceptance criteria", de: "KI-generierte User Stories, PRDs, Akzeptanzkriterien" } },
 
-  // ── TIER 4: AUTOMATION & WORKFLOWS (2025) ───────────────────────────
+  // ── TIER 4: AUTOMATION & WORKFLOWS ────────────────────────────────
   { id: "T4_01", tier: 4, firstAvailable: "2023-06",
     en: "AI workflow automation",
     de: "KI-Workflow-Automatisierung",
     examples: { en: "e.g. Zapier AI, Make AI, n8n with AI nodes", de: "z.B. Zapier AI, Make AI, n8n mit KI-Bausteinen" } },
-  { id: "T4_02", tier: 4, firstAvailable: "2024-01",
-    en: "AI ticket and specification writing",
-    de: "KI-gestützte Ticket- und Spezifikationserstellung",
-    examples: { en: "AI-generated user stories, PRDs, acceptance criteria", de: "KI-generierte User Stories, PRDs, Akzeptanzkriterien" } },
-  { id: "T4_03", tier: 4, firstAvailable: "2024-06",
+  { id: "T4_02", tier: 4, firstAvailable: "2024-06",
     en: "Automated report generation with AI",
     de: "Automatisierte Report-Erstellung mit KI",
     examples: { en: "Dashboards, monthly reports, KPI summaries generated automatically", de: "Dashboards, Monatsberichte, KPI-Zusammenfassungen automatisch erstellen" } },
-  { id: "T4_04", tier: 4, firstAvailable: "2024-03",
+  { id: "T4_03", tier: 4, firstAvailable: "2024-03",
     en: "AI-powered document processing",
     de: "KI-gestützte Dokumentenverarbeitung",
     examples: { en: "Invoices, contracts, proposals — automatically analyzed and processed", de: "Rechnungen, Verträge, Angebote — automatisch auswerten und verarbeiten" } },
 
-  // ── TIER 5: ADVANCED AI INTEGRATION (2026) ──────────────────────────
+  // ── TIER 5: ADVANCED AI INTEGRATION ───────────────────────────────
   { id: "T5_01", tier: 5, firstAvailable: "2024-10",
     en: "Computer Use — AI controlling your screen",
     de: "Computer Use — KI steuert deinen Bildschirm",

@@ -94,7 +94,7 @@ export function TeamOverview({ team, locale }: TeamOverviewProps) {
                     }}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">{era}</p>
+                {era && <p className="text-xs text-muted-foreground">{era}</p>}
               </div>
             ))}
           </div>

@@ -125,7 +125,7 @@ function TierSection({
               {tierName}
             </span>
             <span className="text-xs text-muted-foreground shrink-0">
-              {era} · {answered}/{total} {t('answered')}
+              {era ? `${era} · ` : ''}{answered}/{total} {t('answered')}
             </span>
           </div>
 
