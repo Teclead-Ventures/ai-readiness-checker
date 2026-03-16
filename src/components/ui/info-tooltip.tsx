@@ -10,24 +10,31 @@ interface InfoTooltipProps {
 
 /**
  * A small "?" icon that shows an explanatory tooltip on hover/focus.
- * Used throughout the survey to explain technical terms and AI concepts.
+ * Orange, clearly visible, properly aligned with inline text.
  */
 export function InfoTooltip({ content, side = 'top' }: InfoTooltipProps) {
   return (
-    <TooltipProvider delay={200}>
+    <TooltipProvider delay={150}>
       <Tooltip>
         <TooltipTrigger
           render={
             <button
               type="button"
               aria-label="Mehr Informationen"
-              className="inline-flex h-4 w-4 shrink-0 cursor-help items-center justify-center rounded-full text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="inline-flex h-[18px] w-[18px] shrink-0 cursor-help items-center justify-center rounded-full
+                bg-primary/15 border border-primary/30 text-primary/80
+                transition-all hover:bg-primary/25 hover:text-primary hover:border-primary/60
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                align-middle relative top-[-1px]"
             >
-              <HelpCircle className="h-3.5 w-3.5" />
+              <HelpCircle className="h-3 w-3" />
             </button>
           }
         />
-        <TooltipContent side={side} className="max-w-[220px] text-center leading-relaxed">
+        <TooltipContent
+          side={side}
+          className="max-w-[240px] text-center leading-relaxed text-xs bg-popover border-border text-popover-foreground shadow-lg"
+        >
           {content}
         </TooltipContent>
       </Tooltip>

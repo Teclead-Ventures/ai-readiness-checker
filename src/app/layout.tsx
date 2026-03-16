@@ -30,25 +30,25 @@ export const metadata: Metadata = {
 };
 
 /**
- * Teclead V-mark — two angular stripes forming a downward V/chevron.
- * Left arm: tall parallelogram from top-left to bottom-center.
- * Right arm: same width, mirrored, top-right to bottom-center.
+ * Teclead V-mark:
+ * - Left arm: large, full-height parallelogram from top-left to bottom-center
+ * - Right inner piece: shorter, starts slightly lower, creates the asymmetric double-chevron
  */
 function TecleadMark({ className }: { className?: string }) {
   return (
     <svg
-      width="34"
-      height="26"
-      viewBox="0 0 34 26"
+      width="36"
+      height="28"
+      viewBox="0 0 36 28"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
       aria-hidden="true"
     >
-      {/* Left arm: top-left → bottom-center */}
-      <path d="M0 0 L9 0 L17 24 L8 24 Z" fill="#F5A623" />
-      {/* Right arm: top-right → bottom-center */}
-      <path d="M17 24 L26 24 L34 0 L25 0 Z" fill="#F5A623" />
+      {/* Left arm: full height, dominant */}
+      <path d="M0 0 L10 0 L19 26 L9 26 Z" fill="#F5A623" />
+      {/* Right inner piece: starts lower, creates double-V effect */}
+      <path d="M13 5 L23 5 L27 26 L18 26 Z" fill="#F5A623" />
     </svg>
   );
 }
