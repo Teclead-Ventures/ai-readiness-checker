@@ -99,41 +99,47 @@ function TierSection({
 
   return (
     <div className={cn('overflow-hidden rounded-lg border border-border bg-card', styles.border)}>
-      {/* Header */}
-      <button
-        type="button"
-        onClick={() => setExpanded((prev) => !prev)}
-        className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
-        aria-expanded={expanded}
-      >
-        <ChevronDown
-          className={cn(
-            'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-            expanded && 'rotate-180',
-          )}
-        />
+      {/* Header — InfoTooltip lives outside the <button> to avoid nested buttons */}
+      <div className="flex w-full items-center hover:bg-muted/40 transition-colors">
+        <button
+          type="button"
+          onClick={() => setExpanded((prev) => !prev)}
+          className="flex flex-1 cursor-pointer items-center gap-3 px-4 py-3 text-left min-w-0"
+          aria-expanded={expanded}
+        >
+          <ChevronDown
+            className={cn(
+              'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+              expanded && 'rotate-180',
+            )}
+          />
 
-        {/* Tier badge */}
-        <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums', styles.badge)}>
-          T{tier}
-        </span>
+          {/* Tier badge */}
+          <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums', styles.badge)}>
+            T{tier}
+          </span>
 
-        {/* Title + tooltip */}
-        <div className="flex flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2 min-w-0">
-          <span className="flex items-center gap-1.5 text-sm font-semibold text-foreground">
-            {tierName}
-            <InfoTooltip content={tierTooltip} side="top" />
+          {/* Title + meta */}
+          <div className="flex flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2 min-w-0">
+            <span className="text-sm font-semibold text-foreground truncate">
+              {tierName}
+            </span>
+            <span className="text-xs text-muted-foreground shrink-0">
+              {era} · {answered}/{total} {t('answered')}
+            </span>
+          </div>
+
+          {/* Score */}
+          <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+            {score}%
           </span>
-          <span className="text-xs text-muted-foreground">
-            {era} · {answered}/{total} {t('answered')}
-          </span>
+        </button>
+
+        {/* Tooltip sits outside the button — no nested button issue */}
+        <div className="shrink-0 px-3">
+          <InfoTooltip content={tierTooltip} side="top" />
         </div>
-
-        {/* Score */}
-        <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-          {score}%
-        </span>
-      </button>
+      </div>
 
       {/* Progress bar in tier color */}
       <div className="h-1 w-full bg-muted">
