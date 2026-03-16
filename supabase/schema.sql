@@ -52,7 +52,11 @@ CREATE TABLE IF NOT EXISTS responses (
   -- Section 4: Mindset
   openness INTEGER CHECK (openness BETWEEN 1 AND 5),
   barriers TEXT[] DEFAULT '{}',
+  barriers_other TEXT DEFAULT '',
   priority_areas TEXT[] DEFAULT '{}',
+
+  -- Section 4b: Knowledge management (JSONB)
+  knowledge_management JSONB NOT NULL DEFAULT '{}',
 
   -- Section 5: Feature awareness matrix (JSONB)
   features JSONB NOT NULL DEFAULT '{}',
@@ -66,7 +70,7 @@ CREATE TABLE IF NOT EXISTS responses (
   free_text TEXT,
 
   -- Computed scores
-  scores JSONB NOT NULL DEFAULT '{}'
+  scores JSONB NOT NULL DEFAULT '{}',
 
   -- Campaign attribution
   campaign_src TEXT,

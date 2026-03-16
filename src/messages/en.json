@@ -73,6 +73,13 @@
       "contexts": "In which contexts do you use AI?",
       "frequency": "How often do you use AI tools?",
       "frequencyPlaceholder": "Select frequency",
+      "frequencyOptions": {
+        "Never": "Never",
+        "Monthly": "Monthly",
+        "Weekly": "Weekly",
+        "Daily": "Daily",
+        "Multiple times daily": "Multiple times daily"
+      },
       "config": "Which advanced configurations do you use?"
     },
     "mindset": {
@@ -139,6 +146,7 @@
     "utilizationCurrent": "Currently AI-assisted",
     "utilizationPotential": "Could be AI-assisted",
     "featureBreakdown": "Capabilities by Category",
+    "tierProgress": "Tier Progress",
     "tier": "Category",
     "timelineTitle": "Your Timeline Position",
     "timelinePosition": "Timeline Position",

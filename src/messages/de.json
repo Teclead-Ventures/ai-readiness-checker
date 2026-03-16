@@ -73,6 +73,13 @@
       "contexts": "In welchen Kontexten nutzt du KI?",
       "frequency": "Wie oft nutzt du KI-Tools?",
       "frequencyPlaceholder": "Häufigkeit auswählen",
+      "frequencyOptions": {
+        "Never": "Nie",
+        "Monthly": "Monatlich",
+        "Weekly": "Wöchentlich",
+        "Daily": "Täglich",
+        "Multiple times daily": "Mehrmals täglich"
+      },
       "config": "Welche erweiterten Konfigurationen nutzt du?"
     },
     "mindset": {
@@ -139,6 +146,7 @@
     "utilizationCurrent": "Aktuell KI-unterstützt",
     "utilizationPotential": "Könnte KI-unterstützt sein",
     "featureBreakdown": "Fähigkeiten nach Kategorie",
+    "tierProgress": "Tier-Fortschritt",
     "tier": "Kategorie",
     "timelineTitle": "Deine Zeitliche Einordnung",
     "timelinePosition": "Zeitliche Einordnung",
