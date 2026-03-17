@@ -46,6 +46,8 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       {/* 3. Adaptation Projection (urgency driver) */}
       <AdaptationProjection
         adaptation={response.scores.adaptation}
+        tiers={response.scores.tiers}
+        tiersNA={response.scores.tiersNA}
         locale={locale}
       />
 
