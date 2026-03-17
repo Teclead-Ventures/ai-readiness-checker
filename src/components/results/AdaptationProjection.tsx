@@ -143,10 +143,17 @@ export function AdaptationProjection({
 
   // ── Personalized 6-month target ─────────────────────────────────
   const advancedCeiling = 78;
-  const gapToCeiling = Math.max(0, advancedCeiling - currentPct);
-  const closingFactor =
-    currentPct < 20 ? 0.55 : currentPct < 40 ? 0.65 : currentPct < 60 ? 0.75 : 0.85;
-  const targetPct = Math.round(currentPct + gapToCeiling * closingFactor);
+  let targetPct: number;
+  if (currentPct >= advancedCeiling) {
+    // Already advanced: training gives a small consolidation benefit
+    // (15% of remaining gap to 100) — keeps the line slightly above flat
+    targetPct = Math.min(100, currentPct + Math.round((100 - currentPct) * 0.15));
+  } else {
+    const gapToCeiling = advancedCeiling - currentPct;
+    const closingFactor =
+      currentPct < 20 ? 0.55 : currentPct < 40 ? 0.65 : currentPct < 60 ? 0.75 : 0.85;
+    targetPct = Math.round(currentPct + gapToCeiling * closingFactor);
+  }
   const delta = targetPct - currentPct;
 
   // ── Data-driven monthly growth (proportional to tier opportunity) ─
@@ -172,9 +179,13 @@ export function AdaptationProjection({
   ];
 
   // ── "Without training" decline ─────────────────────────────────
-  // New AI tools keep appearing — relative standing slips even if you don't forget anything
-  const declineRate =
+  // New AI tools keep appearing — relative standing slips even if you don't forget anything.
+  // High scorers already follow AI developments naturally and self-adopt, so their
+  // effective decline is much smaller. Scale from full decline at 0% → ~10% at 100%.
+  const baseDeclineRate =
     direction === 'widening' ? 1.0 : direction === 'stable' ? 0.5 : 0.3;
+  const scoreDeclineFactor = Math.max(0.08, 1 - (currentPct / 100) * 0.9);
+  const declineRate = baseDeclineRate * scoreDeclineFactor;
 
   // ── Build chart data (today + 6 months) ────────────────────────
   const data: DataPoint[] = [];
@@ -231,20 +242,32 @@ export function AdaptationProjection({
             <div className="p-3 rounded-lg border border-green-500/30 bg-green-500/5 text-center">
               <p className="text-xs text-muted-foreground mb-1">{t('withTraining')}</p>
               <p className="text-2xl font-bold text-green-500">{endWithTraining}%</p>
-              {growthAmount > 0 && (
+              {currentPct >= 99 ? (
+                <p className="text-xs text-green-600/80 mt-0.5 leading-tight">
+                  {t('frontierNote')}
+                </p>
+              ) : growthAmount > 0 ? (
                 <p className="text-xs text-green-600/80 mt-0.5">
                   +{growthAmount} {locale === 'de' ? 'Punkte' : 'points'}
                 </p>
-              )}
+              ) : null}
             </div>
             <div className="p-3 rounded-lg border border-slate-500/20 bg-slate-500/5 text-center">
               <p className="text-xs text-muted-foreground mb-1">{t('withoutTraining')}</p>
               <p className="text-2xl font-bold text-slate-400">{endWithoutChange}%</p>
-              {silentFall > 0 && (
+              {currentPct >= 99 ? (
+                <p className="text-xs text-slate-500/80 mt-0.5 leading-tight">
+                  {t('maintainEdgeNote')}
+                </p>
+              ) : endWithoutChange === 0 ? (
+                <p className="text-xs text-amber-500/80 mt-0.5 leading-tight">
+                  {t('zeroDeclineNote')}
+                </p>
+              ) : silentFall > 0 ? (
                 <p className="text-xs text-slate-500/80 mt-0.5">
                   −{silentFall} {locale === 'de' ? 'Punkte' : 'points'}
                 </p>
-              )}
+              ) : null}
             </div>
           </div>
 
