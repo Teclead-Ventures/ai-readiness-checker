@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, Barlow_Condensed } from "next/font/google";
 import Link from "next/link";
+import Image from "next/image";
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -29,29 +30,6 @@ export const metadata: Metadata = {
   },
 };
 
-/**
- * Teclead V-mark:
- * - Left arm: large, full-height parallelogram from top-left to bottom-center
- * - Right inner piece: shorter, starts slightly lower, creates the asymmetric double-chevron
- */
-function TecleadMark({ className }: { className?: string }) {
-  return (
-    <svg
-      width="36"
-      height="28"
-      viewBox="0 0 36 28"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className={className}
-      aria-hidden="true"
-    >
-      {/* Left arm: full height, dominant */}
-      <path d="M0 0 L10 0 L19 26 L9 26 Z" fill="#F5A623" />
-      {/* Right inner piece: starts lower, creates double-V effect */}
-      <path d="M13 5 L23 5 L27 26 L18 26 Z" fill="#F5A623" />
-    </svg>
-  );
-}
 
 export default async function RootLayout({
   children,
@@ -72,17 +50,20 @@ export default async function RootLayout({
             <header className="bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center justify-between sticky top-0 z-50">
               <Link
                 href="/"
-                className="flex items-center gap-2.5 hover:opacity-80 transition-opacity group"
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
               >
-                <TecleadMark />
-                <div className="flex flex-col leading-tight">
-                  <span className="font-bold text-sm tracking-widest text-foreground uppercase">
-                    Teclead Ventures
-                  </span>
-                  <span className="text-[10px] text-primary font-medium tracking-wider uppercase">
-                    AI Readiness Check
-                  </span>
-                </div>
+                <Image
+                  src="/TLV NEW_orange_white.png"
+                  alt="Teclead Ventures"
+                  width={148}
+                  height={32}
+                  priority
+                  className="h-8 w-auto"
+                />
+                <div className="h-5 w-px bg-border" aria-hidden="true" />
+                <span className="text-[11px] text-primary font-medium tracking-wider uppercase">
+                  AI Readiness Check
+                </span>
               </Link>
               <LanguageSwitcher />
             </header>

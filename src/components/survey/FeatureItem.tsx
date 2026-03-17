@@ -52,26 +52,36 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
   return (
     <div
       className={cn(
-        'rounded-lg border p-3 space-y-3 transition-colors',
+        'rounded-lg border transition-colors',
         isAnswered
           ? 'border-border/70 bg-card'
           : 'border-border/40 bg-muted/30',
       )}
     >
-      {/* Label */}
-      <div>
+      {/* Label + examples */}
+      <div className="px-3 pt-3 pb-2.5">
         <p className="text-sm font-medium leading-snug text-foreground">{label}</p>
         {examples && (
           <p className="mt-0.5 text-xs text-muted-foreground">{examples}</p>
         )}
       </div>
 
-      {/* Usage row */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-xs font-medium text-muted-foreground shrink-0">
+      {/* Separator */}
+      <div className="mx-3 border-t border-border/30" />
+
+      {/* ── Two aligned rows via CSS grid ────────────────────────────────────
+          Column 1 width = max-content of both labels (auto-resolved by grid),
+          so both button groups start and end at the exact same X position.
+      ──────────────────────────────────────────────────────────────────── */}
+      <div
+        className="grid items-center gap-x-3 gap-y-2 px-3 py-2.5"
+        style={{ gridTemplateColumns: 'max-content 1fr' }}
+      >
+        {/* ── Usage row ── */}
+        <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
           {t('usageLabel')}
         </span>
-        <div className="inline-flex rounded-lg border border-border bg-background p-0.5 flex-wrap gap-0.5">
+        <div className="flex w-full rounded-md border border-border bg-background p-0.5 gap-0.5">
           {SCALE_ENTRIES.map((scaleEntry) => {
             const isActive = entry?.score === scaleEntry.value;
             const scaleItem = RESPONSE_SCALE[scaleEntry.value];
@@ -84,7 +94,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                 aria-label={scaleItem[lang]}
                 onClick={() => handleScoreSelect(scaleEntry.value)}
                 className={cn(
-                  'min-h-[32px] cursor-pointer rounded-md px-2.5 py-1 text-xs font-medium transition-all select-none',
+                  'flex-1 min-h-[30px] cursor-pointer rounded px-1 py-1 text-xs font-medium transition-all select-none text-center leading-tight',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive
                     ? cn(scaleEntry.activeBg, scaleEntry.activeText, 'ring-2', scaleEntry.activeRing, 'shadow-sm')
@@ -96,15 +106,13 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
             );
           })}
         </div>
-      </div>
 
-      {/* Relevance row */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground shrink-0">
+        {/* ── Relevance row ── */}
+        <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground whitespace-nowrap">
           {t('relevanceLabel')}
           <InfoTooltip content={t('relevanceTooltip')} side="top" />
         </span>
-        <div className="inline-flex rounded-lg border border-border bg-background p-0.5 gap-0.5">
+        <div className="flex w-full rounded-md border border-border/50 bg-background p-0.5 gap-0.5">
           {RELEVANCE_ENTRIES.map((relEntry) => {
             const isActive = entry?.relevant === relEntry.value;
             const labelKey =
@@ -118,7 +126,7 @@ function FeatureItemInner({ featureId, label, examples, entry, onChange }: Featu
                 aria-checked={isActive}
                 onClick={() => handleRelevanceSelect(relEntry.value)}
                 className={cn(
-                  'min-h-[32px] cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-all select-none',
+                  'flex-1 min-h-[28px] cursor-pointer rounded px-1 py-1 text-xs font-medium transition-all select-none text-center leading-tight',
                   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isActive
                     ? cn(relEntry.activeBg, relEntry.activeText, 'ring-2', relEntry.activeRing, 'shadow-sm')
