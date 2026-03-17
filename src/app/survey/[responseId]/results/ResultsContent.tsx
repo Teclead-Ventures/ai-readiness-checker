@@ -14,7 +14,7 @@ import { GapComparison } from '@/components/results/GapComparison';
 import { FeatureBreakdown } from '@/components/results/FeatureBreakdown';
 import { OpportunitiesList } from '@/components/results/OpportunitiesList';
 import { TeamCTA } from '@/components/results/TeamCTA';
-import { BookingCTA } from '@/components/results/BookingCTA';
+import { CalendlyEmbed } from '@/components/results/CalendlyEmbed';
 
 interface ResultsContentProps {
   response: SurveyResponse;
@@ -96,8 +96,8 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       {/* 10. Team CTA */}
       {!response.team_id && <TeamCTA />}
 
-      {/* 11. Booking CTA */}
-      <BookingCTA />
+      {/* 11. Calendly Booking */}
+      <CalendlyEmbed />
     </div>
   );
 }
