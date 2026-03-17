@@ -14,20 +14,22 @@
     "required": "Required",
     "optional": "Optional",
     "of": "of",
-    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment"
+    "poweredBy": "Powered by Teclead Ventures · AI Readiness Assessment",
+    "answerMoreFeatures": "Please answer at least 50% of capabilities to continue",
+    "selectAtLeastOne": "Please select at least one category"
   },
   "landing": {
-    "headline": "How AI-Ready Is Your Team?",
-    "subhead": "Find out in 5 minutes. Get a personalized readiness score — then benchmark your entire team.",
+    "headline": "How AI-Ready Are You?",
+    "subhead": "Find out in 5 minutes. Get your personalized readiness score — and optionally compare yourself with your team.",
     "cta": "Start Assessment",
     "teamLink": "Already have a team link?",
     "teamLinkPlaceholder": "Paste your team link here",
     "feature1Title": "5-Minute Assessment",
-    "feature1Desc": "Rate your team's AI capabilities across 50+ tools and practices.",
+    "feature1Desc": "Rate your AI capabilities across 50+ tools and practices — quick and hands-on.",
     "feature2Title": "Timeline Positioning",
-    "feature2Desc": "See where you stand on the AI adoption timeline — and how fast the gap is closing.",
-    "feature3Title": "Team Benchmarks",
-    "feature3Desc": "Compare individual scores, spot strengths, and identify growth areas as a team."
+    "feature2Desc": "See where you stand on the AI development timeline — and how fast the gap is closing.",
+    "feature3Title": "Compare With Your Team",
+    "feature3Desc": "Optional: Invite your team and compare scores, spot strengths, and identify growth areas together."
   },
   "survey": {
     "title": "AI Readiness Assessment",
@@ -73,6 +75,13 @@
       "contexts": "In which contexts do you use AI?",
       "frequency": "How often do you use AI tools?",
       "frequencyPlaceholder": "Select frequency",
+      "frequencyOptions": {
+        "Never": "Never",
+        "Monthly": "Monthly",
+        "Weekly": "Weekly",
+        "Daily": "Daily",
+        "Multiple times daily": "Multiple times daily"
+      },
       "config": "Which advanced configurations do you use?"
     },
     "mindset": {
@@ -110,18 +119,27 @@
     },
     "features": {
       "title": "Capability Assessment",
-      "subtitle": "For each capability, select your level: Not Aware, Aware, Tried, or Regularly Used",
+      "subtitle": "For each capability, select your usage level and indicate whether it's relevant to your work.",
       "progress": "{count} of {total} answered",
+      "answered": "answered",
+      "minRequired": "Please answer at least {min} to continue",
       "tierScore": "Category score: {score}%",
       "usageLabel": "Usage:",
       "relevanceLabel": "Relevant:",
+      "relevanceTooltip": "Is this capability relevant to your daily work? If not, it won't be counted in your score calculation.",
       "relevanceYes": "Yes",
-      "relevanceUnsure": "Not sure",
-      "relevanceNo": "No"
+      "relevanceUnsure": "Unsure",
+      "relevanceNo": "No",
+      "tierTooltip1": "Foundational AI knowledge relevant to every professional today — available since 2022.",
+      "tierTooltip2": "AI tools that are actively used and measurably improve daily work — available since 2023.",
+      "tierTooltip3": "AI is fully integrated into daily workflows and used professionally every day — available since 2024.",
+      "tierTooltip4": "AI automates recurring processes and orchestrates complex workflows — available since 2025.",
+      "tierTooltip5": "Advanced AI integration: autonomous agents, cross-system connectivity, and organizational embedding — available since 2026."
     },
     "postAssessment": {
       "title": "Final Thoughts",
-      "topCategories": "Which 3 categories would have the biggest impact on your work?",
+      "topCategories": "Which categories would have the biggest impact on your work?",
+      "topCategoriesHint": "Please select at least one category.",
       "freeText": "Anything else you'd like to share?",
       "freeTextPlaceholder": "Optional: your thoughts on AI in your workflow..."
     },
@@ -139,6 +157,7 @@
     "utilizationCurrent": "Currently AI-assisted",
     "utilizationPotential": "Could be AI-assisted",
     "featureBreakdown": "Capabilities by Category",
+    "tierProgress": "Tier Progress",
     "tier": "Category",
     "timelineTitle": "Your Timeline Position",
     "timelinePosition": "Timeline Position",

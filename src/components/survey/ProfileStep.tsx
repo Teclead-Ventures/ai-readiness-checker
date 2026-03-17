@@ -2,24 +2,33 @@
 
 import { useTranslations } from 'next-intl';
 import { useFormContext } from 'react-hook-form';
+import type { FieldPath } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+
+import {
   Select,
-  SelectTrigger,
   SelectContent,
   SelectItem,
+  SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
 import {
-  DEV_ROLES,
   BUSINESS_ROLES,
   COMPANY_SIZES,
   DEV_LANGUAGES,
+  DEV_ROLES,
   INDUSTRIES,
-  type Track,
   type SurveyFormData,
+  type Track,
 } from '@/types/survey';
 
 interface ProfileStepProps {
@@ -29,139 +38,178 @@ interface ProfileStepProps {
 export function ProfileStep({ track }: ProfileStepProps) {
   const t = useTranslations('survey.profile');
   const tCommon = useTranslations('common');
-  const { register, setValue, watch } = useFormContext<SurveyFormData>();
+  const { control } = useFormContext<SurveyFormData>();
 
   const roles = track === 'dev' ? DEV_ROLES : BUSINESS_ROLES;
-  const selectedRole = watch('profile.role') || undefined;
-  const selectedCompanySize = watch('profile.company_size') || undefined;
-  const selectedLanguages = (watch('profile.languages' as 'profile') as unknown as string[]) || [];
-  const selectedIndustry = track === 'business'
-    ? ((watch('profile.industry' as 'profile') as unknown as string) || undefined)
-    : undefined;
 
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold">{t('title')}</h2>
 
       {/* Name (optional) */}
-      <div className="space-y-2">
-        <Label htmlFor="respondent_name">
-          {t('name')} <span className="text-muted-foreground text-xs">({tCommon('optional')})</span>
-        </Label>
-        <Input
-          id="respondent_name"
-          placeholder={t('namePlaceholder')}
-          className="h-11"
-          {...register('respondent_name')}
-        />
-        <p className="text-xs text-muted-foreground">{t('nameHint')}</p>
-      </div>
+      <FormField
+        control={control}
+        name="respondent_name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>
+              {t('name')}{' '}
+              <span className="text-muted-foreground text-xs">({tCommon('optional')})</span>
+            </FormLabel>
+            <FormControl>
+              <Input placeholder={t('namePlaceholder')} className="h-11" {...field} />
+            </FormControl>
+            <FormDescription>{t('nameHint')}</FormDescription>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Role */}
-      <div className="space-y-2">
-        <Label>{t('role')}</Label>
-        <Select
-          value={selectedRole}
-          onValueChange={(val) => setValue('profile.role', val ?? '')}
-        >
-          <SelectTrigger className="w-full h-11">
-            <SelectValue placeholder={t('rolePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {roles.map((role) => (
-              <SelectItem key={role} value={role}>
-                {role}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <FormField
+        control={control}
+        name={'profile.role' as FieldPath<SurveyFormData>}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('role')}</FormLabel>
+            <Select value={field.value as string} onValueChange={field.onChange}>
+              <FormControl>
+                <SelectTrigger className="w-full h-11">
+                  <SelectValue placeholder={t('rolePlaceholder')} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {roles.map((role) => (
+                  <SelectItem key={role} value={role}>
+                    {role}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Experience Years */}
-      <div className="space-y-2">
-        <Label htmlFor="experience_years">{t('experience')}</Label>
-        <Input
-          id="experience_years"
-          type="number"
-          min={0}
-          max={50}
-          className="h-11"
-          {...register('profile.experience_years', { valueAsNumber: true })}
-        />
-      </div>
+      <FormField
+        control={control}
+        name={'profile.experience_years' as FieldPath<SurveyFormData>}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('experience')}</FormLabel>
+            <FormControl>
+              <Input
+                type="number"
+                min={0}
+                max={50}
+                className="h-11"
+                name={field.name}
+                ref={field.ref}
+                onBlur={field.onBlur}
+                value={field.value as number}
+                onChange={(e) => {
+                  const n = e.target.valueAsNumber;
+                  field.onChange(isNaN(n) ? 0 : n);
+                }}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       {/* Dev: Languages */}
       {track === 'dev' && (
-        <div className="space-y-3">
-          <Label>{t('languages')}</Label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {DEV_LANGUAGES.map((lang) => {
-              const checked = selectedLanguages.includes(lang);
-              return (
-                <label
-                  key={lang}
-                  className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors min-h-[44px]"
-                >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={(isChecked) => {
-                      const current = selectedLanguages;
-                      if (isChecked) {
-                        setValue('profile.languages' as 'profile', [...current, lang] as unknown as SurveyFormData['profile']);
-                      } else {
-                        setValue('profile.languages' as 'profile', current.filter((l: string) => l !== lang) as unknown as SurveyFormData['profile']);
-                      }
-                    }}
-                  />
-                  <span className="text-sm">{lang}</span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
+        <FormField
+          control={control}
+          name={'profile.languages' as FieldPath<SurveyFormData>}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('languages')}</FormLabel>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {DEV_LANGUAGES.map((lang) => {
+                  const selected = (field.value as string[]) ?? [];
+                  const checked = selected.includes(lang);
+                  return (
+                    <label
+                      key={lang}
+                      className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors min-h-[44px]"
+                    >
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(isChecked) =>
+                          field.onChange(
+                            isChecked
+                              ? [...selected, lang]
+                              : selected.filter((l) => l !== lang),
+                          )
+                        }
+                      />
+                      <span className="text-sm">{lang}</span>
+                    </label>
+                  );
+                })}
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       )}
 
       {/* Business: Industry */}
       {track === 'business' && (
-        <div className="space-y-2">
-          <Label>{t('industry')}</Label>
-          <Select
-            value={selectedIndustry}
-            onValueChange={(val) => setValue('profile.industry' as 'profile', (val ?? '') as unknown as SurveyFormData['profile'])}
-          >
-            <SelectTrigger className="w-full h-11">
-              <SelectValue placeholder={t('industryPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {INDUSTRIES.map((ind) => (
-                <SelectItem key={ind} value={ind}>
-                  {ind}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <FormField
+          control={control}
+          name={'profile.industry' as FieldPath<SurveyFormData>}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t('industry')}</FormLabel>
+              <Select value={(field.value as string) ?? ''} onValueChange={field.onChange}>
+                <FormControl>
+                  <SelectTrigger className="w-full h-11">
+                    <SelectValue placeholder={t('industryPlaceholder')} />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {INDUSTRIES.map((ind) => (
+                    <SelectItem key={ind} value={ind}>
+                      {ind}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       )}
 
       {/* Company Size */}
-      <div className="space-y-2">
-        <Label>{t('companySize')}</Label>
-        <Select
-          value={selectedCompanySize}
-          onValueChange={(val) => setValue('profile.company_size', val ?? '')}
-        >
-          <SelectTrigger className="w-full h-11">
-            <SelectValue placeholder={t('companySizePlaceholder')} />
-          </SelectTrigger>
-          <SelectContent>
-            {COMPANY_SIZES.map((size) => (
-              <SelectItem key={size} value={size}>
-                {size}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <FormField
+        control={control}
+        name={'profile.company_size' as FieldPath<SurveyFormData>}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>{t('companySize')}</FormLabel>
+            <Select value={(field.value as string) ?? ''} onValueChange={field.onChange}>
+              <FormControl>
+                <SelectTrigger className="w-full h-11">
+                  <SelectValue placeholder={t('companySizePlaceholder')} />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {COMPANY_SIZES.map((size) => (
+                  <SelectItem key={size} value={size}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 }

@@ -31,6 +31,7 @@ export function TeamCTA() {
             size="lg"
             className="bg-[#121212] text-white hover:bg-gray-800 rounded-lg font-bold"
             onClick={handleCtaClick}
+            nativeButton={false}
             render={<a href="/team/new" />}
           >
             {t('button')}

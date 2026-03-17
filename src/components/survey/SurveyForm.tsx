@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { useTranslations } from 'next-intl';
+import { useForm } from 'react-hook-form';
+import { Form } from '@/components/ui/form';
+import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,11 +18,13 @@ import { FeatureMatrixStep } from './FeatureMatrixStep';
 import { FreeTextStep } from './FreeTextStep';
 import { KnowledgeManagementStep } from './KnowledgeManagementStep';
 import { getCampaignFromSession } from '@/lib/campaign';
-import type { Track, SurveyFormData } from '@/types/survey';
-
-const TOTAL_STEPS = 9;
+import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
+import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
+import type { Track, SurveyFormData, FeatureEntry } from '@/types/survey';
 
 const STEP_IDS = ['track_select', 'profile', 'pre_assessment', 'current_usage', 'mindset', 'knowledge_management', 'feature_matrix', 'post_assessment', 'free_text'] as const;
+
+const TOTAL_STEPS = STEP_IDS.length;
 
 const stepVariants = {
   enter: (direction: number) => ({
@@ -46,19 +49,20 @@ interface SurveyFormProps {
 export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   const t = useTranslations('survey');
   const tCommon = useTranslations('common');
+  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initialStep = Number(searchParams.get('step')) || 0;
-  const [step, setStep] = useState(initialStep);
+  const [step, setStep] = useState(() => Number(searchParams.get('step')) || 0);
   const [direction, setDirection] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const methods = useForm<SurveyFormData>({
     defaultValues: {
       track: defaultTrack,
-      language: 'en',
+      language: locale,
       team_id: teamId,
       respondent_name: '',
       profile: {
@@ -100,11 +104,15 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   const track = methods.watch('track');
   const { trackStep } = useFunnelTracking(track);
   const prevStepRef = useRef(step);
+  const trackStepRef = useRef(trackStep);
+  useEffect(() => {
+    trackStepRef.current = trackStep;
+  }, [trackStep]);
 
   // Fire survey_start on mount
   useEffect(() => {
-    trackStep('survey_start', 'enter');
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    trackStepRef.current('survey_start', 'enter');
+  }, []);
 
   // Track step transitions
   useEffect(() => {
@@ -116,32 +124,34 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
     }
   }, [step, trackStep]);
 
-  const updateStepInUrl = useCallback(
-    (newStep: number) => {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('step', String(newStep));
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    },
-    [router, pathname, searchParams],
-  );
+  const searchParamsRef = useRef(searchParams);
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
+
+  // Sync step to URL after state update (avoids setState-during-render)
+  useEffect(() => {
+    const params = new URLSearchParams(searchParamsRef.current.toString());
+    params.set('step', String(step));
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  }, [step, router, pathname]);
+
+  // Guard: if track is lost (e.g. on direct URL access), reset to step 0
+  useEffect(() => {
+    if (!track && step > 0) {
+      setStep(0);
+    }
+  }, [track, step]);
 
   const goNext = useCallback(() => {
     setDirection(1);
-    setStep((s) => {
-      const next = Math.min(s + 1, TOTAL_STEPS - 1);
-      updateStepInUrl(next);
-      return next;
-    });
-  }, [updateStepInUrl]);
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1));
+  }, []);
 
   const goBack = useCallback(() => {
     setDirection(-1);
-    setStep((s) => {
-      const prev = Math.max(s - 1, 0);
-      updateStepInUrl(prev);
-      return prev;
-    });
-  }, [updateStepInUrl]);
+    setStep((s) => Math.max(s - 1, 0));
+  }, []);
 
   const handleTrackSelect = useCallback(
     (selected: Track) => {
@@ -179,15 +189,19 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   );
 
   const onSubmit = useCallback(
-    async (data: SurveyFormData) => {
+    async (_data: SurveyFormData) => {
       setSubmitting(true);
+      setSubmitError(null);
       try {
         const campaign = getCampaignFromSession();
+        // Use getValues() to capture all form values, including fields that are only
+        // tracked via watch/setValue and never registered via Controller/register.
+        const values = methods.getValues();
         const res = await fetch('/api/responses', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            ...data,
+            ...values,
             campaign_src: campaign.src || undefined,
             campaign_cid: campaign.cid || undefined,
           }),
@@ -198,22 +212,31 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
         router.push(`/survey/${id}/results`);
       } catch {
         setSubmitting(false);
-        alert(tCommon('error'));
+        setSubmitError(tCommon('error'));
       }
     },
-    [router, tCommon, trackStep],
+    [methods, router, tCommon, trackStep],
   );
 
   const isLastStep = step === TOTAL_STEPS - 1;
   const isFirstStep = step === 0;
 
-  // Guard: if track is lost (e.g. on direct URL access), reset to step 0
-  useEffect(() => {
-    if (!track && step > 0) {
-      setStep(0);
-      updateStepInUrl(0);
-    }
-  }, [track, step, updateStepInUrl]);
+  // Feature matrix step is step 6 — enforce 50% minimum before proceeding
+  const features = methods.watch('features') ?? {};
+  const isFeatureMatrixStep = step === 6;
+  const featureMatrixBlocked = isFeatureMatrixStep && (() => {
+    const caps = track === 'dev' ? DEV_CAPABILITIES : BUSINESS_CAPABILITIES;
+    if (!caps.length) return false;
+    const answered = caps.filter((c) => {
+      const entry = features[c.id] as FeatureEntry | undefined;
+      return entry?.score !== undefined && entry.score !== null;
+    }).length;
+    return answered < Math.ceil(caps.length * 0.5);
+  })();
+
+  // Last step: require at least 1 category selected before submit
+  const topCategories = methods.watch('top_impact_categories') ?? [];
+  const submitBlocked = isLastStep && topCategories.length === 0;
 
   const renderStep = () => {
     switch (step) {
@@ -241,7 +264,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   };
 
   return (
-    <FormProvider {...methods}>
+    <Form {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
         className="mx-auto w-full max-w-2xl px-4 py-8 space-y-6"
@@ -266,6 +289,11 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
           </motion.div>
         </AnimatePresence>
 
+        {/* Submit error */}
+        {submitError && (
+          <p className="text-sm text-red-600 text-center">{submitError}</p>
+        )}
+
         {/* Navigation */}
         {step > 0 && (
           <div className="flex justify-between pt-4">
@@ -275,26 +303,31 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
               size="lg"
               onClick={goBack}
               disabled={isFirstStep}
-              className="min-w-[100px] h-11 bg-white text-[#121212] border border-gray-300 hover:bg-gray-50 rounded-lg px-8 py-3"
+              className="min-w-[100px] h-11 border-border bg-secondary text-foreground hover:border-primary/40 hover:text-primary rounded-lg px-8 py-3 transition-colors"
             >
               {tCommon('back')}
             </Button>
 
             {isLastStep ? (
               <Button
+                key="submit-btn"
                 type="submit"
                 size="lg"
-                disabled={submitting}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
+                disabled={submitting || submitBlocked}
+                title={submitBlocked ? (tCommon('selectAtLeastOne')) : undefined}
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {submitting ? t('submitting') : tCommon('submit')}
               </Button>
             ) : (
               <Button
+                key="next-btn"
                 type="button"
                 size="lg"
                 onClick={goNext}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
+                disabled={featureMatrixBlocked}
+                title={featureMatrixBlocked ? (tCommon('answerMoreFeatures')) : undefined}
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {tCommon('next')}
               </Button>
@@ -302,6 +335,6 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
           </div>
         )}
       </form>
-    </FormProvider>
+    </Form>
   );
 }

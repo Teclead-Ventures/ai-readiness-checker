@@ -19,8 +19,9 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
   const { setValue, watch } = useFormContext<SurveyFormData>();
 
   const suffix = variant === 'before' ? '_before' : '_after';
+  const isBefore = variant === 'before';
 
-  const selfScore = (watch(`self_score${suffix}` as keyof SurveyFormData) as number) ?? (variant === 'before' ? 5 : 5);
+  const selfScore = (watch(`self_score${suffix}` as keyof SurveyFormData) as number) ?? 5;
   const utilization = (watch(`utilization${suffix}` as keyof SurveyFormData) as number) ?? 0;
   const confidence = (watch(`confidence${suffix}` as keyof SurveyFormData) as number) ?? 3;
   const potentialUtilization = variant === 'after'
@@ -30,10 +31,10 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
   return (
     <div className="space-y-8">
       <h2 className="text-2xl font-bold">
-        {variant === 'before' ? t('titleBefore') : t('titleAfter')}
+        {isBefore ? t('titleBefore') : t('titleAfter')}
       </h2>
 
-      {/* Self Score (1-10) */}
+      {/* Self Score (1–10) */}
       <div className="space-y-4">
         <Label className="text-base font-medium">{t('scoreLabel')}</Label>
         <div className="flex items-center gap-4">
@@ -57,10 +58,10 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
         </div>
       </div>
 
-      {/* Utilization (0-100%) */}
+      {/* Utilization (0–100%) */}
       <div className="space-y-4">
         <Label className="text-base font-medium">
-          {variant === 'before' ? t('utilizationLabel') : t('utilizationAfterLabel')}
+          {isBefore ? t('utilizationLabel') : t('utilizationAfterLabel')}
         </Label>
         <div className="flex items-center gap-4">
           <Slider
@@ -101,7 +102,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
         </div>
       )}
 
-      {/* Confidence (1-5) */}
+      {/* Confidence (1–5) */}
       <div className="space-y-4">
         <Label className="text-base font-medium">{t('confidenceLabel')}</Label>
         <div className="flex items-center gap-4">

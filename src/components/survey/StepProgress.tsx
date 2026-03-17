@@ -13,13 +13,13 @@ export function StepProgress({ currentStep, totalSteps }: StepProgressProps) {
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex items-center justify-between text-sm text-[#444D69]">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>{t('step', { current: currentStep, total: totalSteps })}</span>
-        <span className="tabular-nums">{percentage}%</span>
+        <span className="tabular-nums font-medium text-primary">{percentage}%</span>
       </div>
-      <div className="relative h-1 w-full overflow-hidden rounded-full bg-muted">
+      <div className="relative h-0.5 w-full overflow-hidden rounded-full bg-border">
         <div
-          className="h-full bg-[#121212] transition-all duration-300"
+          className="h-full bg-primary transition-all duration-500 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
