@@ -9,6 +9,9 @@ import { TimelinePosition } from '@/components/results/TimelinePosition';
 import { AdaptationProjection } from '@/components/results/AdaptationProjection';
 import { TierProgress } from '@/components/results/TierProgress';
 import { GapComparison } from '@/components/results/GapComparison';
+import { SelfPerceptionComparison } from '@/components/results/SelfPerceptionComparison';
+import { KMRadarChart } from '@/components/results/KMRadarChart';
+import { RelevanceUsageMatrix } from '@/components/results/RelevanceUsageMatrix';
 import { OpportunitiesList } from '@/components/results/OpportunitiesList';
 import { TeamCTA } from '@/components/results/TeamCTA';
 import { CalendlyEmbed } from '@/components/results/CalendlyEmbed';
@@ -55,6 +58,23 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         locale={locale}
       />
 
+      {/* 4. Relevance × Usage Matrix */}
+      <RelevanceUsageMatrix
+        features={response.features}
+        track={response.track}
+        locale={locale}
+      />
+
+      {/* 5. Knowledge Management Radar */}
+      <KMRadarChart knowledgeManagement={response.knowledge_management} />
+
+      {/* Self-Perception vs. Reality */}
+      <SelfPerceptionComparison
+        selfScoreBefore={response.self_score_before}
+        confidenceBefore={response.confidence_before}
+        overallScore={response.scores.overall}
+        knowledgeManagementScore={response.scores.knowledge_management}
+      />
 
       {/* 6 & 7. Self-Awareness Gap + Utilization Gap */}
       <GapComparison
