@@ -22,13 +22,13 @@ export function InfoTooltip({ content, side = 'top' }: InfoTooltipProps) {
             <button
               type="button"
               aria-label="Mehr Informationen"
-              className="inline-flex h-[18px] w-[18px] shrink-0 cursor-help items-center justify-center rounded-full
+              className="inline-flex h-5 w-5 shrink-0 cursor-help items-center justify-center rounded-full
                 bg-primary/15 text-primary/80
                 transition-all hover:bg-primary/25 hover:text-primary
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
                 align-middle relative top-[-1px]"
             >
-              <HelpCircle className="h-3 w-3" />
+              <HelpCircle className="h-4 w-4" />
             </button>
           }
         />

@@ -35,7 +35,7 @@ export function MindsetStep({ track: _track }: MindsetStepProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold">{t('title')}</h2>
+      <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
 
       {/* Openness (1–5 scale) */}
       <FormField
@@ -56,10 +56,10 @@ export function MindsetStep({ track: _track }: MindsetStepProps) {
                   return (
                     <label
                       key={value}
-                      className={`flex items-center gap-2 px-4 py-3 rounded-lg border cursor-pointer transition-colors min-h-[44px] ${
+                      className={`flex items-center gap-2 px-4 py-3 rounded-lg border border-border bg-card cursor-pointer transition-colors min-h-[2.75rem] ${
                         isSelected
-                          ? 'border-[#FFAB54] bg-[#FFAB54]/5 ring-1 ring-[#FFAB54]'
-                          : 'hover:bg-muted/50'
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                          : 'hover:bg-card/80'
                       }`}
                     >
                       <RadioGroupItem value={String(value)} />
@@ -91,7 +91,7 @@ export function MindsetStep({ track: _track }: MindsetStepProps) {
                   return (
                     <label
                       key={barrier}
-                      className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors min-h-[44px]"
+                      className="flex items-center gap-2 p-3 rounded-lg border border-border bg-card cursor-pointer hover:bg-card/80 transition-colors min-h-[2.75rem]"
                     >
                       <Checkbox
                         checked={checked}
@@ -151,9 +151,9 @@ export function MindsetStep({ track: _track }: MindsetStepProps) {
                   return (
                     <label
                       key={key}
-                      className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors min-h-[44px] ${
-                        atLimit ? 'opacity-50 cursor-not-allowed' : 'hover:bg-muted/50'
-                      } ${checked ? 'border-[#FFAB54] bg-[#FFAB54]/5' : ''}`}
+                      className={`flex items-center gap-2 p-3 rounded-lg border border-border bg-card cursor-pointer transition-colors min-h-[2.75rem] ${
+                        atLimit ? 'opacity-50 cursor-not-allowed' : 'hover:bg-card/80'
+                      } ${checked ? 'border-primary bg-primary/5' : ''}`}
                     >
                       <Checkbox
                         checked={checked}

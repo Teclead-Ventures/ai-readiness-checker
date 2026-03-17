@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 
 export function TeamCTA() {
@@ -22,8 +21,12 @@ export function TeamCTA() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.6 }}
     >
-      <Card className="bg-gradient-to-br from-[#FFAB54]/10 to-[#FFAB54]/5 border border-[#FFAB54]/20">
-        <CardContent className="flex flex-col items-center text-center py-8 gap-4">
+      <div className="relative overflow-hidden rounded-xl bg-black border border-white/10">
+        {/* Shimmer blobs */}
+        <div className="absolute -top-60 -right-20 h-96 w-96 rounded-full bg-gray-500/50 blur-[100px]" />
+        <div className="absolute -bottom-60 -left-40 h-96 w-96 rounded-full bg-[#F97316]/20 blur-[100px]" />
+
+        <div className="relative z-10 flex flex-col items-center text-center py-8 px-4 gap-4">
           <Users className="h-10 w-10 text-[#FFAB54]" />
           <h3 className="text-xl font-semibold text-foreground">{t('title')}</h3>
           <p className="text-muted-foreground max-w-md">{t('description')}</p>
@@ -36,8 +39,8 @@ export function TeamCTA() {
           >
             {t('button')}
           </Button>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </motion.div>
   );
 }

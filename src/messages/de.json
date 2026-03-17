@@ -125,7 +125,7 @@
       "minRequired": "Bitte mindestens {min} beantworten um fortzufahren",
       "tierScore": "Kategorie-Score: {score}%",
       "usageLabel": "Nutzung:",
-      "relevanceLabel": "Relevant:",
+      "relevanceLabel": "Relevanz im Alltag:",
       "relevanceTooltip": "Ist diese Fähigkeit für deinen Arbeitsalltag relevant? Falls nicht, wird sie bei der Berechnung deines Scores nicht berücksichtigt.",
       "relevanceYes": "Ja",
       "relevanceUnsure": "Unsicher",
@@ -157,7 +157,7 @@
     "utilizationCurrent": "Aktuell KI-unterstützt",
     "utilizationPotential": "Könnte KI-unterstützt sein",
     "featureBreakdown": "Fähigkeiten nach Kategorie",
-    "tierProgress": "Tier-Fortschritt",
+    "tierProgress": "Ausschöpfung Potential",
     "tier": "Kategorie",
     "timelineTitle": "Deine Zeitliche Einordnung",
     "timelinePosition": "Zeitliche Einordnung",
@@ -219,7 +219,7 @@
       "submit": "Team erstellen"
     },
     "created": {
-      "title": "Team erstellt!",
+      "title": "Team erstellt",
       "shareLink": "Teile diesen Link mit deinem Team:",
       "resultsLink": "Dein Team-Dashboard (Lesezeichen setzen!):",
       "shareLinkDesc": "Teammitglieder nutzen diesen Link für die Umfrage",

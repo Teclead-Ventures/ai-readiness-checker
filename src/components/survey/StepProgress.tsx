@@ -13,7 +13,7 @@ export function StepProgress({ currentStep, totalSteps }: StepProgressProps) {
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>{t('step', { current: currentStep, total: totalSteps })}</span>
         <span className="tabular-nums font-medium text-primary">{percentage}%</span>
       </div>

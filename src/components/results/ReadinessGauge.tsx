@@ -14,9 +14,9 @@ export function ReadinessGauge({ score, locale }: ReadinessGaugeProps) {
   const t = useTranslations('results');
   const label = getScoreLabel(score);
 
-  const radius = 80;
+  const radius = 120;
   const circumference = 2 * Math.PI * radius;
-  const strokeWidth = 12;
+  const strokeWidth = 14;
   const size = (radius + strokeWidth) * 2;
   const center = size / 2;
 
@@ -74,7 +74,7 @@ export function ReadinessGauge({ score, locale }: ReadinessGaugeProps) {
         </svg>
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold text-foreground">
+          <span className="text-6xl font-bold text-foreground">
             {displayScore}
           </span>
           <span className="text-sm font-medium mt-1" style={{ color: label.color }}>

@@ -30,12 +30,12 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold">
+      <h2 className="text-[1.875rem] font-bold font-display">
         {isBefore ? t('titleBefore') : t('titleAfter')}
       </h2>
 
       {/* Self Score (1–10) */}
-      <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
         <Label className="text-base font-medium">{t('scoreLabel')}</Label>
         <div className="flex items-center gap-4">
           <Slider
@@ -52,14 +52,14 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
             {selfScore}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-sm text-muted-foreground">
           <span>{t('scoreMin')}</span>
           <span>{t('scoreMax')}</span>
         </div>
       </div>
 
       {/* Utilization (0–100%) */}
-      <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
         <Label className="text-base font-medium">
           {isBefore ? t('utilizationLabel') : t('utilizationAfterLabel')}
         </Label>
@@ -82,7 +82,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
 
       {/* Potential Utilization (only for 'after') */}
       {variant === 'after' && (
-        <div className="space-y-4">
+        <div className="rounded-xl border border-border bg-card p-4 space-y-4">
           <Label className="text-base font-medium">{t('potentialLabel')}</Label>
           <div className="flex items-center gap-4">
             <Slider
@@ -103,7 +103,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
       )}
 
       {/* Confidence (1–5) */}
-      <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
         <Label className="text-base font-medium">{t('confidenceLabel')}</Label>
         <div className="flex items-center gap-4">
           <Slider
@@ -120,7 +120,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
             {confidence}
           </span>
         </div>
-        <div className="flex justify-between text-xs text-muted-foreground">
+        <div className="flex justify-between text-sm text-muted-foreground">
           <span>{t('confidenceMin')}</span>
           <span>{t('confidenceMax')}</span>
         </div>
