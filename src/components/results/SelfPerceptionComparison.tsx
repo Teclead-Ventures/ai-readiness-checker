@@ -114,7 +114,7 @@ export function SelfPerceptionComparison({
         </CardHeader>
         <CardContent className="space-y-2">
           {/* 3 mini charts */}
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             {groups.map((group) => (
               <div key={group.title}>
                 <p className="text-xs font-semibold text-center">{group.title}</p>
