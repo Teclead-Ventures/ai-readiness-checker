@@ -118,6 +118,10 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   useEffect(() => {
     const previousStep = prevStepRef.current;
     if (previousStep !== step) {
+      // First transition also completes survey_start (which only had an enter event on mount)
+      if (prevStepRef.current === 0 && step === 1) {
+        trackStep('survey_start', 'complete');
+      }
       trackStep(STEP_IDS[previousStep], 'complete');
       trackStep(STEP_IDS[step], 'enter');
       prevStepRef.current = step;

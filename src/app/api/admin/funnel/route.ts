@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 
+// Must match the actual events fired by useFunnelTracking + SurveyForm + page.tsx
+// landing:          enter on page.tsx mount, complete on CTA click
+// survey_start:     enter on SurveyForm mount (no complete — transition fires track_select complete)
+// track_select…free_text: enter/complete via STEP_IDS transitions in SurveyForm
+// submit:           complete only, fired on form submission
+// results_view:     enter only, fired on results page
 const STEP_ORDER = [
   'landing',
   'survey_start',
@@ -9,6 +15,7 @@ const STEP_ORDER = [
   'pre_assessment',
   'current_usage',
   'mindset',
+  'knowledge_management',
   'feature_matrix',
   'post_assessment',
   'free_text',
@@ -64,36 +71,37 @@ export async function GET(request: NextRequest) {
 
     const allEvents = events || [];
 
-    // Group by step and action
-    const stepEnterCount = new Map<string, number>();
-    const stepCompleteCount = new Map<string, number>();
-
+    // ── Count unique sessions that reached each step ──
+    // A session "reached" a step if it has ANY event (enter or complete) for it.
+    // This avoids issues with steps that only fire enter or only fire complete.
+    const stepSessions = new Map<string, Set<string>>();
     // For median time: track enter/complete timestamps per session+step
     const sessionStepTimes = new Map<string, { enter?: string; complete?: string }>();
 
     for (const event of allEvents) {
-      const key = `${event.session_id}::${event.step}`;
+      const { step, session_id, action, created_at } = event;
 
-      if (event.action === 'enter') {
-        stepEnterCount.set(event.step, (stepEnterCount.get(event.step) || 0) + 1);
-        if (!sessionStepTimes.has(key)) sessionStepTimes.set(key, {});
-        sessionStepTimes.get(key)!.enter = event.created_at;
-      } else if (event.action === 'complete') {
-        stepCompleteCount.set(event.step, (stepCompleteCount.get(event.step) || 0) + 1);
-        if (!sessionStepTimes.has(key)) sessionStepTimes.set(key, {});
-        sessionStepTimes.get(key)!.complete = event.created_at;
+      // Track unique sessions per step
+      if (!stepSessions.has(step)) stepSessions.set(step, new Set());
+      stepSessions.get(step)!.add(session_id);
+
+      // Track timestamps for median time calculation
+      const key = `${session_id}::${step}`;
+      if (!sessionStepTimes.has(key)) sessionStepTimes.set(key, {});
+      if (action === 'enter') {
+        sessionStepTimes.get(key)!.enter = created_at;
+      } else if (action === 'complete') {
+        sessionStepTimes.get(key)!.complete = created_at;
       }
     }
 
-    // Calculate median time per step
+    // ── Median time per step (enter → complete within same session) ──
     const stepDurations = new Map<string, number[]>();
     for (const [key, times] of sessionStepTimes.entries()) {
       if (times.enter && times.complete) {
         const step = key.split('::')[1];
-        const enterTime = new Date(times.enter).getTime();
-        const completeTime = new Date(times.complete).getTime();
-        const durationSec = (completeTime - enterTime) / 1000;
-        if (durationSec > 0 && durationSec < 3600) { // filter out unreasonable durations
+        const durationSec = (new Date(times.complete).getTime() - new Date(times.enter).getTime()) / 1000;
+        if (durationSec > 0 && durationSec < 3600) {
           if (!stepDurations.has(step)) stepDurations.set(step, []);
           stepDurations.get(step)!.push(durationSec);
         }
@@ -109,25 +117,38 @@ export async function GET(request: NextRequest) {
         : Math.round(sorted[mid]);
     }
 
-    const steps: FunnelStep[] = STEP_ORDER.map((step) => {
-      const entered = stepEnterCount.get(step) || 0;
-      const completed = stepCompleteCount.get(step) || 0;
-      const dropOffRate = entered > 0
-        ? Math.round(((entered - completed) / entered) * 10000) / 100
+    // ── Build step metrics ──
+    // "reached" = unique sessions that touched this step
+    // "drop-off" = % of sessions that reached this step but NOT the next step
+    const stepReached: number[] = STEP_ORDER.map(
+      (step) => stepSessions.get(step)?.size || 0
+    );
+
+    const steps: FunnelStep[] = STEP_ORDER.map((step, i) => {
+      const reached = stepReached[i];
+      const nextReached = i < STEP_ORDER.length - 1 ? stepReached[i + 1] : reached;
+      const dropOffRate = reached > 0
+        ? Math.round(((reached - nextReached) / reached) * 10000) / 100
         : 0;
       const durations = stepDurations.get(step);
       const medianTimeSeconds = durations && durations.length > 0
         ? median(durations)
         : null;
 
-      return { step, entered, completed, dropOffRate, medianTimeSeconds };
+      return {
+        step,
+        entered: reached,
+        completed: nextReached,
+        dropOffRate: Math.max(0, dropOffRate),
+        medianTimeSeconds,
+      };
     });
 
-    // Overall conversion: first step entered vs last step completed
-    const firstStepEntered = steps[0]?.entered || 0;
-    const lastStepCompleted = steps[steps.length - 1]?.completed || 0;
-    const overallConversion = firstStepEntered > 0
-      ? Math.round((lastStepCompleted / firstStepEntered) * 10000) / 100
+    // Overall conversion: first step reached vs last step reached
+    const firstReached = steps.find((s) => s.entered > 0)?.entered || 0;
+    const lastReached = [...steps].reverse().find((s) => s.entered > 0)?.entered || 0;
+    const overallConversion = firstReached > 0
+      ? Math.round((lastReached / firstReached) * 10000) / 100
       : 0;
 
     // Biggest drop-off
