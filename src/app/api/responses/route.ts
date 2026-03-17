@@ -83,14 +83,39 @@ export async function POST(request: NextRequest) {
 
     const { error } = await supabase.from('responses').insert({
       id,
-      ...parsed,
+      track: parsed.track,
+      respondent_name: parsed.respondent_name,
+      language: parsed.language,
+      team_id: parsed.team_id,
+      profile: parsed.profile,
+      self_score_before: parsed.self_score_before,
+      utilization_before: parsed.utilization_before,
+      confidence_before: parsed.confidence_before,
+      current_usage: parsed.current_usage,
+      openness: parsed.openness,
+      barriers: parsed.barriers,
+      barriers_other: parsed.barriers_other,
+      priority_areas: parsed.priority_areas,
+      knowledge_management: parsed.knowledge_management,
+      features: parsed.features,
+      self_score_after: parsed.self_score_after,
+      utilization_after: parsed.utilization_after,
+      potential_utilization: parsed.potential_utilization,
+      confidence_after: parsed.confidence_after,
+      top_impact_categories: parsed.top_impact_categories,
+      free_text: parsed.free_text,
       scores,
+      campaign_src: parsed.campaign_src,
+      campaign_cid: parsed.campaign_cid,
       created_at: new Date().toISOString(),
     });
 
     if (error) {
       console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: 'Failed to save response' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to save response', details: error.message },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ id, scores });

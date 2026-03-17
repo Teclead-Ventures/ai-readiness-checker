@@ -32,14 +32,14 @@ export function TrackSelector({ onSelect, selected }: TrackSelectorProps) {
             <Card
               className={`cursor-pointer transition-all min-h-[140px] rounded-xl border-2 ${
                 selected === value
-                  ? 'border-[#FFAB54] bg-[#FFAB54]/5'
-                  : 'border-gray-200 hover:border-[#FFAB54]'
+                  ? 'border-primary bg-primary/8 shadow-sm shadow-primary/20'
+                  : 'border-border bg-card hover:border-primary/50 hover:bg-secondary/50'
               }`}
               onClick={() => onSelect(value)}
             >
               <CardHeader className="flex flex-col items-center text-center gap-3 py-6">
-                <Icon className="size-10 text-[#121212]" />
-                <CardTitle className="text-lg text-[#121212]">
+                <Icon className={`size-10 ${selected === value ? 'text-primary' : 'text-muted-foreground'}`} />
+                <CardTitle className="text-lg text-foreground">
                   {value === 'dev' ? t('dev') : t('business')}
                 </CardTitle>
                 <CardDescription className="text-sm">

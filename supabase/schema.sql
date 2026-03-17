@@ -55,13 +55,13 @@ CREATE TABLE IF NOT EXISTS responses (
   barriers_other TEXT DEFAULT '',
   priority_areas TEXT[] DEFAULT '{}',
 
-  -- Section 4b: Knowledge management (JSONB)
+  -- Section 4b: Knowledge management scores (JSONB)
   knowledge_management JSONB NOT NULL DEFAULT '{}',
 
   -- Section 5: Feature awareness matrix (JSONB)
   features JSONB NOT NULL DEFAULT '{}',
 
-  -- Section 6: Post-exposure re-assessment
+  -- Section 7: Post-exposure re-assessment
   self_score_after INTEGER CHECK (self_score_after BETWEEN 1 AND 10),
   utilization_after INTEGER CHECK (utilization_after BETWEEN 0 AND 100),
   potential_utilization INTEGER CHECK (potential_utilization BETWEEN 0 AND 100),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS responses (
   top_impact_categories TEXT[] DEFAULT '{}',
   free_text TEXT,
 
-  -- Computed scores
+  -- Computed scores (JSONB)
   scores JSONB NOT NULL DEFAULT '{}',
 
   -- Campaign attribution
@@ -98,6 +98,13 @@ CREATE TABLE IF NOT EXISTS funnel_events (
   action      TEXT NOT NULL CHECK (action IN ('enter', 'complete')),
   created_at  TIMESTAMPTZ DEFAULT now()
 );
+
+-- Migration: add columns that may be missing in existing deployments
+-- Run these if the table already exists without these columns:
+-- ALTER TABLE responses ADD COLUMN IF NOT EXISTS barriers_other TEXT;
+-- ALTER TABLE responses ADD COLUMN IF NOT EXISTS knowledge_management JSONB NOT NULL DEFAULT '{}';
+-- ALTER TABLE responses ADD COLUMN IF NOT EXISTS campaign_src TEXT;
+-- ALTER TABLE responses ADD COLUMN IF NOT EXISTS campaign_cid TEXT;
 
 -- Indexes
 CREATE INDEX IF NOT EXISTS idx_responses_team ON responses(team_id);

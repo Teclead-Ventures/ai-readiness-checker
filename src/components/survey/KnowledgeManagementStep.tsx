@@ -36,7 +36,7 @@ function LikertRow({
               onClick={() => onChange(val)}
               className={`flex-1 min-w-[60px] cursor-pointer rounded-lg border px-3 py-2.5 text-xs font-medium transition-all select-none min-h-[44px] ${
                 isSelected
-                  ? 'border-[#FFAB54] bg-[#FFAB54]/10 ring-1 ring-[#FFAB54] text-foreground'
+                  ? 'border-primary bg-primary/10 ring-1 ring-primary/50 text-foreground'
                   : 'hover:bg-muted/50 text-muted-foreground'
               }`}
             >

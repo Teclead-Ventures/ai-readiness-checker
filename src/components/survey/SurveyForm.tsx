@@ -18,7 +18,9 @@ import { FeatureMatrixStep } from './FeatureMatrixStep';
 import { FreeTextStep } from './FreeTextStep';
 import { KnowledgeManagementStep } from './KnowledgeManagementStep';
 import { getCampaignFromSession } from '@/lib/campaign';
-import type { Track, SurveyFormData } from '@/types/survey';
+import { DEV_CAPABILITIES } from '@/lib/features/dev-features';
+import { BUSINESS_CAPABILITIES } from '@/lib/features/business-features';
+import type { Track, SurveyFormData, FeatureEntry } from '@/types/survey';
 
 const STEP_IDS = ['track_select', 'profile', 'pre_assessment', 'current_usage', 'mindset', 'knowledge_management', 'feature_matrix', 'post_assessment', 'free_text'] as const;
 
@@ -217,6 +219,24 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   );
 
   const isLastStep = step === TOTAL_STEPS - 1;
+  const isFirstStep = step === 0;
+
+  // Feature matrix step is step 6 — enforce 50% minimum before proceeding
+  const features = methods.watch('features') ?? {};
+  const isFeatureMatrixStep = step === 6;
+  const featureMatrixBlocked = isFeatureMatrixStep && (() => {
+    const caps = track === 'dev' ? DEV_CAPABILITIES : BUSINESS_CAPABILITIES;
+    if (!caps.length) return false;
+    const answered = caps.filter((c) => {
+      const entry = features[c.id] as FeatureEntry | undefined;
+      return entry?.score !== undefined && entry.score !== null;
+    }).length;
+    return answered < Math.ceil(caps.length * 0.5);
+  })();
+
+  // Last step: require at least 1 category selected before submit
+  const topCategories = methods.watch('top_impact_categories') ?? [];
+  const submitBlocked = isLastStep && topCategories.length === 0;
 
   const renderStep = () => {
     switch (step) {
@@ -282,7 +302,8 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
               variant="outline"
               size="lg"
               onClick={goBack}
-              className="min-w-[100px] h-11 bg-white text-[#121212] border border-gray-300 hover:bg-gray-50 rounded-lg px-8 py-3"
+              disabled={isFirstStep}
+              className="min-w-[100px] h-11 border-border bg-secondary text-foreground hover:border-primary/40 hover:text-primary rounded-lg px-8 py-3 transition-colors"
             >
               {tCommon('back')}
             </Button>
@@ -292,8 +313,9 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 key="submit-btn"
                 type="submit"
                 size="lg"
-                disabled={submitting}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
+                disabled={submitting || submitBlocked}
+                title={submitBlocked ? (tCommon('selectAtLeastOne')) : undefined}
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {submitting ? t('submitting') : tCommon('submit')}
               </Button>
@@ -303,7 +325,9 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
                 type="button"
                 size="lg"
                 onClick={goNext}
-                className="min-w-[100px] h-11 bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg px-8 py-3"
+                disabled={featureMatrixBlocked}
+                title={featureMatrixBlocked ? (tCommon('answerMoreFeatures')) : undefined}
+                className="min-w-[100px] h-11 bg-primary text-primary-foreground font-bold hover:bg-primary/90 rounded-lg px-8 py-3 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.02]"
               >
                 {tCommon('next')}
               </Button>

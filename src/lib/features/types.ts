@@ -8,11 +8,11 @@ export interface Capability {
 }
 
 export const TIER_CONFIG = {
-  1: { weight: 1.0, en: "AI Fundamentals & Understanding", de: "KI-Grundlagen & Verständnis",  era: "2022–2023" },
-  2: { weight: 1.2, en: "Basic Tooling",                   de: "Grundlegendes Tooling",         era: "2023–2024" },
-  3: { weight: 1.5, en: "Productive Usage",                de: "Produktive Nutzung",            era: "2024" },
-  4: { weight: 2.0, en: "Automation & Workflows",          de: "Automatisierung & Workflows",   era: "2025" },
-  5: { weight: 2.5, en: "Strategic AI Competence",         de: "Strategische KI-Kompetenz",     era: "2026" },
+  1: { weight: 1.0, en: "AI Fundamentals & Understanding", de: "KI-Grundlagen & Verständnis",  era: "" },
+  2: { weight: 1.2, en: "Basic Tooling",                   de: "Grundlegendes Tooling",         era: "" },
+  3: { weight: 1.5, en: "Productive Usage",                de: "Produktive Nutzung",            era: "" },
+  4: { weight: 2.0, en: "Automation & Workflows",          de: "Automatisierung & Workflows",   era: "" },
+  5: { weight: 2.5, en: "Advanced AI Integration",          de: "Fortgeschrittene KI-Integration", era: "" },
 } as const;
 
 // 4-point response scale
