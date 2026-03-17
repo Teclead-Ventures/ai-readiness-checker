@@ -130,11 +130,11 @@
       "relevanceYes": "Ja",
       "relevanceUnsure": "Unsicher",
       "relevanceNo": "Nein",
-      "tierTooltip1": "Grundlegende KI-Kenntnisse, die heute für jeden Berufsalltag relevant sind — verfügbar seit 2022.",
-      "tierTooltip2": "KI-Tools die produktiv eingesetzt werden und den Arbeitsalltag messbar verbessern — verfügbar seit 2023.",
-      "tierTooltip3": "KI ist fest in den Arbeitsablauf integriert und wird täglich professionell genutzt — verfügbar seit 2024.",
-      "tierTooltip4": "KI automatisiert wiederkehrende Prozesse und orchestriert komplexe Workflows — verfügbar seit 2025.",
-      "tierTooltip5": "Fortgeschrittene KI-Integration: autonome Agenten, systemübergreifende Vernetzung und organisatorische Verankerung — verfügbar seit 2026."
+      "tierTooltip1": "Grundlegende KI-Kenntnisse, die heute für jeden Berufsalltag relevant sind.",
+      "tierTooltip2": "KI-Tools die produktiv eingesetzt werden und den Arbeitsalltag messbar verbessern.",
+      "tierTooltip3": "KI ist fest in den Arbeitsablauf integriert und wird täglich professionell genutzt.",
+      "tierTooltip4": "KI automatisiert wiederkehrende Prozesse und orchestriert komplexe Workflows.",
+      "tierTooltip5": "Fortgeschrittene KI-Integration: autonome Agenten, systemübergreifende Vernetzung und organisatorische Verankerung."
     },
     "postAssessment": {
       "title": "Abschließende Gedanken",

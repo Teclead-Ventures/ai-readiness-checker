@@ -130,11 +130,11 @@
       "relevanceYes": "Yes",
       "relevanceUnsure": "Unsure",
       "relevanceNo": "No",
-      "tierTooltip1": "Foundational AI knowledge relevant to every professional today — available since 2022.",
-      "tierTooltip2": "AI tools that are actively used and measurably improve daily work — available since 2023.",
-      "tierTooltip3": "AI is fully integrated into daily workflows and used professionally every day — available since 2024.",
-      "tierTooltip4": "AI automates recurring processes and orchestrates complex workflows — available since 2025.",
-      "tierTooltip5": "Advanced AI integration: autonomous agents, cross-system connectivity, and organizational embedding — available since 2026."
+      "tierTooltip1": "Foundational AI knowledge relevant to every professional today.",
+      "tierTooltip2": "AI tools that are actively used and measurably improve daily work.",
+      "tierTooltip3": "AI is fully integrated into daily workflows and used professionally every day.",
+      "tierTooltip4": "AI automates recurring processes and orchestrates complex workflows.",
+      "tierTooltip5": "Advanced AI integration: autonomous agents, cross-system connectivity, and organizational embedding."
     },
     "postAssessment": {
       "title": "Final Thoughts",

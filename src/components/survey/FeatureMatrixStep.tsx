@@ -70,8 +70,9 @@ const TIER_STYLES = {
 function computeTierScore(
   capabilities: { id: string }[],
   features: Record<string, FeatureEntry>,
-): { answered: number; total: number; score: number } {
+): { answered: number; fullyAnswered: number; total: number; score: number } {
   let answered = 0;
+  let fullyAnswered = 0;
   let sum = 0;
   const total = capabilities.length;
 
@@ -81,11 +82,14 @@ function computeTierScore(
     if (score !== undefined && score !== null) {
       answered++;
       sum += score;
+      if (entry?.relevant !== undefined && entry.relevant !== null) {
+        fullyAnswered++;
+      }
     }
   }
 
   const score = total > 0 ? Math.round((sum / (total * 3)) * 100) : 0;
-  return { answered, total, score };
+  return { answered, fullyAnswered, total, score };
 }
 
 function TierSection({
@@ -103,19 +107,19 @@ function TierSection({
   const prevAnsweredRef = useRef<number | null>(null);
   const t = useTranslations('survey.features');
 
-  const { answered, total, score } = useMemo(
+  const { answered, fullyAnswered, total, score } = useMemo(
     () => computeTierScore(capabilities, features),
     [capabilities, features],
   );
 
-  // Fire celebration when the LAST item of this tier gets answered
+  // Fire celebration when the LAST item of this tier gets fully answered (score + relevance)
   useEffect(() => {
     // Skip on first render (prevAnsweredRef starts null)
     if (prevAnsweredRef.current === null) {
-      prevAnsweredRef.current = answered;
+      prevAnsweredRef.current = fullyAnswered;
       return;
     }
-    if (answered === total && total > 0 && prevAnsweredRef.current < total) {
+    if (fullyAnswered === total && total > 0 && prevAnsweredRef.current < total) {
       setShowCelebration(true);
       // Auto-collapse after banner has been visible briefly
       const collapseTimer = setTimeout(() => setExpanded(false), 700);
@@ -125,11 +129,11 @@ function TierSection({
         clearTimeout(hideTimer);
       };
     }
-    prevAnsweredRef.current = answered;
-  }, [answered, total]);
+    prevAnsweredRef.current = fullyAnswered;
+  }, [fullyAnswered, total]);
 
   const styles = TIER_STYLES[tier];
-  const isComplete = answered === total && total > 0;
+  const isComplete = fullyAnswered === total && total > 0;
 
   return (
     <div className={cn('rounded-lg border border-border bg-card overflow-hidden', styles.border)}>
@@ -296,7 +300,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
       </div>
 
       {/* Sticky progress bar + legend */}
-      <div className="sticky top-[57px] z-40 bg-background pb-3 pt-1 -mx-4 px-4 border-b border-border/50">
+      <div className="sticky top-[57px] z-40 bg-background pb-3 pt-1 -mx-4 px-4 border-b border-border/50 before:absolute before:inset-x-0 before:bottom-full before:h-2 before:bg-background before:content-[''] relative">
         {/* Progress bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
