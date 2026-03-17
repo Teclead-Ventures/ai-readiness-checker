@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, HelpCircle } from 'lucide-react';
 import { TIER_CONFIG, RESPONSE_SCALE } from '@/lib/features/types';
 import { getCapabilitiesForTrack } from '@/lib/scoring';
 import { FeatureEntry } from '@/types/survey';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TierProgressProps {
   tiers: Record<number, number>;
@@ -40,8 +41,18 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
       transition={{ duration: 0.5, delay: 0.25 }}
     >
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t('tierProgress')}</CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger className="text-muted-foreground hover:text-foreground transition-colors">
+                <HelpCircle className="h-4 w-4" />
+              </TooltipTrigger>
+              <TooltipContent side="left" className="max-w-72">
+                {t('tierProgressTooltip')}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </CardHeader>
         <CardContent className="space-y-3">
           {tierEntries.map(({ tier, score, caps, counts, total }) => (

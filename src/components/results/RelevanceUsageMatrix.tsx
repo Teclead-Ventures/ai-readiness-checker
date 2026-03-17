@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { getCapabilitiesForTrack } from '@/lib/scoring';
@@ -32,6 +33,16 @@ const TIER_COLORS: Record<number, string> = {
 export function RelevanceUsageMatrix({ features, track, locale }: RelevanceUsageMatrixProps) {
   const t = useTranslations('results');
   const lang = locale as 'en' | 'de';
+  const [expandedQuadrants, setExpandedQuadrants] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (key: string) => {
+    setExpandedQuadrants(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
   const capabilities = getCapabilitiesForTrack(track);
 
   // Build quadrant arrays
@@ -147,7 +158,8 @@ export function RelevanceUsageMatrix({ features, track, locale }: RelevanceUsage
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {quadrantDefs.map(({ key, titleKey, descKey, items, borderColor, countColor, showAll, countOnly }) => {
-              const displayItems = showAll ? items : items.slice(0, 8);
+              const isExpanded = showAll || expandedQuadrants.has(key);
+              const displayItems = isExpanded ? items : items.slice(0, 8);
               const overflow = items.length - displayItems.length;
 
               return (
@@ -185,9 +197,20 @@ export function RelevanceUsageMatrix({ features, track, locale }: RelevanceUsage
                         </span>
                       ))}
                       {overflow > 0 && (
-                        <span className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground">
+                        <button
+                          onClick={() => toggleExpanded(key)}
+                          className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors cursor-pointer"
+                        >
                           +{overflow} {t('matrixMore')}
-                        </span>
+                        </button>
+                      )}
+                      {isExpanded && !showAll && items.length > 8 && (
+                        <button
+                          onClick={() => toggleExpanded(key)}
+                          className="inline-flex items-center rounded-md border border-border bg-muted/40 px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors cursor-pointer"
+                        >
+                          {t('matrixShowLess')}
+                        </button>
                       )}
                     </div>
                   )}

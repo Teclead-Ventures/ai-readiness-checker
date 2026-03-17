@@ -9,77 +9,97 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Legend,
   LabelList,
+  Cell,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface SelfPerceptionComparisonProps {
-  selfScoreBefore: number;    // 1-10
-  confidenceBefore: number;   // 1-5
-  overallScore: number;       // 0-100
-  knowledgeManagementScore: number; // 0-100
+  selfScoreBefore: number;          // 1-10
+  selfScoreAfter: number;           // 1-10
+  overallScore: number;             // 0-100
+  confidenceBefore: number;         // 1-5
+  confidenceAfter: number;          // 1-5
+  knowledgeManagementScore: number; // 0-100 — unused intentionally
+  utilizationBefore: number;        // 0-100
+  utilizationAfter: number;         // 0-100
+  potentialUtilization: number;     // 0-100
 }
 
 function normalizeSelfScore(value: number) {
-  // 1-10 → 0-100
   return Math.round(value * 10);
 }
 
 function normalizeConfidence(value: number) {
-  // 1-5 → 0-100
   return Math.round(((value - 1) / 4) * 100);
 }
 
-function getDeltaVariant(delta: number): 'over' | 'under' | 'accurate' {
-  if (delta > 10) return 'over';
-  if (delta < -10) return 'under';
-  return 'accurate';
+const LABEL_STYLE = { fontSize: 10, fontWeight: 600 } as const;
+const BAR_PROPS = { radius: [4, 4, 0, 0] as [number, number, number, number], maxBarSize: 48 };
+
+function MiniBarChart({ data }: { data: { name: string; value: number; fill: string }[] }) {
+  return (
+    <ResponsiveContainer width="100%" height={180}>
+      <BarChart data={data} margin={{ top: 20, right: 8, left: 0, bottom: 4 }} barCategoryGap="25%">
+        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+        <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} />
+        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} unit="%" width={32} />
+        <Bar dataKey="value" {...BAR_PROPS}>
+          {data.map((entry) => (
+            <Cell key={entry.name} fill={entry.fill} />
+          ))}
+          <LabelList
+            dataKey="value"
+            position="top"
+            style={LABEL_STYLE}
+            formatter={(v: unknown) => `${v}%`}
+          />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+  );
 }
 
 export function SelfPerceptionComparison({
   selfScoreBefore,
-  confidenceBefore,
+  selfScoreAfter,
   overallScore,
-  knowledgeManagementScore,
+  confidenceBefore,
+  confidenceAfter,
+  utilizationBefore,
+  utilizationAfter,
+  potentialUtilization,
 }: SelfPerceptionComparisonProps) {
   const t = useTranslations('results');
 
-  const selfReadiness = normalizeSelfScore(selfScoreBefore);
-  const selfKnowledge = normalizeConfidence(confidenceBefore);
-
-  const readinessDelta = selfReadiness - overallScore;
-  const knowledgeDelta = selfKnowledge - knowledgeManagementScore;
-
-  const data = [
+  const groups = [
     {
-      name: t('selfPerceptionReadiness'),
-      self: selfReadiness,
-      actual: overallScore,
-      delta: readinessDelta,
+      title: t('comparisonReadiness'),
+      subtitle: t('comparisonReadinessDesc'),
+      bars: [
+        { name: t('comparisonShortBefore'), value: normalizeSelfScore(selfScoreBefore), fill: '#444D69' },
+        { name: t('comparisonShortAfter'), value: normalizeSelfScore(selfScoreAfter), fill: '#94A3B8' },
+        { name: t('comparisonShortMeasured'), value: overallScore, fill: '#FFAB54' },
+      ],
     },
     {
-      name: t('selfPerceptionKnowledge'),
-      self: selfKnowledge,
-      actual: knowledgeManagementScore,
-      delta: knowledgeDelta,
+      title: t('comparisonKnowledge'),
+      subtitle: t('comparisonKnowledgeDesc'),
+      bars: [
+        { name: t('comparisonShortBefore'), value: normalizeConfidence(confidenceBefore), fill: '#444D69' },
+        { name: t('comparisonShortAfter'), value: normalizeConfidence(confidenceAfter), fill: '#94A3B8' },
+      ],
+    },
+    {
+      title: t('comparisonUtilization'),
+      subtitle: t('comparisonUtilizationDesc'),
+      bars: [
+        { name: t('comparisonShortBefore'), value: utilizationBefore, fill: '#444D69' },
+        { name: t('comparisonShortAfter'), value: utilizationAfter, fill: '#94A3B8' },
+        { name: t('comparisonShortPossible'), value: potentialUtilization, fill: '#34D399' },
+      ],
     },
   ];
-
-  function getDeltaLabel(delta: number) {
-    const variant = getDeltaVariant(delta);
-    const abs = Math.abs(delta);
-    if (variant === 'accurate') return t('selfPerceptionAccurate');
-    if (variant === 'over') return t('selfPerceptionOverestimated', { n: abs });
-    return t('selfPerceptionUnderestimated', { n: abs });
-  }
-
-  function getDeltaColor(delta: number) {
-    const variant = getDeltaVariant(delta);
-    if (variant === 'accurate') return 'text-green-600 bg-green-50';
-    if (variant === 'over') return 'text-orange-600 bg-orange-50';
-    return 'text-blue-600 bg-blue-50';
-  }
 
   return (
     <motion.div
@@ -89,39 +109,17 @@ export function SelfPerceptionComparison({
     >
       <Card>
         <CardHeader>
-          <CardTitle>{t('selfPerception')}</CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">{t('selfPerceptionDesc')}</p>
+          <CardTitle>{t('comparisonTitle')}</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">{t('comparisonDesc')}</p>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <ResponsiveContainer width="100%" height={220}>
-            <BarChart data={data} margin={{ top: 16, right: 24, left: 0, bottom: 4 }} barCategoryGap="35%">
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} unit="%" />
-              <Legend
-                formatter={(value) =>
-                  value === 'self' ? t('selfPerceptionSelf') : t('selfPerceptionActual')
-                }
-                wrapperStyle={{ fontSize: 12 }}
-              />
-              <Bar dataKey="self" name="self" fill="#444D69" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                <LabelList dataKey="self" position="top" style={{ fontSize: 11, fontWeight: 600 }} formatter={(v: unknown) => `${v}%`} />
-              </Bar>
-              <Bar dataKey="actual" name="actual" fill="#FFAB54" radius={[4, 4, 0, 0]} maxBarSize={48}>
-                <LabelList dataKey="actual" position="top" style={{ fontSize: 11, fontWeight: 600 }} formatter={(v: unknown) => `${v}%`} />
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-
-          {/* Delta badges */}
-          <div className="grid grid-cols-2 gap-3">
-            {data.map((entry) => (
-              <div
-                key={entry.name}
-                className={`rounded-lg px-3 py-2 text-xs font-medium ${getDeltaColor(entry.delta)}`}
-              >
-                <span className="block text-[10px] opacity-70 mb-0.5">{entry.name}</span>
-                {getDeltaLabel(entry.delta)}
+        <CardContent className="space-y-2">
+          {/* 3 mini charts */}
+          <div className="grid grid-cols-3 gap-2">
+            {groups.map((group) => (
+              <div key={group.title}>
+                <p className="text-xs font-semibold text-center">{group.title}</p>
+                <p className="text-[10px] text-center text-muted-foreground mb-1 leading-tight px-1">{group.subtitle}</p>
+                <MiniBarChart data={group.bars} />
               </div>
             ))}
           </div>

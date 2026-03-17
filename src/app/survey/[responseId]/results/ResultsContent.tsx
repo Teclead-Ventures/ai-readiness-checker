@@ -5,10 +5,8 @@ import { useTranslations } from 'next-intl';
 import { SurveyResponse } from '@/types/survey';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
 import { ReadinessGauge } from '@/components/results/ReadinessGauge';
-import { TimelinePosition } from '@/components/results/TimelinePosition';
 import { AdaptationProjection } from '@/components/results/AdaptationProjection';
 import { TierProgress } from '@/components/results/TierProgress';
-import { GapComparison } from '@/components/results/GapComparison';
 import { SelfPerceptionComparison } from '@/components/results/SelfPerceptionComparison';
 import { KMRadarChart } from '@/components/results/KMRadarChart';
 import { RelevanceUsageMatrix } from '@/components/results/RelevanceUsageMatrix';
@@ -45,13 +43,6 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         />
       </div>
 
-      {/* 2. Timeline Position (hero) */}
-      <TimelinePosition
-        timeline={response.scores.timeline}
-        adaptation={response.scores.adaptation}
-        locale={locale}
-      />
-
       {/* 3. Adaptation Projection (urgency driver) */}
       <AdaptationProjection
         adaptation={response.scores.adaptation}
@@ -68,21 +59,17 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
       {/* 5. Knowledge Management Radar */}
       <KMRadarChart knowledgeManagement={response.knowledge_management} />
 
-      {/* Self-Perception vs. Reality */}
+      {/* Self-Perception vs. Reality (combined) */}
       <SelfPerceptionComparison
         selfScoreBefore={response.self_score_before}
-        confidenceBefore={response.confidence_before}
-        overallScore={response.scores.overall}
-        knowledgeManagementScore={response.scores.knowledge_management}
-      />
-
-      {/* 6 & 7. Self-Awareness Gap + Utilization Gap */}
-      <GapComparison
-        selfScoreBefore={response.self_score_before}
         selfScoreAfter={response.self_score_after}
+        overallScore={response.scores.overall}
+        confidenceBefore={response.confidence_before}
+        confidenceAfter={response.confidence_after}
+        knowledgeManagementScore={response.scores.knowledge_management}
+        utilizationBefore={response.utilization_before}
         utilizationAfter={response.utilization_after}
         potentialUtilization={response.potential_utilization}
-        locale={locale}
       />
 
       {/* 9. Top Opportunities */}

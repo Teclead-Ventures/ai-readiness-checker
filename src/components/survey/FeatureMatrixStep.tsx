@@ -25,7 +25,9 @@ interface TierSectionProps {
   capabilities: { id: string; label: string; examples: string }[];
   features: Record<string, FeatureEntry>;
   onFeatureChange: (featureId: string, entry: FeatureEntry) => void;
-  defaultExpanded: boolean;
+  isExpanded: boolean;
+  onToggle: () => void;
+  onComplete?: () => void;
 }
 
 /** Visual identity per tier: badge color, progress bar color, left border accent (dark mode) */
@@ -100,11 +102,14 @@ function TierSection({
   capabilities,
   features,
   onFeatureChange,
-  defaultExpanded,
+  isExpanded,
+  onToggle,
+  onComplete,
 }: TierSectionProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
   const [showCelebration, setShowCelebration] = useState(false);
   const prevAnsweredRef = useRef<number | null>(null);
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
   const t = useTranslations('survey.features');
 
   const { answered, fullyAnswered, total, score } = useMemo(
@@ -119,17 +124,18 @@ function TierSection({
       prevAnsweredRef.current = fullyAnswered;
       return;
     }
-    if (fullyAnswered === total && total > 0 && prevAnsweredRef.current < total) {
+    const prev = prevAnsweredRef.current;
+    prevAnsweredRef.current = fullyAnswered; // always update before any early return
+    if (fullyAnswered === total && total > 0 && prev < total) {
       setShowCelebration(true);
-      // Auto-collapse after banner has been visible briefly
-      const collapseTimer = setTimeout(() => setExpanded(false), 700);
+      // Trigger collapse + next-tier logic after celebration banner is visible
+      const completeTimer = setTimeout(() => onCompleteRef.current?.(), 700);
       const hideTimer = setTimeout(() => setShowCelebration(false), 2400);
       return () => {
-        clearTimeout(collapseTimer);
+        clearTimeout(completeTimer);
         clearTimeout(hideTimer);
       };
     }
-    prevAnsweredRef.current = fullyAnswered;
   }, [fullyAnswered, total]);
 
   const styles = TIER_STYLES[tier];
@@ -141,14 +147,14 @@ function TierSection({
       <div className="flex w-full items-center hover:bg-muted/40 transition-colors">
         <button
           type="button"
-          onClick={() => setExpanded((prev) => !prev)}
+          onClick={onToggle}
           className="flex flex-1 cursor-pointer items-center gap-3 px-4 py-3 text-left min-w-0"
-          aria-expanded={expanded}
+          aria-expanded={isExpanded}
         >
           <ChevronDown
             className={cn(
               'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-              expanded && 'rotate-180',
+              isExpanded && 'rotate-180',
             )}
           />
 
@@ -204,27 +210,37 @@ function TierSection({
             <div className={cn('flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold', styles.celebration)}>
               <CheckCircle2 className="h-4 w-4 shrink-0" />
               <span>{tierName} — abgeschlossen!</span>
-              {/* Progress dots showing which tiers are done */}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Capabilities list */}
-      {expanded && (
-        <div className="divide-y divide-border px-3 pb-3">
-          {capabilities.map((cap) => (
-            <FeatureItem
-              key={cap.id}
-              featureId={cap.id}
-              label={cap.label}
-              examples={cap.examples}
-              entry={features[cap.id]}
-              onChange={onFeatureChange}
-            />
-          ))}
-        </div>
-      )}
+      {/* Capabilities list — animated open/close */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            key="content"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="divide-y divide-border px-3 pb-3">
+              {capabilities.map((cap) => (
+                <FeatureItem
+                  key={cap.id}
+                  featureId={cap.id}
+                  label={cap.label}
+                  examples={cap.examples}
+                  entry={features[cap.id]}
+                  onChange={onFeatureChange}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -239,6 +255,8 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
     useWatch<SurveyFormData, 'features'>({ name: 'features' }) ?? {};
 
   const lang = (locale === 'de' ? 'de' : 'en') as 'en' | 'de';
+
+  const [expandedTiers, setExpandedTiers] = useState<Set<number>>(new Set([1, 2]));
 
   const allIds = useMemo(() => capabilities.map((c) => c.id), [capabilities]);
 
@@ -257,6 +275,34 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
       setValue(`features.${featureId}`, entry, { shouldDirty: true, shouldValidate: true });
     },
     [setValue],
+  );
+
+  const handleToggleTier = useCallback((tier: number) => {
+    setExpandedTiers((prev) => {
+      const next = new Set(prev);
+      if (next.has(tier)) next.delete(tier);
+      else next.add(tier);
+      return next;
+    });
+  }, []);
+
+  const handleTierComplete = useCallback(
+    (tier: number, allTierEntries: { tier: number }[]) => {
+      const idx = allTierEntries.findIndex((e) => e.tier === tier);
+      const nextTier = allTierEntries[idx + 1]?.tier;
+
+      // Close all tiers
+      setExpandedTiers(new Set());
+
+      if (nextTier === undefined) return;
+
+      // Scroll to top once, then open next tier after animation settles
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        setExpandedTiers(new Set([nextTier]));
+      }, 500);
+    },
+    [],
   );
 
   const tierEntries = useMemo(() => {
@@ -374,7 +420,9 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
             capabilities={entry.capabilities}
             features={features}
             onFeatureChange={handleFeatureChange}
-            defaultExpanded={entry.tier <= 2}
+            isExpanded={expandedTiers.has(entry.tier)}
+            onToggle={() => handleToggleTier(entry.tier)}
+            onComplete={() => handleTierComplete(entry.tier, tierEntries)}
           />
         ))}
       </div>
