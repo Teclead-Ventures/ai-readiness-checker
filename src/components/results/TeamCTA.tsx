@@ -25,11 +25,11 @@ export function TeamCTA() {
       <Card className="bg-gradient-to-br from-[#FFAB54]/10 to-[#FFAB54]/5 border border-[#FFAB54]/20">
         <CardContent className="flex flex-col items-center text-center py-8 gap-4">
           <Users className="h-10 w-10 text-[#FFAB54]" />
-          <h3 className="text-xl font-semibold text-[#121212]">{t('title')}</h3>
+          <h3 className="text-xl font-semibold text-foreground">{t('title')}</h3>
           <p className="text-muted-foreground max-w-md">{t('description')}</p>
           <Button
             size="lg"
-            className="bg-[#121212] text-white hover:bg-gray-800 rounded-lg font-bold"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg font-bold"
             onClick={handleCtaClick}
             nativeButton={false}
             render={<a href="/team/new" />}

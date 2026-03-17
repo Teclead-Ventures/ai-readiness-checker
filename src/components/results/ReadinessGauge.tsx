@@ -74,7 +74,7 @@ export function ReadinessGauge({ score, locale }: ReadinessGaugeProps) {
         </svg>
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-5xl font-bold text-[#121212]">
+          <span className="text-5xl font-bold text-foreground">
             {displayScore}
           </span>
           <span className="text-sm font-medium mt-1" style={{ color: label.color }}>
