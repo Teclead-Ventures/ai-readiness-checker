@@ -15,6 +15,7 @@ interface CardBreakdown {
   trackDistribution: { dev: number; business: number };
   firstVisit: string | null;
   lastVisit: string | null;
+  dailyVisits: DailyCount[];
 }
 
 interface CampaignGroup {
@@ -176,6 +177,16 @@ export async function GET(request: NextRequest) {
 
         const cidVisitDates = cidVisits.map((v) => v.visited_at).filter(Boolean).sort();
 
+        // Daily visits per card
+        const cidDailyMap = new Map<string, number>();
+        for (const v of cidVisits) {
+          const date = v.visited_at?.slice(0, 10) || 'unknown';
+          cidDailyMap.set(date, (cidDailyMap.get(date) || 0) + 1);
+        }
+        const cidDailyVisits: DailyCount[] = Array.from(cidDailyMap.entries())
+          .map(([date, count]) => ({ date, count }))
+          .sort((a, b) => a.date.localeCompare(b.date));
+
         return {
           cid,
           visits: cidVisitCount,
@@ -185,6 +196,7 @@ export async function GET(request: NextRequest) {
             : 0,
           avgScore: cidAvgScore,
           trackDistribution: cidTrackDist,
+          dailyVisits: cidDailyVisits,
           firstVisit: cidVisitDates.length > 0 ? cidVisitDates[0] : null,
           lastVisit: cidVisitDates.length > 0 ? cidVisitDates[cidVisitDates.length - 1] : null,
         };

@@ -62,6 +62,10 @@ const labels = {
     conversionByCard: 'Conversion Rate by Card',
     none: '(no card)',
     na: 'N/A',
+    byCampaign: 'By Campaign',
+    byCard: 'By Card',
+    allCampaigns: 'All Campaigns',
+    dailyVisitsTitle: 'Daily Visits Over Time',
   },
   de: {
     title: 'Kampagnen-Performance',
@@ -94,6 +98,10 @@ const labels = {
     conversionByCard: 'Conversion-Rate pro Karte',
     none: '(keine Karte)',
     na: 'N/A',
+    byCampaign: 'Nach Kampagne',
+    byCard: 'Nach Karte',
+    allCampaigns: 'Alle Kampagnen',
+    dailyVisitsTitle: 'Tagliche Besuche',
   },
 } as const;
 
@@ -111,6 +119,7 @@ interface CardBreakdown {
   trackDistribution: { dev: number; business: number };
   firstVisit: string | null;
   lastVisit: string | null;
+  dailyVisits: DailyCount[];
 }
 
 interface CampaignGroup {
@@ -172,6 +181,8 @@ export default function CampaignsPage() {
   const [data, setData] = useState<CampaignData | null>(null);
   const [loading, setLoading] = useState(true);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [dailyViewMode, setDailyViewMode] = useState<'campaign' | 'card'>('campaign');
+  const [dailyCardCampaign, setDailyCardCampaign] = useState<string>('all');
 
   useEffect(() => {
     fetch('/api/admin/campaigns')
@@ -395,31 +406,118 @@ export default function CampaignsPage() {
             </Card>
           )}
 
-          {/* Line chart: daily visits over time */}
+          {/* Line chart: daily visits over time — campaign or card view */}
           <Card>
             <CardHeader>
-              <CardTitle>{t.dailyVisits}</CardTitle>
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <span>{t.dailyVisitsTitle}</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex rounded-md border border-border overflow-hidden text-xs">
+                    <button
+                      className={`px-3 py-1.5 transition-colors ${dailyViewMode === 'campaign' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+                      onClick={() => setDailyViewMode('campaign')}
+                    >
+                      {t.byCampaign}
+                    </button>
+                    <button
+                      className={`px-3 py-1.5 transition-colors ${dailyViewMode === 'card' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:text-foreground'}`}
+                      onClick={() => setDailyViewMode('card')}
+                    >
+                      {t.byCard}
+                    </button>
+                  </div>
+                  {dailyViewMode === 'card' && (
+                    <select
+                      value={dailyCardCampaign}
+                      onChange={(e) => setDailyCardCampaign(e.target.value)}
+                      className="h-7 rounded-md border border-border bg-input px-2 text-xs text-foreground"
+                    >
+                      <option value="all">{t.allCampaigns}</option>
+                      {groups.map((g) => (
+                        <option key={g.src} value={g.src}>{g.src}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={dailyChartData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  {groups.map((g, i) => (
-                    <Line
-                      key={g.src}
-                      type="monotone"
-                      dataKey={g.src}
-                      stroke={LINE_COLORS[i % LINE_COLORS.length]}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
+              {dailyViewMode === 'campaign' ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={dailyChartData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    {groups.map((g, i) => (
+                      <Line
+                        key={g.src}
+                        type="monotone"
+                        dataKey={g.src}
+                        stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (() => {
+                // Build card-level daily data
+                const cardsToShow = allCards
+                  .filter((c) => c.cid !== 'none')
+                  .filter((c) => dailyCardCampaign === 'all' || c.src === dailyCardCampaign);
+
+                const cardDatesSet = new Set<string>();
+                for (const c of cardsToShow) {
+                  for (const d of c.dailyVisits) cardDatesSet.add(d.date);
+                }
+                const cardDates = Array.from(cardDatesSet).sort();
+
+                const cardDailyData = cardDates.map((date) => {
+                  const row: Record<string, string | number> = { date };
+                  for (const c of cardsToShow) {
+                    const label = dailyCardCampaign === 'all' ? `${c.src}/${c.cid}` : c.cid;
+                    const dv = c.dailyVisits.find((d) => d.date === date);
+                    row[label] = dv?.count || 0;
+                  }
+                  return row;
+                });
+
+                const cardKeys = cardsToShow.map((c) =>
+                  dailyCardCampaign === 'all' ? `${c.src}/${c.cid}` : c.cid
+                );
+
+                if (cardsToShow.length === 0) {
+                  return (
+                    <p className="text-muted-foreground text-sm text-center py-8">
+                      {t.noData}
+                    </p>
+                  );
+                }
+
+                return (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={cardDailyData} margin={{ top: 10, right: 30, left: 0, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      {cardKeys.map((key, i) => (
+                        <Line
+                          key={key}
+                          type="monotone"
+                          dataKey={key}
+                          stroke={LINE_COLORS[i % LINE_COLORS.length]}
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      ))}
+                    </LineChart>
+                  </ResponsiveContainer>
+                );
+              })()}
             </CardContent>
           </Card>
 
