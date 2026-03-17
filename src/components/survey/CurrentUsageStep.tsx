@@ -47,7 +47,7 @@ function CheckboxGroup({
       {items.map((item) => (
         <label
           key={item}
-          className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors min-h-[44px]"
+          className="flex items-center gap-2 p-3 rounded-lg border border-border bg-card cursor-pointer hover:bg-card/80 transition-colors min-h-[2.75rem]"
         >
           <Checkbox
             checked={selected.includes(item)}
@@ -74,7 +74,7 @@ export function CurrentUsageStep({ track }: CurrentUsageStepProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold">{t('title')}</h2>
+      <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
 
       {/* Tools */}
       <FormField

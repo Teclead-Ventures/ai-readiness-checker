@@ -59,7 +59,7 @@ export function KnowledgeManagementStep() {
   return (
     <div className="space-y-8">
       <div className="space-y-1">
-        <h2 className="text-2xl font-bold">{t('title')}</h2>
+        <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 

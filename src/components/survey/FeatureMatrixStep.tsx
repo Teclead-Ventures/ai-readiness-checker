@@ -155,10 +155,10 @@ function TierSection({
 
           {/* Title + meta */}
           <div className="flex flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2 min-w-0">
-            <span className="text-sm font-semibold text-foreground truncate">
+            <span className="text-base font-semibold text-foreground truncate">
               {tierName}
             </span>
-            <span className="text-xs text-muted-foreground shrink-0">
+            <span className="text-sm text-muted-foreground shrink-0">
               {era ? `${era} · ` : ''}{answered}/{total} {t('answered')}
             </span>
           </div>
@@ -208,7 +208,7 @@ function TierSection({
 
       {/* Capabilities list */}
       {expanded && (
-        <div className="flex flex-col gap-2 px-3 pb-3 pt-1">
+        <div className="divide-y divide-border px-3 pb-3">
           {capabilities.map((cap) => (
             <FeatureItem
               key={cap.id}
@@ -291,68 +291,71 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-lg font-semibold">{t('title')}</h2>
+        <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
-      {/* Progress bar */}
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{t('progress', { count: answeredCount, total: allIds.length })}</span>
-          {!hasEnough && (
-            <span className="text-amber-500 font-medium">
-              {t('minRequired', { min: minRequired })}
-            </span>
-          )}
-        </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-          <div
-            className={cn(
-              'h-full rounded-full transition-all duration-300',
-              hasEnough ? 'bg-green-500' : 'bg-primary',
+      {/* Sticky progress bar + legend */}
+      <div className="sticky top-[57px] z-40 bg-background pb-3 pt-1 -mx-4 px-4 border-b border-border/50">
+        {/* Progress bar */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>{t('progress', { count: answeredCount, total: allIds.length })}</span>
+            {!hasEnough && (
+              <span className="text-primary font-medium">
+                {t('minRequired', { min: minRequired })}
+              </span>
             )}
-            style={{ width: `${progressPct}%` }}
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className={cn(
+                'h-full rounded-full transition-all duration-300',
+                hasEnough ? 'bg-green-500' : 'bg-primary',
+              )}
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Usage scale legend — single ? explains all levels */}
+        <div className="flex flex-wrap items-center gap-3 rounded-lg bg-card border border-border px-3 py-2 text-sm text-muted-foreground mt-2">
+          {([0, 1, 2, 3] as const).map((level) => {
+            const scale = RESPONSE_SCALE[level];
+            return (
+              <span key={level} className="flex items-center gap-1.5">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
+                  style={{ backgroundColor: scale.color }}
+                />
+                <span>{scale[lang]}</span>
+              </span>
+            );
+          })}
+          {/* One tooltip explaining all 4 levels */}
+          <InfoTooltip
+            side="top"
+            content={
+              <div className="text-left space-y-1.5 py-0.5">
+                {([0, 1, 2, 3] as const).map((level) => {
+                  const scale = RESPONSE_SCALE[level];
+                  return (
+                    <div key={level} className="flex items-start gap-2">
+                      <span
+                        className="mt-0.5 h-2 w-2 rounded-sm shrink-0"
+                        style={{ backgroundColor: scale.color }}
+                      />
+                      <span>
+                        <span className="font-semibold">{scale[lang]}:</span>{' '}
+                        {scale.description[lang]}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            }
           />
         </div>
-      </div>
-
-      {/* Usage scale legend — single ? explains all levels */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
-        {([0, 1, 2, 3] as const).map((level) => {
-          const scale = RESPONSE_SCALE[level];
-          return (
-            <span key={level} className="flex items-center gap-1.5">
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-sm shrink-0"
-                style={{ backgroundColor: scale.color }}
-              />
-              <span>{scale[lang]}</span>
-            </span>
-          );
-        })}
-        {/* One tooltip explaining all 4 levels */}
-        <InfoTooltip
-          side="top"
-          content={
-            <div className="text-left space-y-1.5 py-0.5">
-              {([0, 1, 2, 3] as const).map((level) => {
-                const scale = RESPONSE_SCALE[level];
-                return (
-                  <div key={level} className="flex items-start gap-2">
-                    <span
-                      className="mt-0.5 h-2 w-2 rounded-sm shrink-0"
-                      style={{ backgroundColor: scale.color }}
-                    />
-                    <span>
-                      <span className="font-semibold">{scale[lang]}:</span>{' '}
-                      {scale.description[lang]}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          }
-        />
       </div>
 
       {/* Tier sections */}

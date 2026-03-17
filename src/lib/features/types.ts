@@ -20,5 +20,5 @@ export const RESPONSE_SCALE = {
   0: { en: "Not Aware",       de: "Nicht bekannt",      color: "#ef4444", description: { en: "Don't know this exists",       de: "Kenne ich nicht" } },
   1: { en: "Aware",           de: "Bekannt",            color: "#f97316", description: { en: "Know it, haven't tried",        de: "Kenne ich, noch nicht ausprobiert" } },
   2: { en: "Tried",           de: "Ausprobiert",        color: "#eab308", description: { en: "Used at least once",            de: "Mindestens einmal genutzt" } },
-  3: { en: "Regularly Used",  de: "Regelmäßig genutzt", color: "#22c55e", description: { en: "Part of my regular workflow",   de: "Teil meines Arbeitsalltags" } },
+  3: { en: "Regularly",       de: "Regelmäßig",         color: "#22c55e", description: { en: "Part of my regular workflow",   de: "Teil meines Arbeitsalltags" } },
 } as const;

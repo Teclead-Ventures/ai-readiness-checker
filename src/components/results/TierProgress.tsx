@@ -53,27 +53,26 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                 className="w-full text-left group"
                 onClick={() => setExpandedTier(expandedTier === tier ? null : tier)}
               >
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="text-xs font-semibold text-muted-foreground w-12">
-                    {t('tier')} {tier}
-                  </span>
-                  <div className="flex-1 h-5 bg-muted rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: getBarColor(score) }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${score}%` }}
-                      transition={{ duration: 0.8, delay: 0.1 * tier }}
-                    />
-                  </div>
-                  <span className="text-sm font-bold w-10 text-right">{score}%</span>
-                  <span className="text-xs text-muted-foreground truncate w-36 hidden sm:block">
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="text-xs text-muted-foreground truncate">
                     {TIER_CONFIG[tier][lang]}
                   </span>
-                  <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground transition-transform ${
-                      expandedTier === tier ? 'rotate-180' : ''
-                    }`}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-bold">{score}%</span>
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${
+                        expandedTier === tier ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </div>
+                </div>
+                <div className="h-4 bg-muted rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: getBarColor(score) }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${score}%` }}
+                    transition={{ duration: 0.8, delay: 0.1 * tier }}
                   />
                 </div>
               </button>
@@ -88,7 +87,7 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                     transition={{ duration: 0.25 }}
                     className="overflow-hidden"
                   >
-                    <div className="ml-12 pl-3 border-l-2 border-border space-y-1.5 py-2">
+                    <div className="pl-3 border-l-2 border-border space-y-1.5 py-2">
                       {caps.map((cap) => {
                         const entry = features[cap.id];
                         const value = ((typeof entry === 'object' ? entry?.score : entry) ?? 0) as 0 | 1 | 2 | 3;
@@ -97,8 +96,11 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                           <div key={cap.id} className="flex items-center justify-between text-xs">
                             <span className="truncate mr-2">{cap[lang]}</span>
                             <span
-                              className="shrink-0 px-2 py-0.5 rounded-full text-white font-medium text-[10px]"
-                              style={{ backgroundColor: scale.color }}
+                              className="shrink-0 px-2 py-0.5 rounded-full font-medium text-[10px]"
+                              style={{
+                                backgroundColor: scale.color,
+                                color: value >= 2 ? '#000' : '#fff',
+                              }}
                             >
                               {scale[lang]}
                             </span>

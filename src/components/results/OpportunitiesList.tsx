@@ -68,18 +68,10 @@ export function OpportunitiesList({ features, track, locale }: OpportunitiesList
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.6 + i * 0.1 }}
-                className="bg-[#FFAB54]/5 border border-[#FFAB54]/20 rounded-xl p-4"
+                className="bg-black/30 border border-white/10 rounded-xl p-4"
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                    {t('tier')} {opp.tier}
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">{opp.tierName}</span>
-                </div>
-                <h4 className="font-semibold text-sm mb-1">{opp.capabilityName}</h4>
-                <p className="text-xs text-muted-foreground">
-                  {t('availableSince')} {opp.firstAvailable}
-                </p>
+                <p className="text-[14px] text-muted-foreground mb-1">{opp.tierName}</p>
+                <h4 className="font-semibold text-[16px]">{opp.capabilityName}</h4>
               </motion.div>
             ))}
           </div>

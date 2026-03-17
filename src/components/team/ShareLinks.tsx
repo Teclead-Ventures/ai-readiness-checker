@@ -50,9 +50,9 @@ export function ShareLinks({ teamId }: ShareLinksProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('created.title')}</CardTitle>
+        <CardTitle className="text-2xl">{t('created.title')}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-8">
         <div>
           <p className="text-sm font-medium mb-1">{t('created.shareLink')}</p>
           <p className="text-xs text-muted-foreground mb-2">{t('created.shareLinkDesc')}</p>

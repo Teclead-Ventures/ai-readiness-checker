@@ -86,9 +86,9 @@ export function CreateTeamForm() {
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto bg-white rounded-xl border border-gray-200 p-8">
+    <Card className="w-full max-w-lg mx-auto rounded-xl p-8">
       <CardHeader>
-        <CardTitle>{t('create.title')}</CardTitle>
+        <CardTitle className="text-2xl">{t('create.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -143,7 +143,9 @@ export function CreateTeamForm() {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>
+                  {trackPreset === 'both' ? t('create.trackBoth') : trackPreset === 'dev' ? t('create.trackDev') : t('create.trackBusiness')}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="both">{t('create.trackBoth')}</SelectItem>
@@ -154,13 +156,11 @@ export function CreateTeamForm() {
           </div>
 
           {/* Anonymous mode */}
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <Label>{t('create.anonymous')}</Label>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t('create.anonymousDesc')}
-              </p>
-            </div>
+          <div className="space-y-1.5">
+            <Label>{t('create.anonymous')}</Label>
+            <p className="text-xs text-muted-foreground">
+              {t('create.anonymousDesc')}
+            </p>
             <Switch
               checked={anonymous}
               onCheckedChange={(checked) => setValue('anonymous', checked)}
@@ -177,7 +177,9 @@ export function CreateTeamForm() {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>
+                  {language === 'en' ? tc('english') : tc('german')}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">{tc('english')}</SelectItem>
@@ -192,7 +194,8 @@ export function CreateTeamForm() {
 
           <Button
             type="submit"
-            className="w-full bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg py-3"
+            size="lg"
+            className="w-full bg-[#FFAB54] text-[#121212] font-bold hover:bg-[#FFAB54]/90 rounded-lg h-12 text-base mt-4"
             disabled={submitting}
           >
             {submitting ? tc('loading') : t('create.submit')}

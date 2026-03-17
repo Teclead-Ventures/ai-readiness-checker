@@ -44,7 +44,7 @@ export function ProfileStep({ track }: ProfileStepProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">{t('title')}</h2>
+      <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
 
       {/* Name (optional) */}
       <FormField
@@ -134,7 +134,7 @@ export function ProfileStep({ track }: ProfileStepProps) {
                   return (
                     <label
                       key={lang}
-                      className="flex items-center gap-2 p-3 rounded-lg border cursor-pointer hover:bg-muted/50 transition-colors min-h-[44px]"
+                      className="flex items-center gap-2 p-3 rounded-lg border border-border bg-card cursor-pointer hover:bg-card/80 transition-colors min-h-[2.75rem]"
                     >
                       <Checkbox
                         checked={checked}

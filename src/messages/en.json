@@ -125,7 +125,7 @@
       "minRequired": "Please answer at least {min} to continue",
       "tierScore": "Category score: {score}%",
       "usageLabel": "Usage:",
-      "relevanceLabel": "Relevant:",
+      "relevanceLabel": "Everyday Relevance:",
       "relevanceTooltip": "Is this capability relevant to your daily work? If not, it won't be counted in your score calculation.",
       "relevanceYes": "Yes",
       "relevanceUnsure": "Unsure",
@@ -157,7 +157,7 @@
     "utilizationCurrent": "Currently AI-assisted",
     "utilizationPotential": "Could be AI-assisted",
     "featureBreakdown": "Capabilities by Category",
-    "tierProgress": "Tier Progress",
+    "tierProgress": "Potential Utilization",
     "tier": "Category",
     "timelineTitle": "Your Timeline Position",
     "timelinePosition": "Timeline Position",
@@ -219,7 +219,7 @@
       "submit": "Create Team"
     },
     "created": {
-      "title": "Team Created!",
+      "title": "Team Created",
       "shareLink": "Share this link with your team:",
       "resultsLink": "Your team dashboard (bookmark this):",
       "shareLinkDesc": "Team members use this link to take the survey",
