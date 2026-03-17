@@ -13,6 +13,12 @@ import { RelevanceUsageMatrix } from '@/components/results/RelevanceUsageMatrix'
 import { OpportunitiesList } from '@/components/results/OpportunitiesList';
 import { TeamCTA } from '@/components/results/TeamCTA';
 import { CalendlyEmbed } from '@/components/results/CalendlyEmbed';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@/components/ui/accordion';
 
 interface ResultsContentProps {
   response: SurveyResponse;
@@ -43,49 +49,92 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         />
       </div>
 
-      {/* 3. Adaptation Projection (urgency driver) */}
-      <AdaptationProjection
-        adaptation={response.scores.adaptation}
-        tiers={response.scores.tiers}
-        tiersNA={response.scores.tiersNA}
-        locale={locale}
-      />
-
-      {/* 4. Relevance × Usage Matrix */}
-      <RelevanceUsageMatrix
-        features={response.features}
-        track={response.track}
-        locale={locale}
-      />
-
-      {/* 5. Knowledge Management Radar */}
-      <KMRadarChart knowledgeManagement={response.knowledge_management} />
-
-      {/* Self-Perception vs. Reality (combined) */}
-      <SelfPerceptionComparison
-        selfScoreBefore={response.self_score_before}
-        selfScoreAfter={response.self_score_after}
-        overallScore={response.scores.overall}
-        confidenceBefore={response.confidence_before}
-        confidenceAfter={response.confidence_after}
-        knowledgeManagementScore={response.scores.knowledge_management}
-        utilizationBefore={response.utilization_before}
-        utilizationAfter={response.utilization_after}
-        potentialUtilization={response.potential_utilization}
-      />
-
-      {/* 9. Top Opportunities */}
-      <OpportunitiesList
-        features={response.features}
-        track={response.track}
-        locale={locale}
-      />
-
-      {/* 10. Team CTA */}
-      {!response.team_id && <TeamCTA />}
-
-      {/* 11. Calendly Booking */}
+      {/* Calendly Booking — right after score */}
       <CalendlyEmbed />
+
+      {/* Detailed Analysis — collapsible accordion sections */}
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-3">
+          {t('detailedAnalysis')}
+        </h2>
+        <Accordion>
+          {/* Adaptation Projection */}
+          <AccordionItem>
+            <AccordionTrigger className="text-base font-medium py-3">
+              {t('adaptationTitle')}
+            </AccordionTrigger>
+            <AccordionContent>
+              <AdaptationProjection
+                adaptation={response.scores.adaptation}
+                tiers={response.scores.tiers}
+                tiersNA={response.scores.tiersNA}
+                locale={locale}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Relevance × Usage Matrix */}
+          <AccordionItem>
+            <AccordionTrigger className="text-base font-medium py-3">
+              {t('usageMatrix')}
+            </AccordionTrigger>
+            <AccordionContent>
+              <RelevanceUsageMatrix
+                features={response.features}
+                track={response.track}
+                locale={locale}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Knowledge Management Radar */}
+          <AccordionItem>
+            <AccordionTrigger className="text-base font-medium py-3">
+              {t('kmRadar')}
+            </AccordionTrigger>
+            <AccordionContent>
+              <KMRadarChart knowledgeManagement={response.knowledge_management} />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Self-Perception vs. Reality */}
+          <AccordionItem>
+            <AccordionTrigger className="text-base font-medium py-3">
+              {t('comparisonTitle')}
+            </AccordionTrigger>
+            <AccordionContent>
+              <SelfPerceptionComparison
+                selfScoreBefore={response.self_score_before}
+                selfScoreAfter={response.self_score_after}
+                overallScore={response.scores.overall}
+                confidenceBefore={response.confidence_before}
+                confidenceAfter={response.confidence_after}
+                knowledgeManagementScore={response.scores.knowledge_management}
+                utilizationBefore={response.utilization_before}
+                utilizationAfter={response.utilization_after}
+                potentialUtilization={response.potential_utilization}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Top Opportunities */}
+          <AccordionItem>
+            <AccordionTrigger className="text-base font-medium py-3">
+              {t('opportunities')}
+            </AccordionTrigger>
+            <AccordionContent>
+              <OpportunitiesList
+                features={response.features}
+                track={response.track}
+                locale={locale}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
+
+      {/* Team CTA */}
+      {!response.team_id && <TeamCTA />}
     </div>
   );
 }
