@@ -30,7 +30,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-[1.875rem] font-bold font-display">
+      <h2 className="text-xl sm:text-[1.875rem] font-bold font-display hyphens-auto">
         {isBefore ? t('titleBefore') : t('titleAfter')}
       </h2>
 
@@ -52,7 +52,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
             {selfScore}
           </span>
         </div>
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between text-xs sm:text-sm text-muted-foreground">
           <span>{t('scoreMin')}</span>
           <span>{t('scoreMax')}</span>
         </div>
@@ -120,7 +120,7 @@ export function SelfAssessmentStep({ variant }: SelfAssessmentStepProps) {
             {confidence}
           </span>
         </div>
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between text-xs sm:text-sm text-muted-foreground">
           <span>{t('confidenceMin')}</span>
           <span>{t('confidenceMax')}</span>
         </div>

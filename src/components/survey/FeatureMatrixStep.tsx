@@ -148,43 +148,42 @@ function TierSection({
         <button
           type="button"
           onClick={onToggle}
-          className="flex flex-1 cursor-pointer items-center gap-3 px-4 py-3 text-left min-w-0"
+          className="flex flex-1 flex-col cursor-pointer px-4 py-3 text-left min-w-0 gap-1"
           aria-expanded={isExpanded}
         >
-          <ChevronDown
-            className={cn(
-              'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-              isExpanded && 'rotate-180',
-            )}
-          />
-
-          {/* Tier badge */}
-          <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums', styles.badge)}>
-            T{tier}
-          </span>
-
-          {/* Title + meta */}
-          <div className="flex flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2 min-w-0">
-            <span className="text-base font-semibold text-foreground truncate">
-              {tierName}
+          {/* Row 1: chevron + badge + title */}
+          <div className="flex items-center gap-3">
+            <ChevronDown
+              className={cn(
+                'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                isExpanded && 'rotate-180',
+              )}
+            />
+            <span className={cn('shrink-0 rounded-md px-2 py-0.5 text-xs font-bold tabular-nums', styles.badge)}>
+              T{tier}
             </span>
-            <span className="text-sm text-muted-foreground shrink-0">
-              {era ? `${era} · ` : ''}{answered}/{total} {t('answered')}
+            <span className="text-base font-semibold text-foreground">
+              {tierName}
             </span>
           </div>
 
-          {/* Complete checkmark OR score */}
-          {isComplete ? (
-            <CheckCircle2 className={cn('h-4 w-4 shrink-0', styles.dot === 'bg-primary' ? 'text-primary' : 'text-green-400')} />
-          ) : (
-            <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
-              {score}%
+          {/* Row 2: progress + score (indented past chevron) */}
+          <div className="flex items-center gap-2 pl-7">
+            <span className="text-sm text-muted-foreground shrink-0">
+              {era ? `${era} · ` : ''}{answered}/{total} {t('answered')}
             </span>
-          )}
+            {isComplete ? (
+              <CheckCircle2 className={cn('h-4 w-4 shrink-0', styles.dot === 'bg-primary' ? 'text-primary' : 'text-green-400')} />
+            ) : (
+              <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+                {score}%
+              </span>
+            )}
+          </div>
         </button>
 
-        {/* Tooltip sits outside the button — no nested button issue */}
-        <div className="shrink-0 px-3">
+        {/* Tooltip sits outside the button — no nested button issue; self-end aligns with row 2 */}
+        <div className="shrink-0 px-3 self-end pb-[0.875rem]">
           <InfoTooltip content={tierTooltip} side="top" />
         </div>
       </div>
@@ -341,7 +340,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
     <div className="flex flex-col gap-4">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
+        <h2 className="text-xl sm:text-[1.875rem] font-bold font-display hyphens-auto">{t('title')}</h2>
         <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
       </div>
 
@@ -349,7 +348,7 @@ export function FeatureMatrixStep({ track }: FeatureMatrixStepProps) {
       <div className="sticky top-[57px] z-40 bg-background pb-3 pt-1 -mx-4 px-4 border-b border-border/50 before:absolute before:inset-x-0 before:bottom-full before:h-2 before:bg-background before:content-[''] relative">
         {/* Progress bar */}
         <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex flex-col gap-0.5 sm:flex-row sm:items-center sm:justify-between text-sm text-muted-foreground">
             <span>{t('progress', { count: answeredCount, total: allIds.length })}</span>
             {!hasEnough && (
               <span className="text-primary font-medium">

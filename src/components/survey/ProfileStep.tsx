@@ -44,7 +44,7 @@ export function ProfileStep({ track }: ProfileStepProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
+      <h2 className="text-xl sm:text-[1.875rem] font-bold font-display hyphens-auto">{t('title')}</h2>
 
       {/* Name (optional) */}
       <FormField

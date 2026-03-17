@@ -35,7 +35,7 @@ export function MindsetStep({ track: _track }: MindsetStepProps) {
 
   return (
     <div className="space-y-8">
-      <h2 className="text-[1.875rem] font-bold font-display">{t('title')}</h2>
+      <h2 className="text-xl sm:text-[1.875rem] font-bold font-display hyphens-auto">{t('title')}</h2>
 
       {/* Openness (1–5 scale) */}
       <FormField

@@ -21,7 +21,7 @@ export function TrackSelector({ onSelect, selected }: TrackSelectorProps) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-[1.875rem] font-bold font-display text-center">{t('title')}</h2>
+      <h2 className="text-xl sm:text-[1.875rem] font-bold font-display text-center hyphens-auto">{t('title')}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {tracks.map(({ value, icon: Icon }) => (
           <motion.div
