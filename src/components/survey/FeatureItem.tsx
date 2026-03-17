@@ -111,7 +111,7 @@ function FeatureItemInner({
         <span className="text-sm font-medium text-muted-foreground">
           {t("usageLabel")}
         </span>
-        <div className="flex w-full rounded-lg border border-border bg-background p-0.5 gap-0.5">
+        <div className="grid grid-cols-2 sm:flex w-full rounded-lg border border-border bg-background p-0.5 gap-0.5">
           {SCALE_ENTRIES.map((scaleEntry) => {
             const isActive = entry?.score === scaleEntry.value;
             const scaleItem = RESPONSE_SCALE[scaleEntry.value];
@@ -124,7 +124,7 @@ function FeatureItemInner({
                 aria-label={scaleItem[lang]}
                 onClick={() => handleScoreSelect(scaleEntry.value)}
                 className={cn(
-                  "flex-1 min-h-[2rem] cursor-pointer rounded-md px-2.5 py-1 text-sm font-medium transition-all select-none",
+                  "sm:flex-1 min-h-[2rem] cursor-pointer rounded-md px-2 py-1 text-xs sm:text-sm font-medium transition-all select-none text-center leading-tight",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
                     ? cn(

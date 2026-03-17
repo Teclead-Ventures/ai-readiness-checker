@@ -46,18 +46,20 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <TooltipProvider>
             {/* ── Header ── */}
-            <header className="bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3 grid grid-cols-3 items-center sticky top-0 z-50">
+            <header className="bg-background/95 backdrop-blur-sm border-b border-border px-4 py-3 flex items-center relative sticky top-0 z-50">
               <Link
                 href="/"
                 className="flex items-center hover:opacity-80 transition-opacity"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/tlv-logo.svg" alt="Teclead Ventures" className="h-7" />
+                <img src="/tlv-logo-small.svg" alt="Teclead Ventures" className="h-7 sm:hidden" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/tlv-logo.svg" alt="Teclead Ventures" className="hidden sm:block h-7" />
               </Link>
-              <span className="text-sm font-semibold text-primary tracking-wide text-center whitespace-nowrap">
+              <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold text-primary tracking-wide whitespace-nowrap">
                 AI Readiness Check
               </span>
-              <div className="flex justify-end">
+              <div className="flex ml-auto">
                 <LanguageSwitcher />
               </div>
             </header>
