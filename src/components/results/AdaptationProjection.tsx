@@ -10,9 +10,8 @@ import {
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
-  Legend,
   Tooltip,
-  ReferenceLine,
+  LabelList,
 } from 'recharts';
 import type { ScoreResult } from '@/lib/scoring';
 import { TIER_CONFIG } from '@/lib/features/types';
@@ -28,7 +27,6 @@ interface TierData {
   weightedGap: number;
 }
 
-// Month 0 = today (no focus label), months 1-5 = tier focus, month 6 = synthesis
 type MonthFocus =
   | { kind: 'today' }
   | { kind: 'tier'; tier: TierKey; score: number; gap: number }
@@ -56,11 +54,16 @@ function RoadmapTooltip({ active, payload, label, locale }: any) {
   const focus = dataPoint?.focus;
 
   return (
-    <div className="bg-popover border border-border rounded-lg p-3 shadow-lg text-sm min-w-[190px]">
+    <div className="bg-popover border border-border rounded-lg p-3 shadow-lg text-sm min-w-[200px]">
       <p className="font-semibold text-foreground mb-1.5">{label}</p>
       {payload.map((entry: any, i: number) => (
         <p key={i} style={{ color: entry.color }} className="text-xs leading-relaxed">
           {entry.name}: <span className="font-medium">{entry.value}%</span>
+          {entry.dataKey === 'withoutChange' && focus?.kind !== 'today' && (
+            <span className="text-muted-foreground/60 ml-1">
+              {locale === 'de' ? '(neue KI-Tools nicht übernommen)' : '(new AI tools not adopted)'}
+            </span>
+          )}
         </p>
       ))}
       {focus?.kind === 'tier' && (
@@ -91,6 +94,23 @@ function RoadmapTooltip({ active, payload, label, locale }: any) {
     </div>
   );
 }
+
+// End-point label rendered only at the last data point
+function EndLabel({ x, y, value, color, index, total }: any) {
+  if (index !== total - 1 || value === null || value === undefined) return null;
+  return (
+    <text
+      x={(x ?? 0) + 8}
+      y={(y ?? 0) + 4}
+      fill={color}
+      fontSize={12}
+      fontWeight="700"
+      style={{ userSelect: 'none' }}
+    >
+      {value}%
+    </text>
+  );
+}
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export function AdaptationProjection({
@@ -114,8 +134,6 @@ export function AdaptationProjection({
     });
 
   // ── Sort by learning priority ───────────────────────────────────
-  // Group: T1/T2 (foundations) → T3 (productive) → T4/T5 (advanced)
-  // Within each group: highest weighted gap first (biggest return on effort)
   const tiersByPriority = [...activeTiers].sort((a, b) => {
     const groupA = a.tier <= 2 ? 0 : a.tier <= 3 ? 1 : 2;
     const groupB = b.tier <= 2 ? 0 : b.tier <= 3 ? 1 : 2;
@@ -131,40 +149,30 @@ export function AdaptationProjection({
   const targetPct = Math.round(currentPct + gapToCeiling * closingFactor);
   const delta = targetPct - currentPct;
 
-  // ── Data-driven monthly growth distribution ─────────────────────
-  // Each month's increment is proportional to its tier's weighted gap:
-  //   weightedGap = gap × tierWeight  (T5 gap contributes 2.5× more than T1 gap)
-  // → months focused on high-value, high-gap tiers produce steeper rises
-  // Distribution: months 1-5 receive 90% of delta, month 6 (synthesis) gets 10%
+  // ── Data-driven monthly growth (proportional to tier opportunity) ─
   const totalWeightedGap = activeTiers.reduce((sum, t) => sum + t.weightedGap, 0);
-
-  // Raw share per month — tiers that appear multiple times get diminishing returns (0.5×)
   const rawShares = Array.from({ length: 5 }, (_, m): number => {
     if (!tiersByPriority.length || totalWeightedGap === 0) return 1;
     const tier = tiersByPriority[m % tiersByPriority.length];
-    const isRepeat = m >= tiersByPriority.length;
-    return (tier.weightedGap / totalWeightedGap) * (isRepeat ? 0.5 : 1.0);
+    return (tier.weightedGap / totalWeightedGap) * (m >= tiersByPriority.length ? 0.5 : 1.0);
   });
-
   const rawShareSum = rawShares.reduce((a, b) => a + b, 0);
-  // Normalize so tier months always contribute exactly 90% of delta
   const tierIncrements = rawShares.map((s) =>
     rawShareSum > 0 ? (s / rawShareSum) * delta * 0.9 : delta * 0.18,
   );
 
-  // ── Monthly focus for tooltip (months 1-5 = tiers, month 6 = synthesis) ──
+  // ── Monthly focus for tooltip ───────────────────────────────────
   const monthlyFocus: MonthFocus[] = [
-    // Months 1-5: one unique tier per month (5 tiers = perfectly one each)
     ...Array.from({ length: 5 }, (_, m): MonthFocus => {
       const tier = tiersByPriority[m % tiersByPriority.length];
       if (!tier) return { kind: 'synthesis' };
       return { kind: 'tier', tier: tier.tier, score: tier.score, gap: tier.gap };
     }),
-    // Month 6: always synthesis — combining and applying all learned skills
     { kind: 'synthesis' },
   ];
 
-  // ── "Without change" subtle decline ────────────────────────────
+  // ── "Without training" decline ─────────────────────────────────
+  // New AI tools keep appearing — relative standing slips even if you don't forget anything
   const declineRate =
     direction === 'widening' ? 1.0 : direction === 'stable' ? 0.5 : 0.3;
 
@@ -191,6 +199,16 @@ export function AdaptationProjection({
   }
 
   const growthAmount = targetPct - currentPct;
+  const endWithTraining = data[data.length - 1].withTraining;
+  const endWithoutChange = data[data.length - 1].withoutChange;
+  const silentFall = currentPct - endWithoutChange; // how many pts you lose vs today
+
+  // ── Smart Y-axis domain: focus on the relevant range ───────────
+  const allValues = data.flatMap((d) => [d.withTraining, d.withoutChange]);
+  const rawMin = Math.min(...allValues);
+  const rawMax = Math.max(...allValues);
+  const yMin = Math.max(0, Math.floor((rawMin - 8) / 10) * 10);
+  const yMax = Math.min(100, Math.ceil((rawMax + 12) / 10) * 10);
 
   const tooltipContent = useCallback(
     (props: any) => <RoadmapTooltip {...props} locale={locale} />,
@@ -208,72 +226,111 @@ export function AdaptationProjection({
           <CardTitle>{t('adaptationTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
-          {growthAmount > 0 && (
-            <div className="mb-4 p-3 bg-muted/50 rounded-lg text-center">
-              <p className="text-sm font-semibold text-green-600 dark:text-green-400">
-                {t('growthPotential', { from: currentPct, to: targetPct })}
-              </p>
+          {/* Two-scenario summary — scannable at a glance */}
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <div className="p-3 rounded-lg border border-green-500/30 bg-green-500/5 text-center">
+              <p className="text-xs text-muted-foreground mb-1">{t('withTraining')}</p>
+              <p className="text-2xl font-bold text-green-500">{endWithTraining}%</p>
+              {growthAmount > 0 && (
+                <p className="text-xs text-green-600/80 mt-0.5">
+                  +{growthAmount} {locale === 'de' ? 'Punkte' : 'points'}
+                </p>
+              )}
             </div>
+            <div className="p-3 rounded-lg border border-slate-500/20 bg-slate-500/5 text-center">
+              <p className="text-xs text-muted-foreground mb-1">{t('withoutTraining')}</p>
+              <p className="text-2xl font-bold text-slate-400">{endWithoutChange}%</p>
+              {silentFall > 0 && (
+                <p className="text-xs text-slate-500/80 mt-0.5">
+                  −{silentFall} {locale === 'de' ? 'Punkte' : 'points'}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Chart: the journey between now and those two outcomes */}
+          {/* Subtle warm background = landscape is active and moving */}
+          <div
+            className="rounded-md overflow-hidden"
+            style={{
+              background:
+                'linear-gradient(to right, transparent 0%, rgba(245,158,11,0.04) 60%, rgba(245,158,11,0.09) 100%)',
+            }}
+          >
+            <ResponsiveContainer width="100%" height={240}>
+              <AreaChart data={data} margin={{ top: 10, right: 55, left: 10, bottom: 5 }}>
+                <defs>
+                  <linearGradient id="trainingGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0.03} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.07)" />
+                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
+                <YAxis
+                  domain={[yMin, yMax]}
+                  tick={{ fontSize: 11 }}
+                  tickFormatter={(v) => `${v}%`}
+                  width={42}
+                />
+                <Tooltip content={tooltipContent} />
+
+                {/* Without training — gray dashed, with end label */}
+                <Area
+                  type="monotone"
+                  dataKey="withoutChange"
+                  name={t('withoutTraining')}
+                  stroke="#94a3b8"
+                  fill="rgba(148,163,184,0.06)"
+                  strokeWidth={1.5}
+                  strokeDasharray="4 3"
+                  dot={false}
+                  activeDot={{ r: 4, fill: '#94a3b8' }}
+                >
+                  <LabelList
+                    dataKey="withoutChange"
+                    content={(props: any) => (
+                      <EndLabel
+                        {...props}
+                        color="#94a3b8"
+                        total={data.length}
+                      />
+                    )}
+                  />
+                </Area>
+
+                {/* With training — green hero area, with end label */}
+                <Area
+                  type="monotone"
+                  dataKey="withTraining"
+                  name={t('withTraining')}
+                  stroke="#22c55e"
+                  fill="url(#trainingGradient)"
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 6, fill: '#22c55e' }}
+                >
+                  <LabelList
+                    dataKey="withTraining"
+                    content={(props: any) => (
+                      <EndLabel
+                        {...props}
+                        color="#22c55e"
+                        total={data.length}
+                      />
+                    )}
+                  />
+                </Area>
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Plain-language explanation of the decline — single sentence */}
+          {silentFall > 0 && (
+            <p className="mt-3 text-xs text-muted-foreground text-center leading-relaxed px-2">
+              {t('landscapeNote', { gap: silentFall })}
+            </p>
           )}
-
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data} margin={{ top: 10, right: 30, left: 10, bottom: 5 }}>
-              <defs>
-                <linearGradient id="trainingGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#22c55e" stopOpacity={0.03} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-              <YAxis
-                domain={[0, 100]}
-                tick={{ fontSize: 11 }}
-                tickFormatter={(v) => `${v}%`}
-                width={45}
-              />
-              <Tooltip content={tooltipContent} />
-              <Legend wrapperStyle={{ fontSize: 11, paddingTop: '12px' }} />
-
-              {/* Advanced practitioner reference line */}
-              <ReferenceLine
-                y={advancedCeiling}
-                stroke="#94a3b8"
-                strokeDasharray="6 4"
-                label={{
-                  value: t('advancedPractitioner'),
-                  position: 'insideTopRight',
-                  fontSize: 10,
-                  fill: '#94a3b8',
-                }}
-              />
-
-              {/* With guided training — hero area (green, filled) */}
-              <Area
-                type="monotone"
-                dataKey="withTraining"
-                name={t('withTraining')}
-                stroke="#22c55e"
-                fill="url(#trainingGradient)"
-                strokeWidth={2.5}
-                dot={{ r: 4, fill: '#22c55e', strokeWidth: 0 }}
-                activeDot={{ r: 6 }}
-              />
-
-              {/* Without change — subtle gray, dashed */}
-              <Area
-                type="monotone"
-                dataKey="withoutChange"
-                name={t('withoutChange')}
-                stroke="#94a3b8"
-                fill="rgba(148,163,184,0.05)"
-                strokeWidth={1.5}
-                strokeDasharray="4 3"
-                dot={{ r: 3, fill: '#94a3b8', strokeWidth: 0 }}
-                activeDot={{ r: 4 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
         </CardContent>
       </Card>
     </motion.div>
