@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "ai-readiness-checker.vercel.app"
+        }
+      ],
+      "destination": "https://ai-readiness.teclead-ventures.de/c/transform?cid=card-1",
+      "permanent": true
+    }
+  ]
+}
