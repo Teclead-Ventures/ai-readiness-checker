@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
     <div className="flex items-center justify-center min-h-[60vh] px-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-xl text-[#121212]">
+          <CardTitle className="text-xl text-foreground">
             {l.title}
           </CardTitle>
           <p className="text-sm text-muted-foreground">

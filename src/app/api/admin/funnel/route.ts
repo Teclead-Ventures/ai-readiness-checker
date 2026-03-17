@@ -32,6 +32,15 @@ export async function GET(request: NextRequest) {
     const fromDate = searchParams.get('from');
     const toDate = searchParams.get('to');
 
+    // Fetch available filter options (distinct src values)
+    const { data: allEventsForFilters } = await supabase
+      .from('funnel_events')
+      .select('src');
+
+    const availableSources = Array.from(
+      new Set((allEventsForFilters || []).map((e) => e.src).filter(Boolean))
+    ).sort();
+
     let query = supabase
       .from('funnel_events')
       .select('session_id, step, action, created_at, src');
@@ -133,6 +142,7 @@ export async function GET(request: NextRequest) {
       steps,
       overallConversion,
       biggestDropOff,
+      availableSources,
     });
   } catch (err) {
     console.error('GET /api/admin/funnel error:', err);

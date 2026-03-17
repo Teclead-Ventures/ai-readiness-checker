@@ -5,7 +5,6 @@ import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -26,8 +25,8 @@ const labels = {
     funnelVisualization: 'Funnel Visualization',
     stepDetails: 'Step Details',
     filters: 'Filters',
-    campaignSource: 'Campaign Source',
-    campaignSourcePlaceholder: 'e.g. card-a',
+    campaignSource: 'Campaign',
+    all: 'All',
     dateFrom: 'From',
     dateTo: 'To',
     apply: 'Apply',
@@ -49,8 +48,8 @@ const labels = {
     funnelVisualization: 'Funnel-Visualisierung',
     stepDetails: 'Schrittdetails',
     filters: 'Filter',
-    campaignSource: 'Kampagnenquelle',
-    campaignSourcePlaceholder: 'z.B. card-a',
+    campaignSource: 'Kampagne',
+    all: 'Alle',
     dateFrom: 'Von',
     dateTo: 'Bis',
     apply: 'Anwenden',
@@ -77,6 +76,7 @@ interface FunnelData {
   steps: FunnelStep[];
   overallConversion: number;
   biggestDropOff: { step: string; rate: number };
+  availableSources: string[];
 }
 
 export default function FunnelPage() {
@@ -126,7 +126,7 @@ export default function FunnelPage() {
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#121212]">{t.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t.title}</h1>
         <Link href="/admin">
           <Button variant="outline" size="sm">{t.backToAdmin}</Button>
         </Link>
@@ -141,29 +141,35 @@ export default function FunnelPage() {
           <div className="flex flex-wrap gap-4 items-end">
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">{t.campaignSource}</label>
-              <Input
-                placeholder={t.campaignSourcePlaceholder}
+              <select
                 value={srcFilter}
-                onChange={(e) => setSrcFilter(e.target.value)}
-                className="w-40"
-              />
+                onChange={(e) => {
+                  setSrcFilter(e.target.value);
+                }}
+                className="h-8 w-44 rounded-md border border-border bg-input px-2 text-sm text-foreground"
+              >
+                <option value="">{t.all}</option>
+                {(data?.availableSources || []).map((src) => (
+                  <option key={src} value={src}>{src}</option>
+                ))}
+              </select>
             </div>
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">{t.dateFrom}</label>
-              <Input
+              <input
                 type="date"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
-                className="w-40"
+                className="h-8 w-40 rounded-md border border-border bg-input px-2 text-sm text-foreground"
               />
             </div>
             <div className="space-y-1">
               <label className="text-xs text-muted-foreground">{t.dateTo}</label>
-              <Input
+              <input
                 type="date"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
-                className="w-40"
+                className="h-8 w-40 rounded-md border border-border bg-input px-2 text-sm text-foreground"
               />
             </div>
             <Button onClick={handleApplyFilters} size="sm">{t.apply}</Button>
@@ -246,14 +252,14 @@ export default function FunnelPage() {
                   {steps.map((s) => (
                     <TableRow
                       key={s.step}
-                      className={s.dropOffRate > 20 ? 'bg-red-50' : ''}
+                      className={s.dropOffRate > 20 ? 'bg-red-500/10' : ''}
                     >
                       <TableCell className="capitalize font-medium">
                         {s.step.replace(/_/g, ' ')}
                       </TableCell>
                       <TableCell>{s.entered}</TableCell>
                       <TableCell>{s.completed}</TableCell>
-                      <TableCell className={s.dropOffRate > 20 ? 'text-red-600 font-bold' : ''}>
+                      <TableCell className={s.dropOffRate > 20 ? 'text-red-400 font-bold' : ''}>
                         {s.dropOffRate}%
                       </TableCell>
                       <TableCell>

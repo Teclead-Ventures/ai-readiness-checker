@@ -10,6 +10,11 @@ interface CardBreakdown {
   cid: string;
   visits: number;
   completions: number;
+  conversionRate: number;
+  avgScore: number | null;
+  trackDistribution: { dev: number; business: number };
+  firstVisit: string | null;
+  lastVisit: string | null;
 }
 
 interface CampaignGroup {
@@ -17,6 +22,10 @@ interface CampaignGroup {
   visits: number;
   completions: number;
   conversionRate: number;
+  avgScore: number | null;
+  trackDistribution: { dev: number; business: number };
+  firstVisit: string | null;
+  lastVisit: string | null;
   dailyVisits: DailyCount[];
   dailyCompletions: DailyCount[];
   topCards: CardBreakdown[];
@@ -44,10 +53,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch visits' }, { status: 500 });
     }
 
-    // Query responses grouped by campaign_src
+    // Query responses grouped by campaign_src (include scores and track for analytics)
     let responsesQuery = supabase
       .from('responses')
-      .select('campaign_src, campaign_cid, created_at');
+      .select('campaign_src, campaign_cid, created_at, scores, track');
 
     if (srcFilter) {
       responsesQuery = responsesQuery.eq('campaign_src', srcFilter);
@@ -94,6 +103,25 @@ export async function GET(request: NextRequest) {
         ? Math.round((completionCount / visitCount) * 10000) / 100
         : 0;
 
+      // Campaign-level avg score and track distribution
+      const scoredResponses = srcResponses.filter((r) => r.scores?.overall !== undefined);
+      const avgScore = scoredResponses.length > 0
+        ? Math.round(scoredResponses.reduce((s, r) => s + (r.scores?.overall ?? 0), 0) / scoredResponses.length)
+        : null;
+      const trackDist = { dev: 0, business: 0 };
+      for (const r of srcResponses) {
+        if (r.track === 'dev') trackDist.dev++;
+        else if (r.track === 'business') trackDist.business++;
+      }
+
+      // First/last visit timestamps
+      const visitDates = srcVisits
+        .map((v) => v.visited_at)
+        .filter(Boolean)
+        .sort();
+      const firstVisit = visitDates.length > 0 ? visitDates[0] : null;
+      const lastVisit = visitDates.length > 0 ? visitDates[visitDates.length - 1] : null;
+
       // Daily visits
       const dailyVisitsMap = new Map<string, number>();
       for (const v of srcVisits) {
@@ -114,29 +142,63 @@ export async function GET(request: NextRequest) {
         .map(([date, count]) => ({ date, count }))
         .sort((a, b) => a.date.localeCompare(b.date));
 
-      // Per-card breakdown (only if drill-down or always include top cards)
-      const cardVisitsMap = new Map<string, number>();
+      // Per-card breakdown with enriched metrics
+      const cardVisitsMap = new Map<string, typeof srcVisits>();
       for (const v of srcVisits) {
         const cid = v.cid || 'none';
-        cardVisitsMap.set(cid, (cardVisitsMap.get(cid) || 0) + 1);
+        if (!cardVisitsMap.has(cid)) cardVisitsMap.set(cid, []);
+        cardVisitsMap.get(cid)!.push(v);
       }
-      const cardCompletionsMap = new Map<string, number>();
+      const cardResponsesMap = new Map<string, typeof srcResponses>();
       for (const r of srcResponses) {
         const cid = r.campaign_cid || 'none';
-        cardCompletionsMap.set(cid, (cardCompletionsMap.get(cid) || 0) + 1);
+        if (!cardResponsesMap.has(cid)) cardResponsesMap.set(cid, []);
+        cardResponsesMap.get(cid)!.push(r);
       }
-      const allCids = new Set([...cardVisitsMap.keys(), ...cardCompletionsMap.keys()]);
-      const topCards: CardBreakdown[] = Array.from(allCids).map((cid) => ({
-        cid,
-        visits: cardVisitsMap.get(cid) || 0,
-        completions: cardCompletionsMap.get(cid) || 0,
-      })).sort((a, b) => b.visits - a.visits);
+
+      const allCids = new Set([...cardVisitsMap.keys(), ...cardResponsesMap.keys()]);
+      const topCards: CardBreakdown[] = Array.from(allCids).map((cid) => {
+        const cidVisits = cardVisitsMap.get(cid) || [];
+        const cidResponses = cardResponsesMap.get(cid) || [];
+        const cidVisitCount = cidVisits.length;
+        const cidCompletionCount = cidResponses.length;
+
+        const cidScored = cidResponses.filter((r) => r.scores?.overall !== undefined);
+        const cidAvgScore = cidScored.length > 0
+          ? Math.round(cidScored.reduce((s, r) => s + (r.scores?.overall ?? 0), 0) / cidScored.length)
+          : null;
+
+        const cidTrackDist = { dev: 0, business: 0 };
+        for (const r of cidResponses) {
+          if (r.track === 'dev') cidTrackDist.dev++;
+          else if (r.track === 'business') cidTrackDist.business++;
+        }
+
+        const cidVisitDates = cidVisits.map((v) => v.visited_at).filter(Boolean).sort();
+
+        return {
+          cid,
+          visits: cidVisitCount,
+          completions: cidCompletionCount,
+          conversionRate: cidVisitCount > 0
+            ? Math.round((cidCompletionCount / cidVisitCount) * 10000) / 100
+            : 0,
+          avgScore: cidAvgScore,
+          trackDistribution: cidTrackDist,
+          firstVisit: cidVisitDates.length > 0 ? cidVisitDates[0] : null,
+          lastVisit: cidVisitDates.length > 0 ? cidVisitDates[cidVisitDates.length - 1] : null,
+        };
+      }).sort((a, b) => b.visits - a.visits);
 
       groups.push({
         src,
         visits: visitCount,
         completions: completionCount,
         conversionRate,
+        avgScore,
+        trackDistribution: trackDist,
+        firstVisit,
+        lastVisit,
         dailyVisits,
         dailyCompletions,
         topCards,
