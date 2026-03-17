@@ -52,9 +52,11 @@ export function ResultsContent({ response, locale }: ResultsContentProps) {
         locale={locale}
       />
 
-      {/* 3. Adaptation Projection (urgency driver) */}
+      {/* 3. AI Growth Roadmap */}
       <AdaptationProjection
         adaptation={response.scores.adaptation}
+        tiers={response.scores.tiers}
+        tiersNA={response.scores.tiersNA}
         locale={locale}
       />
 
