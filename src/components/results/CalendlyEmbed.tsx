@@ -17,7 +17,7 @@ export function CalendlyEmbed() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      <Card className="border-[#FFAB54]/40 bg-linear-to-br from-[#FFAB54]/5 to-background overflow-hidden">
+      <Card className="bg-black border border-white/10 overflow-hidden">
         <CardContent className="flex flex-col gap-6 pt-8 pb-0 px-0">
           <div className="text-center px-6">
             <h3 className="text-xl font-bold text-foreground">{t('title')}</h3>
