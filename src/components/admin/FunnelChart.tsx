@@ -63,7 +63,7 @@ export function FunnelChart({
             </div>
             <div className="w-16 text-xs text-right font-medium">{step.entered}</div>
             <div
-              className={`w-16 text-xs text-right ${isHighDropOff ? 'text-red-600 font-bold' : 'text-muted-foreground'}`}
+              className={`w-16 text-xs text-right ${isHighDropOff ? 'text-red-400 font-bold' : 'text-muted-foreground'}`}
             >
               {step.dropOffRate}%
             </div>

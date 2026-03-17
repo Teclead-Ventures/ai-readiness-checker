@@ -67,6 +67,8 @@ export default function AdminPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [scoreFilter, setScoreFilter] = useState<string>('all');
+  const [campaignFilter, setCampaignFilter] = useState<string>('all');
+  const [cardFilter, setCardFilter] = useState<string>('all');
   const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function AdminPage() {
   return (
     <div className="px-4 py-8 max-w-6xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl md:text-3xl font-bold text-[#121212]">{t('title')}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('title')}</h1>
         <Button
           variant="outline"
           size="sm"
@@ -154,13 +156,13 @@ export default function AdminPage() {
       </div>
 
       {/* Reset database button */}
-      <Card className="border-red-200 bg-red-50">
+      <Card className="border-red-500/30 bg-red-500/10">
         <CardContent className="flex items-center justify-between py-4">
           <div>
-            <p className="text-sm font-medium text-red-800">
+            <p className="text-sm font-medium text-red-400">
               {locale === 'de' ? 'Testdaten zurucksetzen' : 'Reset Test Data'}
             </p>
-            <p className="text-xs text-red-600">
+            <p className="text-xs text-red-400/70">
               {locale === 'de'
                 ? 'Alle Antworten, Teams, Kampagnen-Besuche und Funnel-Events loschen.'
                 : 'Delete all responses, teams, campaign visits, and funnel events.'}
@@ -270,38 +272,100 @@ export default function AdminPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Score filter bar */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            <span className="text-sm text-muted-foreground self-center mr-2">{al.scoreFilter}:</span>
-            {[
-              { value: 'all', label: al.scoreAll },
-              { value: '0-30', label: al.score0_30 },
-              { value: '31-55', label: al.score31_55 },
-              { value: '56-75', label: al.score56_75 },
-              { value: '76-100', label: al.score76_100 },
-            ].map((opt) => (
-              <Button
-                key={opt.value}
-                variant={scoreFilter === opt.value ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setScoreFilter(opt.value)}
-              >
-                {opt.label}
-              </Button>
-            ))}
+          {/* Filter bar */}
+          <div className="space-y-3 mb-4">
+            {/* Score filter */}
+            <div className="flex flex-wrap gap-2">
+              <span className="text-sm text-muted-foreground self-center mr-2">{al.scoreFilter}:</span>
+              {[
+                { value: 'all', label: al.scoreAll },
+                { value: '0-30', label: al.score0_30 },
+                { value: '31-55', label: al.score31_55 },
+                { value: '56-75', label: al.score56_75 },
+                { value: '76-100', label: al.score76_100 },
+              ].map((opt) => (
+                <Button
+                  key={opt.value}
+                  variant={scoreFilter === opt.value ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setScoreFilter(opt.value)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+            {/* Campaign & Card ID filters */}
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{al.campaignSrc}:</span>
+                <select
+                  value={campaignFilter}
+                  onChange={(e) => {
+                    setCampaignFilter(e.target.value);
+                    setCardFilter('all');
+                  }}
+                  className="h-8 rounded-md border border-border bg-input px-2 text-sm text-foreground"
+                >
+                  <option value="all">{al.scoreAll}</option>
+                  <option value="__none__">{locale === 'de' ? '(ohne Kampagne)' : '(no campaign)'}</option>
+                  {Array.from(new Set(responses.map((r) => r.campaign_src).filter(Boolean)))
+                    .sort()
+                    .map((src) => (
+                      <option key={src} value={src!}>{src}</option>
+                    ))}
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">{locale === 'de' ? 'Karten-ID' : 'Card ID'}:</span>
+                <select
+                  value={cardFilter}
+                  onChange={(e) => setCardFilter(e.target.value)}
+                  className="h-8 rounded-md border border-border bg-input px-2 text-sm text-foreground"
+                >
+                  <option value="all">{al.scoreAll}</option>
+                  <option value="__none__">{locale === 'de' ? '(ohne Karte)' : '(no card)'}</option>
+                  {Array.from(new Set(
+                    responses
+                      .filter((r) => campaignFilter === 'all' || campaignFilter === '__none__'
+                        ? true
+                        : r.campaign_src === campaignFilter)
+                      .map((r) => r.campaign_cid)
+                      .filter(Boolean)
+                  ))
+                    .sort()
+                    .map((cid) => (
+                      <option key={cid} value={cid!}>{cid}</option>
+                    ))}
+                </select>
+              </div>
+            </div>
           </div>
 
           {(() => {
             const filteredResponses = responses.filter((r) => {
-              if (scoreFilter === 'all') return true;
-              const score = r.scores.overall;
-              switch (scoreFilter) {
-                case '0-30': return score >= 0 && score <= 30;
-                case '31-55': return score >= 31 && score <= 55;
-                case '56-75': return score >= 56 && score <= 75;
-                case '76-100': return score >= 76 && score <= 100;
-                default: return true;
+              // Score filter
+              if (scoreFilter !== 'all') {
+                const score = r.scores.overall;
+                switch (scoreFilter) {
+                  case '0-30': if (score < 0 || score > 30) return false; break;
+                  case '31-55': if (score < 31 || score > 55) return false; break;
+                  case '56-75': if (score < 56 || score > 75) return false; break;
+                  case '76-100': if (score < 76 || score > 100) return false; break;
+                }
               }
+              // Campaign filter
+              if (campaignFilter === '__none__') {
+                if (r.campaign_src) return false;
+              } else if (campaignFilter !== 'all') {
+                if (r.campaign_src !== campaignFilter) return false;
+              }
+              // Card filter
+              if (cardFilter === '__none__') {
+                if (r.campaign_cid) return false;
+              } else if (cardFilter !== 'all') {
+                if (r.campaign_cid !== cardFilter) return false;
+              }
+              return true;
             });
 
             return filteredResponses.length === 0 ? (
@@ -318,6 +382,7 @@ export default function AdminPage() {
                     <TableHead>{t('gapMonths')}</TableHead>
                     <TableHead>{t('track')}</TableHead>
                     <TableHead>{al.campaignSrc}</TableHead>
+                    <TableHead>{locale === 'de' ? 'Karten-ID' : 'Card ID'}</TableHead>
                     <TableHead>{t('team')}</TableHead>
                     <TableHead>{t('date')}</TableHead>
                     <TableHead></TableHead>
@@ -350,6 +415,9 @@ export default function AdminPage() {
                         <TableCell className="capitalize">{response.track}</TableCell>
                         <TableCell className="text-xs text-muted-foreground">
                           {response.campaign_src || '\u2014'}
+                        </TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {response.campaign_cid || '\u2014'}
                         </TableCell>
                         <TableCell>
                           {response.team_id ? (
