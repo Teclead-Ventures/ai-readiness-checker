@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
   Legend,
-  ReferenceLine,
+  Tooltip,
 } from 'recharts';
 import type { ScoreResult } from '@/lib/scoring';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,26 +23,38 @@ interface AdaptationProjectionProps {
 export function AdaptationProjection({ adaptation, locale: _locale }: AdaptationProjectionProps) {
   const t = useTranslations('results');
 
-  const { currentPct, projectedPct12Months, improvedPct12Months, direction } = adaptation;
+  const { currentPct, direction } = adaptation;
 
-  // Midpoint interpolation (+6 months)
-  const midCurrentPace = Math.round((currentPct + projectedPct12Months) / 2);
-  const midImproved = Math.round((currentPct + improvedPct12Months) / 2);
+  // Exponential frontier: AI capabilities roughly double per year (index, today = 100)
+  const frontier0 = 100;
+  const frontier6 = Math.round(100 * Math.sqrt(2)); // ~141
+  const frontier12 = 200;
+
+  // "Bei aktuellem Tempo": stays at same % of frontier at each point
+  const pace0 = Math.round((currentPct / 100) * frontier0); // = currentPct
+  const pace6 = Math.round((currentPct / 100) * frontier6);
+  const pace12 = Math.round((currentPct / 100) * frontier12);
+
+  // "Mit gezielter Weiterbildung": starts at currentPct, catches up to frontier by +12 months
+  const improved0 = pace0;
+  const improved6 = Math.round(pace0 + (frontier12 - pace0) * 0.5);
+  const improved12 = frontier12;
 
   const data = [
-    { name: t('today'), currentPace: currentPct, improved: currentPct, aiGrowth: 100 },
-    { name: t('sixMonths'), currentPace: midCurrentPace, improved: midImproved, aiGrowth: 100 },
-    { name: t('twelveMonths'), currentPace: projectedPct12Months, improved: improvedPct12Months, aiGrowth: 100 },
+    { name: t('today'),        currentPace: pace0,   improved: improved0,   aiGrowth: frontier0  },
+    { name: t('sixMonths'),    currentPace: pace6,   improved: improved6,   aiGrowth: frontier6  },
+    { name: t('twelveMonths'), currentPace: pace12,  improved: improved12,  aiGrowth: frontier12 },
   ];
+
+  // Text summary: user stays at currentPct% of frontier; with training they reach 100%
+  const improvementDelta = 100 - currentPct;
 
   const directionLabel =
     direction === 'widening'
-      ? t('gapWidening', { pct: projectedPct12Months })
+      ? t('gapWidening', { pct: currentPct })
       : direction === 'closing'
-        ? t('gapClosing', { pct: projectedPct12Months })
-        : t('gapStable', { pct: projectedPct12Months });
-
-  const improvementDelta = improvedPct12Months - projectedPct12Months;
+        ? t('gapClosing', { pct: currentPct })
+        : t('gapStable', { pct: currentPct });
 
   const directionColor =
     direction === 'widening'
@@ -70,8 +82,8 @@ export function AdaptationProjection({ adaptation, locale: _locale }: Adaptation
           </div>
 
           {improvementDelta > 0 && (
-            <div className="mb-4 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-center">
-              <p className="text-xs text-green-700">
+            <div className="mb-4 px-3 py-2 bg-muted/50 rounded-lg text-center">
+              <p className="text-sm font-semibold text-green-700">
                 {t('improvementPotential', { pct: improvementDelta })}
               </p>
             </div>
@@ -79,12 +91,12 @@ export function AdaptationProjection({ adaptation, locale: _locale }: Adaptation
 
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
               <XAxis dataKey="name" tick={{ fontSize: 12 }} />
               <YAxis
-                domain={[0, 100]}
-                tick={{ fontSize: 12 }}
-                tickFormatter={(v) => `${v}%`}
+                domain={[0, 210]}
+                tick={false}
+                tickLine={false}
                 label={{
                   value: t('capabilitiesAxis'),
                   angle: -90,
@@ -93,16 +105,16 @@ export function AdaptationProjection({ adaptation, locale: _locale }: Adaptation
                   dx: -8,
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              <ReferenceLine y={currentPct} stroke="#94a3b8" strokeDasharray="4 4" strokeWidth={1} />
+              <Tooltip formatter={(value) => [`${value ?? ''}`, '']} />
+              <Legend wrapperStyle={{ fontSize: 11, paddingTop: '12px' }} />
               <Line
                 type="monotone"
                 dataKey="aiGrowth"
                 name={t('aiGrowth')}
-                stroke="#94a3b8"
-                strokeWidth={1.5}
-                strokeDasharray="6 3"
-                dot={false}
+                stroke="#FFAB54"
+                strokeWidth={2}
+                dot={{ r: 4, fill: '#FFAB54' }}
+                activeDot={{ r: 5 }}
               />
               <Line
                 type="monotone"

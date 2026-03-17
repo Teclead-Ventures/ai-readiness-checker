@@ -16,14 +16,6 @@ interface TierProgressProps {
   locale: string;
 }
 
-function getBarColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#84cc16';
-  if (score >= 40) return '#eab308';
-  if (score >= 20) return '#f97316';
-  return '#ef4444';
-}
-
 export function TierProgress({ tiers, features, track, locale }: TierProgressProps) {
   const t = useTranslations('results');
   const lang = locale as 'en' | 'de';
@@ -32,7 +24,13 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
 
   const tierEntries = ([1, 2, 3, 4, 5] as const).map((tier) => {
     const tierCaps = capabilities.filter((c) => c.tier === tier);
-    return { tier, score: tiers[tier] ?? 0, caps: tierCaps };
+    const counts = { 0: 0, 1: 0, 2: 0, 3: 0 } as Record<0 | 1 | 2 | 3, number>;
+    for (const cap of tierCaps) {
+      const entry = features[cap.id];
+      const value = ((typeof entry === 'object' ? entry?.score : entry) ?? 0) as 0 | 1 | 2 | 3;
+      counts[value]++;
+    }
+    return { tier, score: tiers[tier] ?? 0, caps: tierCaps, counts, total: tierCaps.length };
   });
 
   return (
@@ -46,11 +44,11 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
           <CardTitle>{t('tierProgress')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {tierEntries.map(({ tier, score, caps }) => (
+          {tierEntries.map(({ tier, score, caps, counts, total }) => (
             <div key={tier}>
               {/* Progress bar row */}
-              <button
-                className="w-full text-left group"
+              <div
+                className="w-full text-left group cursor-pointer"
                 onClick={() => setExpandedTier(expandedTier === tier ? null : tier)}
               >
                 <div className="flex items-center justify-between mb-0.5">
@@ -68,14 +66,26 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                 </div>
                 <div className="h-4 bg-muted rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full rounded-full"
-                    style={{ backgroundColor: getBarColor(score) }}
-                    initial={{ width: 0 }}
-                    animate={{ width: `${score}%` }}
+                    className="h-full flex"
+                    style={{ transformOrigin: 'left' }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
                     transition={{ duration: 0.8, delay: 0.1 * tier }}
-                  />
+                  >
+                    {([3, 2, 1, 0] as const).map((level) => {
+                      const pct = total > 0 ? (counts[level] / total) * 100 : 0;
+                      if (pct === 0) return null;
+                      return (
+                        <div
+                          key={level}
+                          className="h-full"
+                          style={{ backgroundColor: RESPONSE_SCALE[level].color, width: `${pct}%` }}
+                        />
+                      );
+                    })}
+                  </motion.div>
                 </div>
-              </button>
+              </div>
 
               {/* Expanded capability detail */}
               <AnimatePresence>
@@ -88,7 +98,11 @@ export function TierProgress({ tiers, features, track, locale }: TierProgressPro
                     className="overflow-hidden"
                   >
                     <div className="pl-3 border-l-2 border-border space-y-1.5 py-2">
-                      {caps.map((cap) => {
+                      {[...caps].sort((a, b) => {
+                        const va = ((typeof features[a.id] === 'object' ? (features[a.id] as { score?: number })?.score : features[a.id]) ?? 0) as number;
+                        const vb = ((typeof features[b.id] === 'object' ? (features[b.id] as { score?: number })?.score : features[b.id]) ?? 0) as number;
+                        return vb - va;
+                      }).map((cap) => {
                         const entry = features[cap.id];
                         const value = ((typeof entry === 'object' ? entry?.score : entry) ?? 0) as 0 | 1 | 2 | 3;
                         const scale = RESPONSE_SCALE[value];
