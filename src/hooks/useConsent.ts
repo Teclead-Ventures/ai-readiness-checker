@@ -18,6 +18,7 @@ export function useConsent(): {
   consent: ConsentState;
   accept: () => void;
   decline: () => void;
+  reset: () => void;
 } {
   const [consent, setConsent] = useState<ConsentState>(readConsent);
 
@@ -31,7 +32,16 @@ export function useConsent(): {
     setConsent('declined');
   }, []);
 
-  return { consent, accept, decline };
+  const reset = useCallback(() => {
+    localStorage.removeItem(CONSENT_KEY);
+    sessionStorage.removeItem('arc_campaign_src');
+    sessionStorage.removeItem('arc_campaign_cid');
+    sessionStorage.removeItem('arc_session_id');
+    sessionStorage.removeItem('arc_visit_recorded');
+    setConsent('pending');
+  }, []);
+
+  return { consent, accept, decline, reset };
 }
 
 export function hasConsent(): boolean {

@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ConsentResetLink } from "@/components/ConsentResetLink";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -77,8 +78,10 @@ export default async function RootLayout({
               </div>
               <div className="text-sm text-muted-foreground">
                 {locale === 'de'
-                  ? 'Cookiefreie Analyse · Datenverarbeitung nur mit Einwilligung'
-                  : 'Cookie-free analytics · Data processing only with consent'}
+                  ? 'Datenverarbeitung nur mit Einwilligung'
+                  : 'Data processing only with consent'}
+                {' · '}
+                <ConsentResetLink />
               </div>
               <div className="text-sm text-muted-foreground space-x-3">
                 <a

@@ -9,7 +9,9 @@
     "accept": "Participate",
     "decline": "Decline",
     "declinedTitle": "Consent Required",
-    "declinedMessage": "The survey cannot be conducted without your consent. You can revisit this page at any time to give your consent."
+    "declinedMessage": "The survey cannot be conducted without your consent.",
+    "reconsider": "Reconsider",
+    "manageCookies": "Cookie Settings"
   },
   "common": {
     "next": "Next",

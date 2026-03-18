@@ -9,7 +9,9 @@
     "accept": "Teilnehmen",
     "decline": "Ablehnen",
     "declinedTitle": "Einwilligung erforderlich",
-    "declinedMessage": "Ohne Einwilligung kann die Umfrage leider nicht durchgeführt werden. Sie können die Seite jederzeit erneut besuchen, um Ihre Einwilligung zu erteilen."
+    "declinedMessage": "Ohne Einwilligung kann die Umfrage leider nicht durchgeführt werden.",
+    "reconsider": "Erneut entscheiden",
+    "manageCookies": "Cookie-Einstellungen"
   },
   "common": {
     "next": "Weiter",

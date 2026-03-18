@@ -18,7 +18,7 @@ const FEATURE_ICONS = [Clock, MapPin, BarChart3];
 function HomeContent() {
   const t = useTranslations();
   const [teamLink, setTeamLink] = useState("");
-  const { consent, accept, decline } = useConsent();
+  const { consent, accept, decline, reset } = useConsent();
   const hasConsent = consent === "accepted";
   const { src, cid } = useCampaignTracking({ enabled: hasConsent });
   const { trackStep } = useFunnelTracking(undefined, { enabled: hasConsent });
@@ -65,6 +65,13 @@ function HomeContent() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               {t("consent.declinedMessage")}
             </p>
+            <Button
+              variant="outline"
+              onClick={reset}
+              className="mt-4 border-primary text-primary hover:bg-primary/10"
+            >
+              {t("consent.reconsider")}
+            </Button>
           </div>
         </div>
       )}
