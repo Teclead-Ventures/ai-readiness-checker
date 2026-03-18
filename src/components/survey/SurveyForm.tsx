@@ -6,6 +6,7 @@ import { Form } from '@/components/ui/form';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
+import { hasConsent } from '@/hooks/useConsent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { StepProgress } from './StepProgress';
@@ -102,7 +103,7 @@ export function SurveyForm({ defaultTrack, teamId }: SurveyFormProps) {
   });
 
   const track = methods.watch('track');
-  const { trackStep } = useFunnelTracking(track);
+  const { trackStep } = useFunnelTracking(track, { enabled: hasConsent() });
   const prevStepRef = useRef(step);
   const trackStepRef = useRef(trackStep);
   useEffect(() => {

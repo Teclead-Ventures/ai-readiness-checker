@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { SurveyResponse } from '@/types/survey';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
+import { hasConsent } from '@/hooks/useConsent';
 import { ReadinessGauge } from '@/components/results/ReadinessGauge';
 import { AdaptationProjection } from '@/components/results/AdaptationProjection';
 import { TierProgress } from '@/components/results/TierProgress';
@@ -27,7 +28,7 @@ interface ResultsContentProps {
 
 export function ResultsContent({ response, locale }: ResultsContentProps) {
   const t = useTranslations('results');
-  const { trackStep } = useFunnelTracking(response.track);
+  const { trackStep } = useFunnelTracking(response.track, { enabled: hasConsent() });
 
   useEffect(() => {
     trackStep('results_view', 'enter');

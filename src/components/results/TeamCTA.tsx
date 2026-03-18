@@ -6,10 +6,11 @@ import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useFunnelTracking } from '@/hooks/useFunnelTracking';
+import { hasConsent } from '@/hooks/useConsent';
 
 export function TeamCTA() {
   const t = useTranslations('results.teamCta');
-  const { trackStep } = useFunnelTracking();
+  const { trackStep } = useFunnelTracking(undefined, { enabled: hasConsent() });
 
   const handleCtaClick = useCallback(() => {
     trackStep('team_cta', 'enter');

@@ -77,8 +77,8 @@ export default async function RootLayout({
               </div>
               <div className="text-sm text-muted-foreground">
                 {locale === 'de'
-                  ? 'Cookiefreie, anonyme Analyse · Keine personenbezogenen Daten'
-                  : 'Cookie-free, anonymous analytics · No personal data'}
+                  ? 'Cookiefreie Analyse · Datenverarbeitung nur mit Einwilligung'
+                  : 'Cookie-free analytics · Data processing only with consent'}
               </div>
               <div className="text-sm text-muted-foreground space-x-3">
                 <a
@@ -91,9 +91,7 @@ export default async function RootLayout({
                 </a>
                 <span>·</span>
                 <a
-                  href="https://teclead-ventures.de/dataprotection"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/datenschutz"
                   className="hover:text-primary transition-colors"
                 >
                   Datenschutz

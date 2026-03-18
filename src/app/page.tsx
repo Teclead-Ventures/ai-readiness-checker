@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useCampaignTracking } from "@/hooks/useCampaignTracking";
 import { useFunnelTracking } from "@/hooks/useFunnelTracking";
+import { useConsent } from "@/hooks/useConsent";
+import { ConsentBanner } from "@/components/ConsentBanner";
 import { ArrowRight, Clock, MapPin, BarChart3 } from "lucide-react";
 
 const FEATURE_ICONS = [Clock, MapPin, BarChart3];
@@ -16,12 +18,16 @@ const FEATURE_ICONS = [Clock, MapPin, BarChart3];
 function HomeContent() {
   const t = useTranslations();
   const [teamLink, setTeamLink] = useState("");
-  const { src, cid } = useCampaignTracking();
-  const { trackStep } = useFunnelTracking();
+  const { consent, accept, decline } = useConsent();
+  const hasConsent = consent === "accepted";
+  const { src, cid } = useCampaignTracking({ enabled: hasConsent });
+  const { trackStep } = useFunnelTracking(undefined, { enabled: hasConsent });
 
   useEffect(() => {
-    trackStep("landing", "enter");
-  }, [trackStep]);
+    if (hasConsent) {
+      trackStep("landing", "enter");
+    }
+  }, [trackStep, hasConsent]);
 
   const surveyHref = `/survey${
     src ? "?src=" + src + (cid ? "&cid=" + cid : "") : ""
@@ -47,6 +53,21 @@ function HomeContent() {
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-[calc(100vh-130px)]">
+      {consent === "pending" && (
+        <ConsentBanner onAccept={accept} onDecline={decline} />
+      )}
+      {consent === "declined" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[4px] bg-black/40">
+          <div className="mx-4 w-full max-w-md rounded-xl border-2 border-primary bg-card p-6 text-center shadow-2xl">
+            <h2 className="text-xl font-bold text-primary mb-3">
+              {t("consent.declinedTitle")}
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {t("consent.declinedMessage")}
+            </p>
+          </div>
+        </div>
+      )}
       {/* Background image */}
       <div
         className="absolute inset-0 pointer-events-none bg-cover bg-center bg-no-repeat"

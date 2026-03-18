@@ -3,11 +3,21 @@
 import { useCallback, useRef } from 'react';
 import { getOrCreateSessionId, getCampaignFromSession } from '@/lib/campaign';
 
-export function useFunnelTracking(track?: string | null) {
+interface FunnelTrackingOptions {
+  enabled?: boolean;
+}
+
+export function useFunnelTracking(
+  track?: string | null,
+  options: FunnelTrackingOptions = {},
+) {
+  const { enabled = true } = options;
   const fired = useRef(new Set<string>());
 
   const trackStep = useCallback(
     (step: string, action: 'enter' | 'complete') => {
+      if (!enabled) return;
+
       const key = `${step}:${action}`;
       if (fired.current.has(key)) return;
       fired.current.add(key);
@@ -27,7 +37,7 @@ export function useFunnelTracking(track?: string | null) {
         }),
       }).catch(() => {});
     },
-    [track],
+    [track, enabled],
   );
 
   return { trackStep };

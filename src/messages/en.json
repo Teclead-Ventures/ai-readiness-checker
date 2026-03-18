@@ -1,4 +1,16 @@
 {
+  "consent": {
+    "title": "Privacy Notice for Participation",
+    "intro": "As part of this survey, Teclead Ventures GmbH collects your responses and optionally your name for market research purposes. Technical access data (e.g. IP address) is recorded by the web server. Data will be deleted after evaluation, no later than three months.",
+    "legalBasis": "The legal basis is your consent (Art. 6(1)(a) GDPR). You can revoke this at any time with future effect by contacting us at info@teclead-ventures.de.",
+    "moreInfo": "For more information, please see our",
+    "privacyLink": "Privacy Policy",
+    "checkboxLabel": "I have read the privacy notice and consent to the processing of my data as described. I understand that participation is voluntary and that I can revoke my consent at any time.",
+    "accept": "Participate",
+    "decline": "Decline",
+    "declinedTitle": "Consent Required",
+    "declinedMessage": "The survey cannot be conducted without your consent. You can revisit this page at any time to give your consent."
+  },
   "common": {
     "next": "Next",
     "back": "Back",

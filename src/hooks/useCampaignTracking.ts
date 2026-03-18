@@ -9,7 +9,14 @@ import {
   markCampaignVisitRecorded,
 } from '@/lib/campaign';
 
-export function useCampaignTracking(): { src: string | null; cid: string | null } {
+interface CampaignTrackingOptions {
+  enabled?: boolean;
+}
+
+export function useCampaignTracking(
+  options: CampaignTrackingOptions = {},
+): { src: string | null; cid: string | null } {
+  const { enabled = true } = options;
   const searchParams = useSearchParams();
   const recorded = useRef(false);
 
@@ -17,6 +24,8 @@ export function useCampaignTracking(): { src: string | null; cid: string | null 
   const cid = searchParams.get('cid') || getCampaignFromSession().cid;
 
   useEffect(() => {
+    if (!enabled) return;
+
     const urlSrc = searchParams.get('src');
     const urlCid = searchParams.get('cid');
     const isRedirected = searchParams.get('_v') === '1';
@@ -43,7 +52,7 @@ export function useCampaignTracking(): { src: string | null; cid: string | null 
         .then(() => markCampaignVisitRecorded())
         .catch(() => {});
     }
-  }, [searchParams]);
+  }, [searchParams, enabled]);
 
   return { src, cid };
 }

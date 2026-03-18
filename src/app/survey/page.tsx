@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
 import { SurveyForm } from '@/components/survey/SurveyForm';
 import { useCampaignTracking } from '@/hooks/useCampaignTracking';
+import { hasConsent } from '@/hooks/useConsent';
 import type { Track } from '@/types/survey';
 
 function SurveyPageContent() {
@@ -11,7 +12,7 @@ function SurveyPageContent() {
   const trackParam = searchParams.get('track') as Track | null;
   const defaultTrack = trackParam === 'dev' || trackParam === 'business' ? trackParam : undefined;
 
-  useCampaignTracking();
+  useCampaignTracking({ enabled: hasConsent() });
 
   return <SurveyForm defaultTrack={defaultTrack} />;
 }

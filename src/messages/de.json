@@ -1,4 +1,16 @@
 {
+  "consent": {
+    "title": "Datenschutzhinweis zur Teilnahme",
+    "intro": "Im Rahmen dieser Umfrage erhebt die Teclead Ventures GmbH Ihre Antworten sowie optional Ihren Namen zum Zweck der Marktforschung. Technische Zugriffsdaten (z.\u00a0B. IP-Adresse) werden durch den Webserver erfasst. Die Daten werden nach Auswertung, spätestens nach drei Monaten, gelöscht.",
+    "legalBasis": "Rechtsgrundlage ist Ihre Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Sie können diese jederzeit mit Wirkung für die Zukunft widerrufen, indem Sie uns unter info@teclead-ventures.de kontaktieren.",
+    "moreInfo": "Weitere Informationen finden Sie in unserer",
+    "privacyLink": "Datenschutzerklärung",
+    "checkboxLabel": "Ich habe den Datenschutzhinweis gelesen und willige in die Verarbeitung meiner Daten im beschriebenen Umfang ein. Mir ist bekannt, dass die Teilnahme freiwillig ist und ich meine Einwilligung jederzeit widerrufen kann.",
+    "accept": "Teilnehmen",
+    "decline": "Ablehnen",
+    "declinedTitle": "Einwilligung erforderlich",
+    "declinedMessage": "Ohne Einwilligung kann die Umfrage leider nicht durchgeführt werden. Sie können die Seite jederzeit erneut besuchen, um Ihre Einwilligung zu erteilen."
+  },
   "common": {
     "next": "Weiter",
     "back": "Zurück",
